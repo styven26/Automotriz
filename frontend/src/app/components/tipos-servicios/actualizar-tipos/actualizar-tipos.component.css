@@ -1,0 +1,79 @@
+/* Contenedor general del modal */
+  .modal-container {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Hace que _full-span_ cubra columnas 1 a 2 (todas) */
+  .modal-body .full-span {
+    grid-column: 1 / -1;
+  }
+
+  /* Si quisieras que también ocupe 2 filas, añade: */
+  .modal-body .full-span {
+    grid-column: 1 / -1;  /* ambas columnas */
+    grid-row:    span 2;   /* dos filas */
+  }
+
+  /* Estilo para el header del modal */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #dddddd;
+    background-color: #f5f1f1;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  /* Estilo para el cuerpo del modal */
+  .modal-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  
+  /* Estilo para los campos del formulario */
+  .mat-form-field {
+    width: 100%;
+  }
+  
+  /* Footer del modal */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 20px;
+    border-top: 1px solid #ddd;
+    background-color: #f5f5f5;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    gap: 20px; /* Espaciado entre los botones */
+  }
+  
+  /* Botón de Cancelar */
+  .cancel-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    padding: 12px 24px;
+    color: #f44336;
+    background-color: #f44336;
+    color: white;
+  }
+  
+  /* Botón de Guardar Cambios */
+  .save-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+  }

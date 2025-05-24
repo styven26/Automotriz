@@ -1,0 +1,350 @@
+<div class="dashboard-container">
+  <!-- Sidebar/Menu Lateral -->
+  <div class="sidebar">
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+    
+      <!-- Selector de rol -->
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)">
+          <option *ngFor="let rol of roles" [value]="rol">{{ rol }}</option>
+        </select>
+      </div>
+    </div>
+    
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Administrador" -->
+        <li>
+          <a (click)="navigateDashboardAdmin()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+              <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+            </div>
+          </a>
+        </li>
+
+        <!-- Menú "Mecánicos" con submenú -->
+        <li>
+          <a (click)="toggleMenu('mecanicos')">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-user-group" style="color: #0d0d0d; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Mecánicos</span>
+            </div>
+          </a>
+          <!-- Submenú -->
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateToCrearMecanico()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-user-plus" style="color: #0d0d0d; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Agregar Mecánico</span>
+                </div>
+              </a>
+            </li>
+            <li class="submenu-item">
+              <a (click)="navigateListarMecanico()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-list" style="color: #0d0d0d; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Mecánicos</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Clientes" con submenú -->
+        <li>
+          <a (click)="toggleMenu('clientes')">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-user-group" style="color: #0d0d0d; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Clientes</span>
+            </div>
+          </a>
+          <!-- Submenú -->
+          <ul *ngIf="showClientesMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateListarClientes()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-list" style="color: #0d0d0d; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Clientes</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Horarios" con submenú -->
+        <li>
+          <a (click)="toggleMenu('horarios')">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-calendar-plus" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Horarios</span>
+            </div>
+          </a>
+          <ul *ngIf="showHorariosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateToCrearHorario()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-calendar-plus" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Agregar Horario</span>
+                </div>
+              </a>
+            </li>
+            <li class="submenu-item">
+              <a (click)="navigateToListarHorario()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-calendar-alt" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Horarios</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Tipos de Servicios" con submenú -->
+        <li>
+          <a (click)="toggleMenu('orden')">
+              <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Tipos de Servicios</span>
+              </div>
+          </a>
+          <ul *ngIf="showOrdenMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateListarOrden()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                        <span style="font-size: 14px; color: #050505;">Agregar Tipo de Servicio</span>
+                    </div>
+                </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateListarServicio()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Listar Tipos de Servicios</span>
+                  </div>
+                </a>
+              </li>
+          </ul>
+        </li>
+        
+        <!-- Menú "Servicios" con submenú -->
+        <li>
+          <a (click)="toggleMenu('tipos')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Servicios</span>
+              </div>
+          </a>
+          <ul *ngIf="showTiposnMenu" class="submenu">
+              <li class="submenu-item">
+              <a (click)="navigateArgregarServicio()">
+                  <div style="display: flex; align-items: center;">
+                      <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                      <span style="font-size: 14px; color: #050505;">Agregar Servicio</span>
+                  </div>
+              </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateListarSubtipo()">
+                  <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Servicios</span>
+                  </div>
+              </a>
+              </li>
+          </ul>
+        </li>
+  
+        <!-- Menú "Citas" con submenú -->
+        <li>
+          <a (click)="toggleMenu('citas')">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-calendar-days" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Citas</span>
+            </div>
+          </a>
+          <ul *ngIf="showCitasMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateListarCitas()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-calendar-check" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Ver Citas de Mecánicos</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+  </div>
+
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+      <div class="header">
+        <h2>Registrar Mecánico</h2>
+        <p>Mecánico</p>
+      </div><br>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <div class="input-row">
+          <!-- Nombre -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput type="text" formControlName="nombre" placeholder="Introduce tu nombre" />
+            <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+          </mat-form-field>
+  
+          <!-- Apellido -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Apellido</mat-label>
+            <input matInput type="text" formControlName="apellido" placeholder="Introduce tu apellido" />
+            <mat-error *ngIf="lastNameErrors">{{ lastNameErrors }}</mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div class="input-row">
+          <!-- Cédula -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Cédula</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="cedula"
+              placeholder="Introduce tu cédula"
+              maxlength="10"
+            />
+            <mat-error *ngIf="registerForm.get('cedula')?.hasError('required')">
+              La cédula es obligatoria.
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('cedula')?.hasError('pattern')">
+              La cédula debe tener 10 dígitos.
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('cedula')?.hasError('invalidCedula')">
+              La cédula no es válida.
+            </mat-error>
+          </mat-form-field>
+          
+  
+          <!-- Dirección -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Dirección del Domicilio</mat-label>
+            <input matInput type="text" formControlName="direccion_domicilio" placeholder="Introduce tu dirección" />
+            <mat-error *ngIf="registerForm.get('direccion_domicilio')?.touched && registerForm.get('direccion_domicilio')?.invalid">
+              {{ direccionErrors }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div class="input-row">
+          <!-- Correo Electrónico -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Correo Electrónico</mat-label>
+            <input matInput type="email" formControlName="correo" placeholder="Introduce tu correo" />
+            <mat-error *ngIf="registerForm.get('correo')?.hasError('required')">
+              El correo es obligatorio.
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('correo')?.hasError('taken')">
+              El correo ya ha sido registrado.
+            </mat-error>
+            <mat-error *ngIf="registerForm.get('correo')?.hasError('email')">
+              Ingresa un correo válido.
+            </mat-error>
+          </mat-form-field>          
+  
+          <!-- Teléfono -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Teléfono</mat-label>
+            <span matPrefix class="prefix" style="padding-left: 0.5cm;">+593</span>
+            <input
+              matInput
+              type="text"
+              formControlName="telefono"
+              placeholder="9XXXXXXXX"
+              maxlength="9" 
+            />
+            <mat-error *ngIf="phoneErrors">{{ phoneErrors }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Fecha de nacimiento y Género -->
+        <div class="input-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="fecha_nacimiento" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="fechaNacimientoErrors">{{ fechaNacimientoErrors }}</mat-error>
+          </mat-form-field>                   
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Género</mat-label>
+            <mat-select formControlName="genero">
+              <mat-option value="masculino">Masculino</mat-option>
+              <mat-option value="femenino">Femenino</mat-option>
+              <mat-option value="otro">Otro</mat-option>
+            </mat-select>
+            <mat-error *ngIf="generoErrors">{{ generoErrors }}</mat-error>
+          </mat-form-field>
+        </div>
+  
+        <div class="input-row">
+          <!-- Especialidad -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Especialidad</mat-label>
+            <mat-select formControlName="especialidad" placeholder="Seleccione una especialidad">
+              <mat-option *ngFor="let especialidad of especialidades" [value]="especialidad">
+                {{ especialidad }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="especialidadErrors">{{ especialidadErrors }}</mat-error>
+          </mat-form-field>
+
+          <!-- Contraseña -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Introduce tu contraseña" />
+            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Mostrar u ocultar la contraseña'" [attr.aria-pressed]="!hidePassword">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="passwordErrors">{{ passwordErrors }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <!-- Confirmar Contraseña -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Confirmar Contraseña</mat-label>
+            <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Confirma tu contraseña" />
+            <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" [attr.aria-label]="'Mostrar u ocultar la confirmación de contraseña'" [attr.aria-pressed]="!hideConfirmPassword">
+              <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="confirmPasswordErrors">{{ confirmPasswordErrors }}</mat-error>
+          </mat-form-field>
+        </div>
+  
+        <!-- Botón para enviar -->
+        <button class="large-button" mat-flat-button type="submit">Guardar Cambios</button>
+      </form>
+    </div>
+</div>

@@ -1,0 +1,334 @@
+  /* src/styles.css */
+  /* Contenedor principal del dashboard */
+  .dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+  }
+  
+  /* Estilo de los widgets */
+  .widget {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .widget-content {
+    display: flex;
+    flex-direction: column; /* Coloca los elementos en una columna */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    text-align: center; /* Asegura que el texto esté centrado */
+  }
+  
+  .widget-content h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+  } 
+  
+  /* Estilo de los títulos */
+  h1, h2, h4 {
+    color: #333;
+    margin: 0;
+  }
+
+  /* Botón personalizado de SweetAlert2 */
+  .btn-success {
+    background-color: #4CAF50; /* Color verde */
+    color: white; /* Texto blanco */
+    padding: 12px 24px; /* Tamaño del botón */
+    font-size: 16px; /* Tamaño de la fuente */
+    font-weight: bold; /* Texto en negrita */
+    border: none; /* Sin bordes */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Efecto hover para el botón */
+  .btn-success:hover {
+    background-color: #45a049; /* Verde más oscuro al pasar el cursor */
+    transform: scale(1.05); /* Agrandar ligeramente el botón */
+  }
+
+  /* Efecto de botón redondeado */
+  .btn-rounded {
+    border-radius: 20px;
+  }
+
+  /* Botón personalizado de Eliminar */
+  .btn-danger {
+    background-color: #f44336; /* Rojo para eliminar */
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background-color: #d32f2f; /* Rojo más oscuro */
+    transform: scale(1.05); /* Agrandar ligeramente */
+  }
+
+  /* Botón personalizado de Cancelar */
+  .btn-secondary {
+    background-color: #6c757d; /* Gris para cancelar */
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268; /* Gris más oscuro */
+    transform: scale(1.05);
+  }
+
+  /* Efecto de botón redondeado */
+  .btn-rounded {
+    border-radius: 20px;
+  }
+
+  /* Fondo principal del modal */
+  .swal-popup-custom {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    font-family: 'Arial', sans-serif; /* Fuente general */
+    color: #444;
+  }
+
+  /* Título con estilo renovado */
+  .swal-title-custom {
+    font-size: 20px; /* Tamaño más pequeño */
+    font-weight: bold;
+    color: #1e88e5; /* Azul brillante */
+    text-align: center;
+  }  
+
+  /* Botón "Cerrar" sencillo y azul */
+  .swal-confirm-btn-simple {
+    background-color: #1e88e5; /* Azul brillante */
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    box-shadow: none; /* Sin sombra */
+    transition: none; /* Sin efectos de transición */
+  }
+
+  .swal-confirm-btn-simple:hover {
+    background-color: #1565c0; /* Azul más oscuro al pasar el mouse */
+    cursor: pointer;
+  }
+
+  /* Detalle de la cita */
+  .detalle-cita {
+    text-align: left;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  .detalle-cita p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .detalle-cita strong {
+    color: #000;
+    font-weight: 600;
+  }
+
+  .detalle-cita .icono-cita {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .detalle-cita .icono-cita i {
+    font-size: 50px;
+    color: #42a5f5;
+  }
+
+/* Contenedor del calendario */
+/* Estilo para los días anteriores */
+.fc-daygrid-day.fc-day-past {
+  background-color: #f8f9fa; /* Un gris claro más limpio */
+  color: #adb5bd; /* Gris suave para el texto */
+}
+
+/* Hover para los días anteriores */
+.fc-daygrid-day.fc-day-past:hover {
+  background-color: #e9ecef; /* Un gris un poco más oscuro al pasar el mouse */
+  cursor: not-allowed; /* Indica que no se puede interactuar */
+}
+
+/* Estilo para el día actual */
+.fc-daygrid-day.fc-day-today {
+  background-color: #ffeeba !important; /* Amarillo suave */
+  border: 1px solid #ffc107; /* Amarillo más intenso para resaltar */
+}
+
+/* Estilo para los días futuros */
+.fc-daygrid-day.fc-day-future {
+  background-color: #ffffff; /* Fondo blanco */
+  color: #212529; /* Texto oscuro */
+}
+
+/* Hover para los días futuros */
+.fc-daygrid-day.fc-day-future:hover {
+  background-color: #d4edda; /* Verde claro al pasar el mouse */
+  cursor: pointer;
+}
+
+/* Estilo para las cabeceras del calendario (días de la semana) */
+.fc-col-header-cell {
+  background-color: #343a40; /* Fondo oscuro */
+  color: white; /* Texto blanco */
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Cambia el color de los eventos de hoy */
+.fc-event-today {
+  background-color: #ffd700 !important; /* Amarillo dorado */
+  color: black !important;
+  border: none;
+}
+
+/* Tooltip para los eventos */
+.fc-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.calendar-container {
+  width: 100%; /* Ocupa todo el ancho */
+  height: calc(100vh); /* Resta 50px si hay algún header o footer */
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  background-color: #fff; /* Fondo blanco para mejor visibilidad */
+}
+  
+.fc {
+  width: 100%; /* Ocupa todo el ancho */
+  height: 100%; /* Ocupa toda la altura */
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Estilo para eventos */
+.fc-event {
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+}
+
+/* Cabecera del calendario */
+.fc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.fc-toolbar-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0d0d0d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.fc-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.fc-button:hover {
+  background-color: #45a047;
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* Eventos de diferentes colores */
+/* Estilo para los eventos confirmados */
+.fc-event-green {
+  background-color: #4caf50 !important; /* Verde para citas confirmadas */
+  color: white !important;
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+/* Estilo para los eventos cancelados */
+.fc-event-red {
+  background-color: #f44336 !important; /* Rojo para citas canceladas */
+  color: white !important;
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.fc-event-blue {
+  background-color: #2196f3 !important; /* Azul para citas pendientes */
+  color: white !important;
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.fc-event-orange {
+  background-color: #ff9800 !important; /* Naranja */
+  color: #ffffff !important;           /* Texto blanco */
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 5px;
+}

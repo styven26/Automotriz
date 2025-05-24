@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mecánica Automotriz Don Chavo - Reporte de Clientes</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 10px;
+            color: #333;
+        }
+
+        /* Cabecera */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 180px;
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+        }
+        .header h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+        .header h2 {
+            font-size: 22px;
+            color: rgb(22, 15, 234);
+            margin: 10px 0 15px 0;
+            font-weight: 700;
+            text-transform: capitalize;
+            letter-spacing: 1px;
+        }
+        .header .line {
+            width: 100%;
+            height: 3px;
+            background: #007bff;
+            margin: 10px 0 20px 0;
+        }
+
+        /* Tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 16px;
+        }
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Mensaje final */
+        .good-job {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #28a745;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Pie de página */
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img 
+            src="https://st.depositphotos.com/1006018/3132/v/450/depositphotos_31322065-stock-illustration-automotive-mechanic-car-repair-retro.jpg" 
+            alt="Logo Mecánica Automotriz Don Chavo">
+        <h1>Mecánica Automotriz Don Chavo</h1><br><br>
+        <h2>Reporte de Clientes Registrados</h2>
+        <p><strong>Mes:</strong> {{ $mesSeleccionado }} | <strong>Año:</strong> {{ $anioSeleccionado }}</p>
+        <div class="line"></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha de Registro</th>
+                <th>Cliente</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($clientes as $cliente)
+            <tr>
+                <td>{{ $cliente->created_at->format('d/m/Y') }}</td>
+                <td>{{ $cliente->nombre }} {{ $cliente->apellido }}</td>
+                <td>{{ $cliente->correo }}</td>
+                <td>{{ $cliente->telefono }}</td>
+                <td>{{ $cliente->direccion_domicilio }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" style="text-align: center; font-weight: bold;">No hay clientes registrados.</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Reporte generado automáticamente el {{ now()->format('d/m/Y H:i') }}</p>
+    </div>
+</body>
+</html>

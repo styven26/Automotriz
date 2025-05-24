@@ -1,0 +1,94 @@
+/* Contenedor Principal del Modal */
+.dialog-container {
+  height: auto; /* Altura automática */
+  padding: 20px 30px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  max-height: 90vh; /* Límite máximo para la altura */
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+ul {
+  list-style-type: none; /* Quita los puntos */
+  padding-left: 0; /* Elimina el espaciado a la izquierda */
+  margin-left: 0; /* Elimina márgenes adicionales */
+}  
+
+/* Título */
+.dialog-title {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #3f51b5; /* Color Material azul */
+}
+
+/* Fecha seleccionada */
+.selected-date {
+  font-size: 1rem;
+  color: #6c757d; /* Gris claro */
+  margin-bottom: 20px;
+}
+
+/* Campos del formulario */
+.form-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Botones */
+/* Estilo del contenedor de los botones */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px; /* Espaciado entre botones */
+  padding: 20px;
+  background-color: #f7f6f6;
+  border-top: 1px solid #f8f2f2;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Botón Cancelar */
+.btn-cancel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #f44336;
+  background-color: #ffeceb;
+  border: 1px solid #f44336;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #f44336;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Botón Confirmar */
+.btn-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm:hover {
+  background-color: #45a049;
+  color: #fff;
+  transform: scale(1.05);
+}

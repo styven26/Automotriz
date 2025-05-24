@@ -1,0 +1,197 @@
+<div class="dashboard-container">
+    <!-- Sidebar/Menu Lateral -->
+    <div class="sidebar">
+        <div class="header">
+            <img src="icons/usuario.png" alt="">
+            <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+            <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+          
+            <!-- Selector de rol -->
+            <div class="role-switcher">
+                <select (change)="cambiarRol($event)" [value]="rolActivo">
+                    <option *ngFor="let rol of roles" [value]="rol" [selected]="rol === rolActivo">
+                    {{ rol }}
+                    </option>
+                </select>  
+            </div>
+        </div>
+        
+        <nav>
+        <ul>
+            <!-- Opción "Dashboard Administrador" -->
+            <li>
+                <a (click)="navigateDashboard()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+                        <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Menú "Citas" con submenú -->
+            <li>
+                <a (click)="toggleMenu('citas')">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-calendar-alt" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Citas</span>
+                    </div>
+                </a>
+            <ul *ngIf="showCitasMenu" class="submenu">
+                <li class="submenu-item">
+                    <a (click)="navigateCitasMecanico()">
+                        <div style="display: flex; align-items: center;">
+                            <i class="fa-solid fa-calendar-check" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                            <span style="font-size: 14px; color: #050505;">Ver Citas</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            </li>
+    
+            <!-- Menú "Trabajos" con submenú -->
+            <li>
+                <a (click)="toggleMenu('trabajos')">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Trabajos</span>
+                    </div>
+                </a>
+            <ul *ngIf="showTiposnMenu" class="submenu">
+                <li class="submenu-item">
+                    <a (click)="navigateTrabajos()">
+                        <div style="display: flex; align-items: center;">
+                            <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                            <span style="font-size: 14px; color: #050505;">Ver Trabajos</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            </li>
+    
+            <!-- Opción "Cerrar Sesión" -->
+            <li>
+                <a (click)="logout()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        </nav>
+        <!-- Reloj al final del Sidebar -->
+         <div class="reloj-container">
+            <i class="fas fa-clock"></i>
+            <span>{{ tiempoRestante }}</span>
+        </div>
+    </div>
+    
+    <!-- Contenido Principal del Dashboard -->
+    <div class="main-content">
+        <div class="auth-container">
+          <div class="header">
+            <h2>Listado de Diagnóstico</h2>
+            <p>Diagnósticos</p>
+          </div>
+
+            <!-- Filtro de búsqueda -->
+            <mat-form-field appearance="outline">
+                <mat-label>Buscar</mat-label>
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Buscar diagnósticos">
+            </mat-form-field>
+            
+            <!-- Tabla de diagnósticos -->
+            <div class="table-container">
+                <div class="mat-elevation-z8">
+                <table mat-table [dataSource]="dataSource" matSort>
+            
+                    <!-- CLIENTE -->
+                    <ng-container matColumnDef="cliente">
+                        <th mat-header-cell *matHeaderCellDef> Cliente </th>
+                        <td mat-cell *matCellDef="let diag">
+                            {{ diag.cita?.cliente?.nombre }} {{ diag.cita?.cliente?.apellido }}
+                        </td>
+                    </ng-container>
+            
+                    <!-- AUTO -->
+                    <ng-container matColumnDef="auto">
+                        <th mat-header-cell *matHeaderCellDef> Vehículo </th>
+                        <td mat-cell *matCellDef="let diag">
+                            {{ diag.cita?.vehiculo?.marca }} - {{ diag.cita?.vehiculo?.modelo }}
+                        </td>
+                    </ng-container>
+            
+                    <!-- SERVICIO -->
+                    <ng-container matColumnDef="servicio">
+                        <th mat-header-cell *matHeaderCellDef> Servicio </th>
+                        <td mat-cell *matCellDef="let diag">
+                            Diagnóstico
+                        </td>
+                    </ng-container>
+            
+                    <!-- PROBLEMAS (descripcion) -->
+                    <ng-container matColumnDef="problemas">
+                        <th mat-header-cell *matHeaderCellDef> Problemas Encontrados </th>
+                        <td mat-cell *matCellDef="let diag">
+                            {{ diag.descripcion }}
+                        </td>
+                    </ng-container>
+            
+                    <!-- RECOMENDADOS (servicios_recomendados) -->
+                    <ng-container matColumnDef="recomendados">
+                        <th mat-header-cell *matHeaderCellDef> Servicios Recomendados </th>
+                        <td mat-cell *matCellDef="let diag">
+                          {{ diag.servicios_recomendados_nombres?.join(', ') }}
+                        </td>
+                    </ng-container>
+                      
+                    <!-- ACCIONES -->
+                    <ng-container matColumnDef="acciones">
+                        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                        <td mat-cell *matCellDef="let diag">
+                          <!-- Botón para editar diagnóstico -->
+                          <button mat-icon-button color="primary" (click)="openUpdateDialog(diag)">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                      
+                          <!-- Botón para notificar al cliente cuando NO hay servicios recomendados -->
+                            <button *ngIf="!diag.servicios_recomendados || diag.servicios_recomendados.length === 0"
+                                mat-icon-button color="warn" (click)="sendEmailNoServices(diag)" matTooltip="Notificar: Sin Servicios">
+                                <mat-icon>mail_outline</mat-icon>
+                            </button>
+
+                            <!-- Botón para confirmar servicios recomendados (si existen) -->
+                            <button
+                                *ngIf="
+                                    diag.servicios_recomendados
+                                    && diag.servicios_recomendados.length > 0
+                                    && !diag.correo_enviado
+                                "
+                                mat-icon-button
+                                color="accent"
+                                (click)="sendEmailRecommended(diag)"
+                                matTooltip="Confirmar Servicios"
+                                >
+                                <mat-icon>check_circle</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+  
+                    <!-- Encabezados y filas -->
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+                    <!-- No data row -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="7">No hay datos que coincidan con "{{ filterValue }}"</td>
+                    </tr> 
+                </table>
+            
+                <!-- Paginador -->
+                <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

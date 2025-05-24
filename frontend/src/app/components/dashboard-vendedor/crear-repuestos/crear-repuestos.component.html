@@ -1,0 +1,158 @@
+<div class="dashboard-container">
+  <!-- Sidebar/Menu Lateral -->
+  <div class="sidebar">
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+    
+      <!-- Selector de rol -->
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)" [ngModel]="rolActivo">
+            <option *ngFor="let rol of roles" [value]="rol">
+                {{ rol.charAt(0).toUpperCase() + rol.slice(1) }}
+            </option>
+        </select>
+      </div>
+    </div>
+
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Vendedor" -->
+        <li>
+          <a (click)="navigateDashboard()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+              <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+            </div>                       
+          </a>
+        </li>              
+
+        <!-- Menú "Repuestos" con submenú -->
+        <li>
+          <a (click)="toggleMenu('repuestos')">
+              <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Repuestos</span>
+              </div>
+          </a>
+          <ul *ngIf="showRepuestosMenu" class="submenu">
+              <li class="submenu-item">
+              <a (click)="navigateCrearRepuestos()">
+                  <div style="display: flex; align-items: center;">
+                      <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                      <span style="font-size: 14px; color: #050505;">Agregar Repuestos</span>
+                  </div>
+              </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateListarRepuestos()">
+                  <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Repuestos</span>
+                  </div>
+              </a>
+              </li>
+          </ul>
+        </li>
+
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+  </div>
+  
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+    <div class="header">
+      <h2>Agregar Repuesto</h2>
+      <p>Repuesto</p>
+    </div>
+    <br><br>
+
+    <form [formGroup]="repuestoForm" (ngSubmit)="onSubmit()">        
+        <div class="input-row">
+            <!-- Nombre -->
+            <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" placeholder="Nombre del repuesto" />
+                <mat-error *ngIf="repuestoForm.get('nombre')?.hasError('required')">
+                    El nombre es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="repuestoForm.get('nombre')?.hasError('maxlength')">
+                    Máximo 50 caracteres.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Precio base -->
+            <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Precio Base</mat-label>
+                <input matInput type="number" formControlName="precio_base" placeholder="0.00" />
+                <mat-error *ngIf="repuestoForm.get('precio_base')?.hasError('required')">
+                    El precio base es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="repuestoForm.get('precio_base')?.hasError('min')">
+                    Debe ser ≥ 0.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="input-row">
+            <!-- IVA -->
+            <mat-form-field appearance="outline" class="half-width">
+                <mat-label>IVA (%)</mat-label>
+                <input matInput type="number" formControlName="iva" placeholder="0–100" />
+                <mat-error *ngIf="repuestoForm.get('iva')?.hasError('required')">
+                    El IVA es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="repuestoForm.get('iva')?.hasError('min') || repuestoForm.get('iva')?.hasError('max')">
+                    Debe estar entre 0 y 100.
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Stock -->
+            <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Stock</mat-label>
+                <input matInput type="number" formControlName="stock" placeholder="Cantidad disponible" />
+                <mat-error *ngIf="repuestoForm.get('stock')?.hasError('required')">
+                    El stock es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="repuestoForm.get('stock')?.hasError('min')">
+                    Debe ser ≥ 0.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="input-row">
+            <!-- Stock mínimo -->
+            <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Stock Mínimo</mat-label>
+                <input matInput type="number" formControlName="stock_minimo" placeholder="Punto de pedido" />
+                <mat-error *ngIf="repuestoForm.get('stock_minimo')?.hasError('required')">
+                    El stock mínimo es obligatorio.
+                </mat-error>
+                <mat-error *ngIf="repuestoForm.get('stock_minimo')?.hasError('min')">
+                    Debe ser ≥ 0.
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <button class="large-button" mat-flat-button type="submit">
+            Guardar Repuesto
+        </button>
+    </form>
+  </div>
+</div>

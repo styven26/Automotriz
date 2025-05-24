@@ -1,0 +1,336 @@
+/* Estructura principal */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f9fafc;
+    padding: 0%;
+  }
+
+  .quarter-width {
+    width: 30%; /* Más pequeño que quarter-width */
+  }
+  
+  .sidebar {
+    flex-direction: column; /* Organiza los elementos en columna */
+    display: flex;
+    width: 240px;
+    background-color: #e5eae5;
+    color: rgb(82, 96, 93);
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar .header {
+    text-align: center;
+  }
+
+  .sidebar .header img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .sidebar .header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .sidebar .header span {
+    font-size: 14px;
+  }
+
+  .sidebar .logo {
+    display: flex; /* Para usar Flexbox */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin-bottom: 15px;
+  }
+
+  .sidebar .logo img {
+    width: 140px;
+    max-width: 100%;
+    height: auto;
+  } 
+
+  .sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .sidebar nav ul li {
+    margin-bottom: 15px;
+  }
+
+  .sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    color: rgb(121, 134, 127);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .sidebar nav ul li a img {
+    width: 20px;
+    margin-right: 10px;
+  }
+
+  .sidebar nav ul li a:hover {
+    background-color: #ecba8c;
+    transform: translateX(10px);
+  }
+  
+  /* Ajustes para submenú */
+  .submenu {
+    padding-left: 20px;  /* Espaciado entre el menú principal y el submenú */
+    margin-top: 5px;
+  }
+  
+  .submenu-item {
+    margin-left: 20px;  /* Alineación hacia la derecha para los submenús */
+  }
+  
+  .submenu-item a {
+    font-size: 14px;    /* Tamaño de fuente más pequeño */
+    display: flex;
+    align-items: center;
+  }
+  
+  .submenu-item i {
+    font-size: 14px;    /* Íconos más pequeños */
+    margin-right: 8px;
+  }
+  
+  /* Añadiendo animación al hover en submenú */
+  .submenu-item a:hover {
+    transform: translateX(5px);  /* Efecto de hover en el submenú */
+  }
+  
+  /* Contenido principal */
+  .main-content {
+    margin-left: 270px;
+    padding: 50px;
+    width: calc(100% - 220px);
+  }
+  
+  /* Cabecera */
+  .header {
+    margin-bottom: 30px;
+    text-align: center;
+    color: #243447;
+    font-family: 'Poppins', sans-serif; /* Cambia la tipografía aquí */
+  }
+  
+  .header h2 {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;    /* Centra verticalmente */
+    font-size: 25px;  /* Tamaño del texto más grande */
+    font-weight: 700; /* Texto más grueso */
+    color: #243447;
+    margin: 0;
+    padding-bottom: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;  /* Convierte a mayúsculas */
+  }
+  
+  .header p {
+    font-size: 15px;   /* Texto un poco más grande */
+    color: #707070;    /* Un color gris más suave para el rol */
+    font-weight: 500;  /* Peso medio */
+    text-transform: capitalize;
+  }
+
+  /* Agregando una pequeña animación */
+  .header h2, .header p {
+    animation: fadeIn 1s ease-in-out;  /* Efecto de entrada */
+  }
+
+  .input-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem; /* Ensures consistent spacing between elements */
+    margin-bottom: 1.5rem;
+  }
+
+  .half-width {
+    flex: 1;         /* o un width fijo, por ejemplo: width: 30%; */
+    min-width: 250px; /* Ensures that fields don't shrink too small on small screens */
+    width: 49%; /* Ajuste para que los campos ocupen la mitad del contenedor */
+  }
+
+  .no-error .mat-form-field-flex {
+    border-color: initial !important; /* Para evitar que se muestre el borde rojo */
+  }
+
+  .large-button {
+    font-size: 1rem; /* Aumenta el tamaño del texto */
+    width: 100%; /* Ajusta el ancho del botón */
+    margin: 1rem auto; /* Centra el botón */
+    font-family: 'Roboto', sans-serif;
+    display: block; /* Asegura que el botón sea tratado como un bloque */
+    border-radius: 0; /* Bordes completamente rectos */
+    height: 3rem; /* Ajusta la altura del botón */
+  }
+
+  .full-width {
+    flex: 1;         /* o un width fijo, por ejemplo: width: 30%; */
+    min-width: 250px; /* Ensures that fields don't shrink too small on small screens */
+    width: 100%; /* Ajuste para que los campos ocupen la mitad del contenedor */
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+    
+  /* Para pantallas de tablets (anchos menores a 1024px) */
+  @media (max-width: 1024px) {
+    .sidebar {
+      width: 180px;
+    }
+  
+    .main-content {
+      margin-left: 180px;
+      width: calc(100% - 180px);
+    }
+  
+    .grid-container {
+      grid-template-columns: repeat(2, 1fr); /* Mostrar solo 2 columnas de widgets */
+    }
+  
+    .header h2 {
+      font-size: 22px;
+    }
+  
+    .widget h2 {
+      font-size: 28px;
+    }
+  }
+  
+  /* Para pantallas de móviles (anchos menores a 768px) */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 100%; /* Hacer que el sidebar ocupe toda la pantalla */
+      position: static; /* Quitar el sidebar fijo */
+      padding: 10px;
+    }
+  
+    .main-content {
+      margin-left: 0;
+      width: 100%;
+    }
+  
+    .grid-container {
+      grid-template-columns: 1fr; /* Mostrar solo 1 columna de widgets */
+    }
+  
+    .widget {
+      padding: 15px;
+    }
+  
+    .header h2 {
+      font-size: 20px;
+    }
+  
+    .widget h2 {
+      font-size: 24px;
+    }
+  }
+  
+  /* Reloj */
+  .reloj-container {
+    margin-top: auto; /* Empuja el reloj hacia el fondo */
+    display: flex;
+    align-items: center; /* Alinear verticalmente el ícono y texto */
+    padding: 10px; /* Espaciado uniforme como en los demás elementos */
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 1.5rem; /* Tamaño de la fuente similar */
+    color: #050505; /* Color de texto */
+    font-weight: bold; /* Fuente en negrita */
+  }
+
+  .reloj-container i {
+    margin-right: 12px; /* Espacio entre el ícono y el texto */
+    font-size: 1.5rem; /* Aumenta el tamaño del ícono */
+  }
+
+  .reloj-container:hover {
+    background-color: #ecba8c; /* Efecto hover como los otros elementos */
+    transform: translateX(10px); /* Animación consistente */
+  }
+
+  .chart-title {
+    font-size: 16px; /* Tamaño de letra ligeramente mayor */
+    font-weight: 700; /* Más negrita para resaltar */
+    text-align: center;
+    margin-bottom: 15px; /* Más espacio para separar del gráfico */
+    color: #2c3e50; /* Un tono más oscuro para mayor contraste */
+    text-transform: uppercase; /* Convertir texto a mayúsculas */
+    letter-spacing: 1px; /* Espaciado entre letras */
+    padding-bottom: 3px; /* Espacio adicional debajo del texto */
+    font-family: 'Roboto', sans-serif; /* Fuente moderna (puedes cambiarla si usas otra) */
+  }
+
+  /* Contenedor del selector de rol */
+  .role-switcher {
+    display: inline-block; /* Alinea el selector con el contenido */
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 8px; /* Bordes redondeados */
+  }
+
+  /* Estilo del selector */
+  .role-switcher select {
+    border: none; /* Sin bordes internos */
+    font-size: 14px; /* Tamaño del texto */
+    color: #333333; /* Color del texto */
+    background: transparent; /* Fondo transparente */
+    padding: 5px 5px; /* Espaciado interno */
+    outline: none; /* Sin borde de foco */
+    font-family: 'Poppins', sans-serif; /* Fuente consistente */
+    cursor: pointer; /* Cambiar cursor a mano */
+  }
+
+  /* Flecha personalizada para el selector */
+  .role-switcher select::-ms-expand {
+    display: none; /* Oculta la flecha en IE/Edge */
+  }
+
+  .role-switcher select:hover {
+    color: #000000; /* Cambiar color del texto al pasar el mouse */
+  }
+
+  .role-switcher select:focus {
+    outline: none; /* Sin borde predeterminado */
+  }
+
+  /* Animación al mostrar */
+  .role-switcher {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

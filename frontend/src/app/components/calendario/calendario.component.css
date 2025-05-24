@@ -1,0 +1,262 @@
+/* Estructura principal */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f4f7f6;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden; /* Elimina el scroll horizontal */
+  padding: 0;
+  margin: 0;
+}
+
+/* Sidebar */
+.sidebar {
+  flex-direction: column; /* Organiza los elementos en columna */
+  display: flex;
+  width: 260px;
+  background-color: #fff;
+  color: #333;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.sidebar .header {
+  background: linear-gradient(135deg, #54c057, #54c057);
+  padding: 30px 20px;
+  text-align: center;
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.sidebar .header img {
+  width: 80px;
+  height: 80px;
+}
+
+.sidebar .header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sidebar .header span {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 15px;
+}
+
+.sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: #333;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.sidebar nav ul li a:hover {
+  background-color: #f1f1f1;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar nav ul li a span.material-icons {
+  font-size: 20px;
+  margin-right: 15px;
+  color: #333;
+}
+
+.sidebar nav ul li a.active {
+  background-color: #4caf50;
+  color: white;
+  font-weight: 600;
+}
+
+.sidebar nav ul li a.active span.material-icons {
+  color: white;
+}
+
+/* Botón destacado */
+.sidebar nav ul li a.dashboard {
+  background-color: #00c7c7;
+  color: white;
+  font-weight: 600;
+}
+
+.sidebar nav ul li a.dashboard:hover {
+  background-color: #00a5a5;
+}
+
+/* Submenú */
+.submenu {
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+.submenu-item {
+  margin-left: 10px;
+}
+
+.submenu-item a {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.submenu-item a:hover {
+  color: #000;
+}
+
+/* Reloj al final del Sidebar */
+.reloj-container {
+  margin-top: auto; /* Empuja el reloj hacia abajo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px; /* Espaciado más amplio */
+  background: linear-gradient(135deg, #4caf50, #4caf50); /* Degradado elegante */
+  color: #ffffff; /* Texto blanco */
+  border-radius: 12px; /* Bordes más redondeados */
+  font-size: 1.6rem; /* Texto más grande */
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  transition: all 0.3s ease-in-out;
+}
+
+.reloj-container i {
+  margin-right: 10px; /* Espacio entre el ícono y el texto */
+  font-size: 2rem; /* Ícono más grande */
+  color: #ffffff; /* Color blanco */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra en el ícono */
+}
+
+.legend {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+  align-items: center;
+}
+
+.color-box {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    border-radius: 3px;
+}
+
+.color-box.green {
+    background-color: #4caf50;
+}
+
+/* Contenido principal */
+.main-content {
+  margin-left: 300px;
+  padding: 0;
+  width: calc(100% - 200px); /* Ajusta este valor si es necesario */
+  height: 100%; /* Usa toda la altura disponible */
+  display: flex;
+  justify-content: center; /* Centra horizontalmente si es necesario */
+  align-items: flex-start; /* Asegura que se pegue al principio */
+}
+
+.header {
+  background-color: #f9f9f9;
+  padding: 30px;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 30px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #243447;
+}
+
+.mat-mdc-form-field {
+  margin-top: 16px;
+}
+
+.calendario-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type="date"] {
+  padding: 10px;
+  font-size: 16px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+
+/* Role-switcher */
+.role-switcher {
+  display: inline-block;
+  background-color: #54c057;
+  padding: 8px 12px;
+  border: 1px solid #54c057;
+  border-radius: 8px;
+}
+
+/* Selector del role-switcher */
+.role-switcher select {
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #0f0f0f;
+  background: transparent;
+  padding: 5px 10px;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+}
+
+/* (Opcional) Animación keyframes para fadeIn */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

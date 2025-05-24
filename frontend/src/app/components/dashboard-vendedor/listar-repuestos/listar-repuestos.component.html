@@ -1,0 +1,195 @@
+<div class="dashboard-container">
+  <!-- Sidebar/Menu Lateral -->
+  <div class="sidebar">
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+    
+      <!-- Selector de rol -->
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)" [ngModel]="rolActivo">
+            <option *ngFor="let rol of roles" [value]="rol">
+                {{ rol.charAt(0).toUpperCase() + rol.slice(1) }}
+            </option>
+        </select>
+      </div>
+    </div>
+
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Vendedor" -->
+        <li>
+          <a (click)="navigateDashboard()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+              <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+            </div>                       
+          </a>
+        </li>              
+
+        <!-- Menú "Repuestos" con submenú -->
+        <li>
+          <a (click)="toggleMenu('repuestos')">
+              <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Repuestos</span>
+              </div>
+          </a>
+          <ul *ngIf="showRepuestosMenu" class="submenu">
+              <li class="submenu-item">
+              <a (click)="navigateCrearRepuestos()">
+                  <div style="display: flex; align-items: center;">
+                      <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                      <span style="font-size: 14px; color: #050505;">Agregar Repuestos</span>
+                  </div>
+              </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateListarRepuestos()">
+                  <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Repuestos</span>
+                  </div>
+              </a>
+              </li>
+          </ul>
+        </li>
+
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+  </div>
+  
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+        <div class="auth-container">
+            <div class="header">
+                <h2>Listado de Repuestos</h2>
+                <p>Repuestos</p><br>
+
+                <!-- 1) Botón Importar Excel -->
+                <div class="import-container">
+                  <button class="boton" (click)="fileInput.click()">
+                    Importar Excel
+                  </button>
+                  <input #fileInput type="file" accept=".xlsx,.xls" (change)="onFileChange($event)" hidden />
+                </div>
+            </div><br>
+
+            <!-- 2) Aviso de duplicados descartados -->
+            <div *ngIf="duplicateNames.length" class="duplicate-alert">
+              <mat-icon color="warn">warning</mat-icon>
+              Se descartaron estos nombres duplicados:
+              <span class="dup-list">{{ duplicateNames.join(', ') }}</span>
+            </div>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Buscar</mat-label>
+                <mat-icon matPrefix>search</mat-icon>
+                <input
+                    matInput
+                    (keyup)="applyFilter($event)"
+                    placeholder="Buscar por nombre"
+                />
+            </mat-form-field>
+
+            <div class="table-container">
+                <div class="mat-elevation-z8">
+                    <table mat-table [dataSource]="dataSource" matSort>
+
+                        <!-- Fecha-->
+                        <ng-container matColumnDef="created_date">
+                          <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de Creación</th>
+                          <td mat-cell *matCellDef="let r">
+                            {{ r.created_at | date: 'dd/MM/yyyy' }}
+                          </td>
+                        </ng-container>
+
+                        <!-- Hora -->
+                        <ng-container matColumnDef="created_time">
+                          <th mat-header-cell *matHeaderCellDef mat-sort-header>Hora de Creación</th>
+                          <td mat-cell *matCellDef="let r">
+                            {{ r.created_at | date: 'HH:mm' }}
+                          </td>
+                        </ng-container>
+
+                        <!-- Nombre -->
+                        <ng-container matColumnDef="nombre">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+                            <td mat-cell *matCellDef="let r">{{ r.nombre }}</td>
+                        </ng-container>
+                        
+                        <!-- Precio Base -->
+                        <ng-container matColumnDef="precio_base">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Precio Base</th>
+                            <td mat-cell *matCellDef="let r">{{ r.precio_base | number:'1.2-2' }}</td>
+                        </ng-container>
+                        
+                        <!-- IVA -->
+                        <ng-container matColumnDef="iva">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>IVA (%)</th>
+                            <td mat-cell *matCellDef="let r">{{ r.iva }}</td>
+                        </ng-container>
+                        
+                        <!-- Precio Final -->
+                        <ng-container matColumnDef="precio_final">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Precio Final</th>
+                            <td mat-cell *matCellDef="let r">{{ r.precio_final | number:'1.2-2' }}</td>
+                        </ng-container>
+                        
+                        <!-- Stock -->
+                        <ng-container matColumnDef="stock">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Stock</th>
+                            <td mat-cell *matCellDef="let r">{{ r.stock }}</td>
+                        </ng-container>
+                        
+                        <!-- Stock Mínimo -->
+                        <ng-container matColumnDef="stock_minimo">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Stock Mínimo</th>
+                            <td mat-cell *matCellDef="let r">{{ r.stock_minimo }}</td>
+                        </ng-container>
+                        
+                        <!-- Acciones -->
+                        <ng-container matColumnDef="acciones">
+                            <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+                            <td mat-cell *matCellDef="let r">
+                            <div class="action-buttons">
+                                <button mat-icon-button color="primary" (click)="editarRepuesto(r)">
+                                <mat-icon>edit</mat-icon>
+                                </button>
+                                <button mat-icon-button color="warn" (click)="eliminarRepuesto(r)">
+                                <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                            </td>
+                        </ng-container>
+                        
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            No hay datos que coincidan con "{{ filterValue }}"
+                            </td>
+                        </tr>
+                    </table>
+                    <mat-paginator [pageSizeOptions]="[6, 12, 18, 24, 30, 36]" showFirstLastButtons></mat-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

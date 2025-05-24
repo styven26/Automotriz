@@ -1,0 +1,168 @@
+<div class="dashboard-container">
+    <!-- Sidebar/Menu Lateral -->
+    <div class="sidebar">
+        <div class="header">
+            <img src="icons/usuario.png" alt="">
+            <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+            <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+          
+            <!-- Selector de rol -->
+            <div class="role-switcher">
+                <select (change)="cambiarRol($event)" [value]="rolActivo">
+                    <option *ngFor="let rol of roles" [value]="rol" [selected]="rol === rolActivo">
+                    {{ rol }}
+                    </option>
+                </select>  
+            </div>
+        </div>
+
+        <nav>
+        <ul>
+            <!-- Opción "Dashboard Administrador" -->
+            <li>
+                <a routerLink="/dashboard">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+                        <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- Menú "Citas" con submenú -->
+            <li>
+                <a (click)="toggleMenu('citas')">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-calendar-alt" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Citas</span>
+                    </div>
+                </a>
+            <ul *ngIf="showCitasMenu" class="submenu">
+                <li class="submenu-item">
+                    <a (click)="navigateCitasMecanico()">
+                        <div style="display: flex; align-items: center;">
+                            <i class="fa-solid fa-calendar-check" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                            <span style="font-size: 14px; color: #050505;">Ver Citas</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            </li>
+    
+            <!-- Menú "Trabajos" con submenú -->
+            <li>
+                <a (click)="toggleMenu('trabajos')">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Trabajos</span>
+                    </div>
+                </a>
+                <ul *ngIf="showTiposnMenu" class="submenu">
+                    <li class="submenu-item">
+                        <a (click)="navigateTrabajos()">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                <span style="font-size: 14px; color: #050505;">Ver Trabajos</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+                <ul *ngIf="showTiposnMenu" class="submenu">
+                    <li class="submenu-item">
+                        <a (click)="navigateDiagnostico()">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                <span style="font-size: 14px; color: #050505;">Diagnóstico</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+    
+            <!-- Opción "Cerrar Sesión" -->
+            <li>
+                <a (click)="logout()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        </nav>
+        <!-- Reloj al final del Sidebar -->
+         <div class="reloj-container">
+            <i class="fas fa-clock"></i>
+            <span>{{ tiempoRestante }}</span>
+        </div>
+    </div>
+    
+    <!-- Contenido Principal del Dashboard -->
+    <div class="main-content">
+        <!-- KPIs -->
+        <div class="kpi-container">
+            <mat-card class="kpi-card kpi-card-followers">
+                <mat-card-content>
+                    <div class="kpi-header">
+                        <div class="icon-wrapper icon-followers">
+                            <i class="fas fa-calendar-check" style="font-size: 24px; color: white;"></i>
+                        </div>
+                        <mat-card-title>Total de Citas</mat-card-title>
+                    </div>
+                    <h2 class="value">{{ citas.length }}</h2>
+                </mat-card-content>
+            </mat-card>
+      
+            <mat-card class="kpi-card kpi-card-income">
+                <mat-card-content>
+                    <div class="kpi-header">
+                        <div class="icon-wrapper icon-income">
+                            <i class="fas fa-wallet" style="font-size: 24px; color: white;"></i>
+                        </div>
+                        <mat-card-title>Total de Órdenes de Servicios</mat-card-title>
+                    </div>
+                <h2 class="value">{{ ordenes.length }}</h2>
+                </mat-card-content>
+            </mat-card>
+        </div><br>
+      
+        <!-- Gráficos -->
+        <div class="charts-container">
+            <!-- Gráfico de Pie -->
+            <div class="chart">
+                <ngx-charts-pie-chart
+                    [results]="citasChartData"
+                    [view]="[700, 550]"
+                    [legend]="true"
+                    [explodeSlices]="true"
+                    [legendTitle]="'Estados de Citas'"           
+                    [labels]="true"
+                    [labels]="true"
+                    [customColors]="[
+                    { name: 'Diagnosticado', value: '#3498db' },
+                    { name: 'Confirmada', value: '#9676d8' },
+                    { name: 'Cancelada', value: '#ff7f7f' },
+                    { name: 'Atendida', value: '#27ae60' },
+                    ]">
+                </ngx-charts-pie-chart>
+            </div>
+            <!-- Gráfico de Barras -->
+            <div class="chart">
+                <ngx-charts-bar-vertical
+                    [results]="ordenesChartData"
+                    [view]="[800, 550]"
+                    [legend]="true"
+                    [legendTitle]="'Estados de Órdenes'"
+                    [xAxis]="true"
+                    [yAxis]="true"
+                    [animations]="true"
+                    [customColors]="[
+                        { name: 'Pendiente', value: '#ff7f7f' },
+                        { name: 'En_proceso', value: '#9676d8' },
+                        { name: 'Completado', value: '#7fb3ff' },
+                        { name: 'Cancelado', value: '#ffbf7f' }
+                    ]">
+                </ngx-charts-bar-vertical>
+            </div>
+        </div>
+    </div>
+</div>

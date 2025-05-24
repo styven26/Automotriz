@@ -1,0 +1,180 @@
+/* Contenedor principal */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;   /* Asegúrate de que ocupe todo el ancho disponible */
+  margin: 0;      /* Sin márgenes */
+  padding: 0;     /* Sin relleno */
+}
+
+/* Formulario centrado verticalmente */
+.login-form-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden; /* Evita scroll si la imagen es más grande */
+}
+
+.login-form-container img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Hace que la imagen cubra todo sin deformarse */
+  z-index: -1; /* Envía la imagen al fondo */
+}
+
+/* Ajusta el formulario para que pueda crecer dinámicamente */
+.login-form {
+  padding: 5rem 3rem;
+  border-radius: 12px;
+  max-width: 500px;  /* Incrementa el ancho máximo */
+  width: 100%;       /* Asegúrate de que ocupe todo el espacio disponible */
+  text-align: center;
+}
+
+/* Estilo del título del formulario */
+.login-form h2 {
+  margin-bottom: 1.5rem;
+  font-size: 35px;
+  color: #002776; /* Azul oscuro */
+  font-weight: 700;
+  position: relative;
+  text-align: center;
+}
+
+.login-form h2::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  width: 180px;
+  height: 4px;
+  background-color: #ff5722;
+  transform: translateX(-50%);
+}
+
+/* Estilo de los campos */
+.large-input .mat-input-element {
+  font-size: 18px;
+  height: 60px;
+  padding-left: 45px;
+  box-sizing: border-box;
+  width: 100%;
+  color: #000; /* Color de texto negro */
+  background: rgba(255, 255, 255, 0.9); /* Fondo blanco para mayor contraste */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Ajustes para el mat-form-field */
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+}
+
+.large-input .mat-form-field-wrapper {
+  width: 100%;
+}
+
+.large-input .mat-form-field-flex {
+  width: 100%;
+}
+
+/* Estilo del icono */
+.large-input .mat-icon {
+  font-size: 24px;
+  top: 14px;
+  color: #ff5722; /* Color de los iconos */
+}
+
+/* Botón de inicio de sesión */
+.large-button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #ff5722 !important;
+  color: #ffffff !important;
+  border-radius: 8px;
+  border: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.large-button:hover {
+  background-color: #e64a19 !important;
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
+}
+
+/* Enlace para recuperar contraseña */
+.forgot-password {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.forgot-password a {
+  color: #ff5722;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+/* Enlace para registrarse */
+.password a {
+  color: #ff5722;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.password a:hover {
+  text-decoration: underline;
+}
+
+/* Superposición de la imagen */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Oscurece la imagen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay h2 {
+  color: white;
+  font-size: 44px;
+  border-bottom: 3px solid white;
+  padding-bottom: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-image {
+    display: none;
+  }
+
+  .login-form-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .login-form {
+    padding: 2rem 1.5rem;
+    max-width: 100%;  /* Asegúrate de que el formulario ocupe todo el ancho en pantallas pequeñas */
+  }
+}

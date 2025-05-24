@@ -1,0 +1,94 @@
+<div class="modal-container">
+    <!-- Header del modal -->
+    <div class="modal-header">
+        <h2>Servicios de Mantenimiento Automotriz</h2>
+        <button mat-icon-button (click)="cancelar()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <!-- Formulario del modal -->
+    <form [formGroup]="subtipoForm" (ngSubmit)="guardarCambios()">
+        <div class="modal-body">
+
+            <!-- Tipo de Servicio -->
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Servicio</mat-label>
+              <mat-select formControlName="id_tipo">
+                <mat-option *ngFor="let t of tiposExistentes" [value]="t.id_tipo">
+                  {{ t.nombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="subtipoForm.get('id_tipo')?.hasError('required')">
+                Debes seleccionar un tipo.
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Nombre -->
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre del Servicio</mat-label>
+              <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+              <mat-error *ngIf="subtipoForm.get('nombre')?.hasError('required')">
+                El nombre es obligatorio.
+              </mat-error>
+              <mat-error *ngIf="subtipoForm.get('nombre')?.hasError('maxlength')">
+                El nombre no puede exceder 100 caracteres.
+              </mat-error>
+            </mat-form-field>
+      
+            <!-- Descripción -->
+            <mat-form-field appearance="outline">
+              <mat-label>Descripción</mat-label>
+              <textarea matInput formControlName="descripcion" placeholder="Ingrese la descripción"></textarea>
+              <mat-error *ngIf="subtipoForm.get('descripcion')?.hasError('required')">
+                La descripción es obligatoria.
+              </mat-error>
+              <mat-error *ngIf="subtipoForm.get('descripcion')?.hasError('maxlength')">
+                La descripción no puede exceder 255 caracteres.
+              </mat-error>
+            </mat-form-field>
+      
+            <!-- Precio Base -->
+            <mat-form-field appearance="outline">
+              <mat-label>Precio Base</mat-label>
+              <input matInput type="number" formControlName="precio_base" min="0" placeholder="Ingrese el precio base">
+              <mat-error *ngIf="subtipoForm.get('precio_base')?.hasError('required')">
+                El precio base es obligatorio.
+              </mat-error>
+              <mat-error *ngIf="subtipoForm.get('precio_base')?.hasError('min')">
+                El precio base no puede ser negativo.
+              </mat-error>
+            </mat-form-field>
+      
+            <!-- IVA -->
+            <mat-form-field appearance="outline">
+              <mat-label>IVA (%)</mat-label>
+              <input matInput type="number" formControlName="iva" min="0" max="20" placeholder="Ingrese el IVA" step="1">
+              <mat-error *ngIf="subtipoForm.get('iva')?.hasError('required')">
+                El IVA es obligatorio.
+              </mat-error>
+              <mat-error *ngIf="subtipoForm.get('iva')?.hasError('min')">
+                El IVA no puede ser negativo.
+              </mat-error>
+              <mat-error *ngIf="subtipoForm.get('iva')?.hasError('max')">
+                El IVA no puede exceder 100%.
+              </mat-error>
+              <mat-error *ngIf="subtipoForm.get('iva')?.hasError('pattern')">
+                El IVA debe ser un número entero.
+              </mat-error>
+            </mat-form-field>            
+      
+            <!-- Precio Final -->
+            <mat-form-field appearance="outline">
+              <mat-label>Precio Final</mat-label>
+              <input matInput type="number" formControlName="precio" placeholder="Precio final">
+            </mat-form-field>
+        </div>
+
+        <!-- Footer -->
+        <footer class="modal-footer">
+            <button class="btn-danger" mat-button type="button" (click)="cancelar()">Cancelar</button>
+            <button class="btn-success" mat-raised-button color="primary" type="submit">Guardar Cambios</button>
+        </footer>
+    </form>
+</div>

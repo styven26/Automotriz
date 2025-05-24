@@ -1,0 +1,243 @@
+<div class="dashboard-container">
+  <div class="sidebar">
+    <!-- Logo e imagen del usuario -->
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)" [value]="rolActivo">
+            <option *ngFor="let rol of roles" [value]="rol" [selected]="rol === rolActivo">
+            {{ rol }}
+            </option>
+        </select>  
+      </div>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Cliente" -->
+        <li>
+          <a (click)="navigateDashboarCliente()" class="dashboard active">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">dashboard</span>
+              <span>Dashboard</span>
+            </div>
+          </a>
+        </li>
+
+        <!-- Menú "Vehículo" con submenú -->
+        <li>
+          <a (click)="toggleMenu('mecanicos')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">directions_car</span>
+              <span>Vehículo</span>
+            </div>
+          </a>
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateVehiculoCliente()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">event_available</span>
+                  <span>Registrar Vehículo</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+              <li class="submenu-item">
+                <a routerLink="/citas">
+                    <div style="display: flex; align-items: center;">
+                    <span class="material-icons">list</span>
+                    <span>Listado</span>
+                  </div>
+                </a>
+              </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Citas" con submenú -->
+        <li>
+          <a (click)="toggleMenu('citas')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">calendar_today</span>
+              <span>Citas</span>
+            </div>
+          </a>
+          <ul *ngIf="showCitasMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateCitasCliente()">
+                  <div style="display: flex; align-items: center;">
+                  <span class="material-icons">event_available</span>
+                  <span>Programar Cita</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Historial" -->
+        <li>
+          <a (click)="toggleMenu('historial')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">history</span>
+              <span>Historial</span>
+            </div>
+          </a>
+          <ul *ngIf="showHistorialMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateHistorial()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">history_toggle_off</span>
+                  <span>Historial de Citas</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Monitoreo Tiempo Real" con submenú -->
+        <li>
+          <a (click)="toggleMenu('monitoreo')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">settings</span>
+              <span>Monitoreo TR</span>
+            </div>
+          </a>
+          <ul *ngIf="showMonitoreoMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateMonitoreoCliente()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">build</span>
+                  <span>Estado del Vehículo</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">logout</span>
+              <span>Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+    
+  </div>
+
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+    <div class="auth-container">
+        <div class="header">
+            <h2>Listado de Vehículos</h2>
+            <p>Vehículos registrados</p>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Buscar por marca, modelo, año, número de placa">
+        </mat-form-field> 
+
+        <div class="table-container">
+          <div class="mat-elevation-z8">
+              <table mat-table [dataSource]="dataSource" matSort>
+                  <!-- Marca Column -->
+                  <ng-container matColumnDef="marca">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header> Marca </th>
+                      <td mat-cell *matCellDef="let vehiculo"> {{vehiculo.marca}} </td>
+                  </ng-container>
+  
+                  <!-- Modelo Column -->
+                  <ng-container matColumnDef="modelo">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header> Modelo </th>
+                      <td mat-cell *matCellDef="let vehiculo"> {{vehiculo.modelo}} </td>
+                  </ng-container>
+  
+                  <!-- Año Column -->
+                  <ng-container matColumnDef="anio">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header> Año </th>
+                      <td mat-cell *matCellDef="let vehiculo"> {{vehiculo.anio}} </td>
+                  </ng-container>
+  
+                  <!-- Número de Placa Column -->
+                  <ng-container matColumnDef="numero_placa">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header> Número de Placa </th>
+                      <td mat-cell *matCellDef="let vehiculo"> {{vehiculo.numero_placa}} </td>
+                  </ng-container>
+
+                  <!-- Transmisión Column -->
+                  <ng-container matColumnDef="transmision">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Transmisión </th>
+                    <td mat-cell *matCellDef="let vehiculo"> {{vehiculo.transmision}} </td>
+                  </ng-container>
+
+                  <!-- Tipo de Combustible Column -->
+                  <ng-container matColumnDef="tipo_combustible">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de Combustible </th>
+                    <td mat-cell *matCellDef="let vehiculo"> {{vehiculo.tipo_combustible}} </td>
+                  </ng-container>
+
+                  <!-- Kilometraje Column -->
+                  <ng-container matColumnDef="kilometraje">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Kilometraje </th>
+                    <td mat-cell *matCellDef="let vehiculo"> {{ vehiculo.kilometraje }} km </td>
+                  </ng-container>
+
+                  <!-- Fecha Último Servicio Column -->
+                  <ng-container matColumnDef="fecha_ultimo_servicio">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Último Servicio </th>
+                    <td mat-cell *matCellDef="let vehiculo">
+                      {{ vehiculo.fecha_ultimo_servicio | date:'dd/MM/yyyy' }}
+                    </td>
+                  </ng-container>                  
+
+                  <!-- Imagen Column -->
+                  <ng-container matColumnDef="imagen">
+                    <th mat-header-cell *matHeaderCellDef> Imagen </th>
+                    <td mat-cell *matCellDef="let vehiculo">
+                      <img *ngIf="vehiculo.imagen" [src]="'http://localhost:8000/' + vehiculo.imagen" alt="Imagen del vehículo" width="50">
+                      <span *ngIf="!vehiculo.imagen">Sin imagen</span>
+                    </td>
+                  </ng-container>
+  
+                  <!-- Acciones Column -->
+                  <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+                    <td mat-cell *matCellDef="let vehiculo">
+                          <div class="action-buttons">
+                              <button mat-icon-button color="primary" (click)="editarVehiculo(vehiculo)">
+                                  <mat-icon>edit</mat-icon>
+                              </button>
+                              <button mat-icon-button color="warn" (click)="eliminarVehiculo(vehiculo)">
+                                  <mat-icon>delete</mat-icon>
+                              </button>
+                          </div>
+                      </td>
+                  </ng-container>
+  
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  
+                  <!-- No data row -->
+                  <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell" colspan="5">No hay datos que coincidan con "{{ filterValue }}"</td>
+                  </tr>
+              </table>
+            <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

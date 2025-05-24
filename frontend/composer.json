@@ -1,0 +1,8 @@
+{
+    "require-dev": {
+        "laravel/breeze": "^2.2"
+    },
+    "require": {
+        "laravel/sanctum": "^4.0"
+    }
+}

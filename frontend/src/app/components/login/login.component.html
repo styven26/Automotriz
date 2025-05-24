@@ -1,0 +1,37 @@
+<div class="login-container">
+  <div class="login-form-container">
+    <img src="icons/login1.jpg" alt="Usuario">
+    <div class="login-form">
+      <h2>Iniciar sesión</h2><br>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Campo de Correo Electrónico con la clase 'large-input' -->
+        <div class="input-group">
+          <mat-form-field appearance="outline" class="full-width large-input">
+            <mat-label>Correo Electrónico</mat-label>
+            <mat-icon matPrefix>mail</mat-icon>
+            <input matInput type="correo" formControlName="correo" placeholder="example@mail.com" />
+            <mat-error *ngIf="loginForm.get('correo')?.invalid">Correo requerido</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Campo de Contraseña con la clase 'large-input' -->
+        <div class="input-group">
+          <mat-form-field appearance="outline" class="full-width large-input">
+            <mat-label>Contraseña</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput type="password" formControlName="password" placeholder="Introduce tu contraseña" />
+            <mat-error *ngIf="loginForm.get('password')?.invalid">Contraseña requerida</mat-error>
+          </mat-form-field>
+          <p class="password">¿Olvidaste tu contraseña? <a routerLink="/password-reset">Recupérala Aquí</a></p>
+        </div><br>
+
+        <button mat-raised-button color="primary" class="btn-login large-button" type="Submit">Iniciar sesión</button>
+
+        <div class="forgot-password">
+          <p>¿No tienes cuenta? <a routerLink="/register">Regístrate Aquí</a></p>
+        </div>
+      </form>     
+    </div>
+  </div>
+
+</div>

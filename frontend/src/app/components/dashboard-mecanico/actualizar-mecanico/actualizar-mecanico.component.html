@@ -1,0 +1,132 @@
+<div class="modal-container">
+  <!-- Header del modal -->
+  <div class="modal-header">
+    <h2 id="dialog-title">Editar Mecánico</h2>
+    <button mat-icon-button (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Formulario del modal -->
+  <form [formGroup]="mecanicoForm" (ngSubmit)="guardarCambios()">
+    <div class="modal-body">
+      <!-- Nombre -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+        <mat-error *ngIf="mecanicoForm.get('nombre')?.hasError('required')">
+          El nombre es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('nombre')?.hasError('minlength')">
+          El nombre debe tener al menos 3 caracteres.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('nombre')?.hasError('pattern')">
+          El nombre solo puede contener letras y espacios.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Apellido -->
+      <mat-form-field appearance="outline">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+        <mat-error *ngIf="mecanicoForm.get('apellido')?.hasError('required')">
+          El apellido es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('apellido')?.hasError('minlength')">
+          El apellido debe tener al menos 3 caracteres.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('apellido')?.hasError('pattern')">
+          El apellido solo puede contener letras y espacios.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Cédula -->
+      <mat-form-field appearance="outline"> 
+        <mat-label>Cédula</mat-label>
+        <input matInput formControlName="cedula" placeholder="Ingrese la cédula" maxlength="10">
+        
+        <!-- Error: cédula obligatoria -->
+        <mat-error *ngIf="mecanicoForm.get('cedula')?.hasError('required')">
+          La cédula es obligatoria.
+        </mat-error>
+      
+        <!-- Error: patrón incorrecto -->
+        <mat-error *ngIf="mecanicoForm.get('cedula')?.hasError('pattern')">
+          La cédula debe tener 10 dígitos.
+        </mat-error>
+      
+        <!-- Error: cédula no válida (validador personalizado) -->
+        <mat-error *ngIf="mecanicoForm.get('cedula')?.hasError('invalidCedula')">
+          La cédula no es válida.
+        </mat-error>
+      
+        <!-- Error: cédula ya está registrada en la BD -->
+        <mat-error *ngIf="mecanicoForm.get('cedula')?.hasError('taken')">
+          La cédula ya está registrada.
+        </mat-error>
+      </mat-form-field>      
+
+      <!-- Correo -->
+      <mat-form-field appearance="outline">
+        <mat-label>Correo</mat-label>
+        <input matInput formControlName="correo" placeholder="Ingrese el correo">
+        <mat-error *ngIf="mecanicoForm.get('correo')?.hasError('required')">
+          El correo es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('correo')?.hasError('email')">
+          Ingresa un correo válido.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Teléfono -->
+      <mat-form-field appearance="outline">
+        <mat-label>Teléfono</mat-label>
+        <!-- Prefijo estático +593 -->
+        <span matPrefix class="prefix" style="padding-left: 0.5cm;">+593</span>
+        <input
+          matInput
+          formControlName="telefono"
+          placeholder="999999999"
+          maxlength="9"
+        />
+        <mat-error *ngIf="mecanicoForm.get('telefono')?.hasError('required')">
+          El teléfono es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('telefono')?.hasError('pattern')">
+          El teléfono debe contener 9 dígitos.
+        </mat-error>
+      </mat-form-field>
+      
+      <!-- Dirección -->
+      <mat-form-field appearance="outline">
+        <mat-label>Dirección</mat-label>
+        <textarea matInput formControlName="direccion_domicilio" placeholder="Ingrese la dirección" rows="2"></textarea>
+        <mat-error *ngIf="mecanicoForm.get('direccion_domicilio')?.hasError('required')">
+          La dirección es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('direccion_domicilio')?.hasError('minlength')">
+          La dirección debe tener al menos 5 caracteres.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Especialidad -->
+      <mat-form-field appearance="outline">
+        <mat-label>Especialidad</mat-label>
+        <mat-select formControlName="especialidad" placeholder="Seleccione una especialidad">
+          <mat-option *ngFor="let esp of especialidades" [value]="esp">
+            {{ esp }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="mecanicoForm.get('especialidad')?.hasError('required')">
+          La especialidad es obligatoria.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Footer con botones -->
+    <footer class="modal-footer">
+      <button class="btn-danger" mat-button type="button" (click)="cancelar()">Cancelar</button>
+      <button class="btn-success" mat-raised-button color="primary" type="submit">Guardar Cambios</button>
+    </footer>
+  </form>
+</div>

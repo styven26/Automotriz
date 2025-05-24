@@ -1,0 +1,230 @@
+<div class="dashboard-container">
+  <div class="sidebar">
+    <!-- Logo e imagen del usuario -->
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)" [value]="rolActivo">
+            <option *ngFor="let rol of roles" [value]="rol" [selected]="rol === rolActivo">
+            {{ rol }}
+            </option>
+        </select>  
+      </div>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Cliente" -->
+        <li>
+          <a (click)="navigateDashboarCliente()" class="dashboard active">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">dashboard</span>
+              <span>Dashboard</span>
+            </div>
+          </a>
+        </li>
+
+        <!-- Menú "Vehículo" con submenú -->
+        <li>
+          <a (click)="toggleMenu('mecanicos')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">directions_car</span>
+              <span>Vehículo</span>
+            </div>
+          </a>
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateVehiculoCliente()">
+                  <div style="display: flex; align-items: center;">
+                  <span class="material-icons">event_available</span>
+                  <span>Registrar Vehículo</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateListarVehiculos()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">list</span>
+                  <span>Listado</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Citas" con submenú -->
+        <li>
+          <a (click)="toggleMenu('citas')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">calendar_today</span>
+              <span>Citas</span>
+            </div>
+          </a>
+          <ul *ngIf="showCitasMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateCitas()">
+                  <div style="display: flex; align-items: center;">
+                  <span class="material-icons">event_available</span>
+                  <span>Programar Cita</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Historial" -->
+        <li>
+          <a (click)="toggleMenu('historial')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">history</span>
+              <span>Historial</span>
+            </div>
+          </a>
+          <ul *ngIf="showHistorialMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateHistorial()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">history_toggle_off</span>
+                  <span>Historial de Citas</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Monitoreo Tiempo Real" con submenú -->
+        <li>
+          <a (click)="toggleMenu('monitoreo')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">settings</span>
+              <span>Monitoreo TR</span>
+            </div>
+          </a>
+          <ul *ngIf="showMonitoreoMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateMonitoreo()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">build</span>
+                  <span>Estado del Vehículo</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">logout</span>
+              <span>Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+  </div>
+
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+    <!-- Paso del registro de vehículo utilizando mat-stepper -->
+    <mat-stepper linear #stepper>
+      <mat-step [stepControl]="vehicleFormGroup">
+        <form [formGroup]="vehicleFormGroup">
+          <ng-template matStepLabel>Datos del Vehículo</ng-template>
+
+          <div class="row">
+            <!-- Izquierda: Campos del formulario -->
+            <div class="left-section">
+              <mat-form-field appearance="fill">
+                <mat-label>Marca</mat-label>
+                <input matInput formControlName="marca" placeholder="Marca del vehículo" />
+              </mat-form-field><br><br>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Modelo</mat-label>
+                <input matInput formControlName="modelo" placeholder="Modelo del vehículo" />
+              </mat-form-field><br><br>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Año</mat-label>
+                <input matInput type="number" formControlName="anio" placeholder="Año del vehículo" />
+              </mat-form-field><br><br>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Número de Placa</mat-label>
+                <input
+                  matInput
+                  formControlName="numero_placa"
+                  placeholder="Número de placa"
+                  (blur)="verificarPlaca()"
+                />
+              </mat-form-field><br><br>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Kilometraje</mat-label>
+                <input matInput type="number" formControlName="kilometraje" placeholder="Ej. 50000" />
+              </mat-form-field><br><br> 
+
+              <mat-form-field appearance="fill">
+                <mat-label>Transmisión</mat-label>
+                <mat-select formControlName="transmision">
+                  <mat-option value="Manual">Manual</mat-option>
+                  <mat-option value="Automática">Automática</mat-option>
+                  <mat-option value="Semi-automática">Semi-automática</mat-option>
+                </mat-select>
+              </mat-form-field><br><br>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Tipo de Combustible</mat-label>
+                <mat-select formControlName="tipo_combustible">
+                  <mat-option value="Gasolina">Gasolina</mat-option>
+                  <mat-option value="Diesel">Diesel</mat-option>
+                </mat-select>
+              </mat-form-field><br><br>
+
+              <mat-form-field appearance="fill">
+                <mat-label>Último Día de Servicio</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field><br>           
+            </div>
+
+            <!-- Derecha: Seleccionar Imagen y vista previa -->
+            <div class="right-section">
+              <div class="image-upload-container">
+                <label for="imagen" class="custom-file-label">Seleccionar Imagen</label>
+                <input id="imagen" type="file" (change)="onFileChange($event)" />
+              </div>
+              <img *ngIf="previewImage" [src]="previewImage" alt="Vista previa" class="preview-image" />
+            </div>
+          </div><br><br>
+
+          <!-- Botón Registrar Vehículo -->
+          <div class="button-container">
+            <button class="styled-button" type="submit" (click)="registrarVehiculo(stepper)">
+              Registrar Vehículo
+            </button>
+          </div>              
+        </form>
+      </mat-step>
+
+      <mat-step>
+        <ng-template matStepLabel>Confirmación</ng-template>
+        <p>El vehículo ha sido registrado exitosamente.</p>
+        <button mat-button matStepperPrevious>Volver</button>
+        <button mat-button (click)="finalizarRegistro()">Finalizar</button>
+      </mat-step>
+    </mat-stepper>
+  </div>    
+</div>

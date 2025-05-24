@@ -1,0 +1,145 @@
+<div class="dashboard-container">
+  <!-- Sidebar/Menu Lateral -->
+  <div class="sidebar">
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+    
+      <!-- Selector de rol -->
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)" [ngModel]="rolActivo">
+            <option *ngFor="let rol of roles" [value]="rol">
+                {{ rol.charAt(0).toUpperCase() + rol.slice(1) }}
+            </option>
+        </select>
+      </div>
+    </div>
+
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Vendedor" -->
+        <li>
+          <a routerLink="/dashboard">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+              <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+            </div>                       
+          </a>
+        </li>              
+
+        <!-- Menú "Repuestos" con submenú -->
+        <li>
+          <a (click)="toggleMenu('repuestos')">
+              <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Repuestos</span>
+              </div>
+          </a>
+          <ul *ngIf="showRepuestosMenu" class="submenu">
+              <li class="submenu-item">
+              <a (click)="navigateCrearRepuestos()">
+                  <div style="display: flex; align-items: center;">
+                      <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                      <span style="font-size: 14px; color: #050505;">Agregar Repuestos</span>
+                  </div>
+              </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateListarRepuestos()">
+                  <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Listar Repuestos</span>
+                  </div>
+              </a>
+              </li>
+          </ul>
+        </li>
+
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+  </div>
+  
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+    <!-- Widgets de Repuestos -->
+    <div class="grid-container">
+      <!-- Total de repuestos -->
+      <div class="widget zoom-animation primary-widget">
+        <div class="widget-icon">
+          <i class="fa-solid fa-boxes-packing" style="color: #090a0b; font-size:30px;"></i>
+        </div>
+        <div class="widget-content">
+          <h4>Total de Repuestos</h4>
+          <h2>{{ totalRepuestos }}</h2>
+        </div>
+      </div>
+
+      <!-- Repuestos en alerta -->
+      <!-- Widget de Repuestos en Alerta -->
+      <div class="widget zoom-animation secondary-widget">
+        <div class="widget-icon">
+          <i class="fa-solid fa-exclamation-triangle"
+            style="color: #090a0b; font-size:30px;"></i>
+        </div>
+        <div class="widget-content">
+          <h4>Repuestos en Alerta</h4>
+          <h2 class="clickable" (click)="openAlertModal()">
+            {{ lowStockCount }}
+          </h2>
+        </div>
+      </div>
+
+      <!-- Stock total -->
+      <div class="widget zoom-animation primary-widget">
+        <div class="widget-icon">
+          <i class="fa-solid fa-layer-group" style="color: #090a0b; font-size:30px;"></i>
+        </div>
+        <div class="widget-content">
+          <h4>Stock Total</h4>
+          <h2>{{ totalStock }}</h2>
+        </div>
+      </div>
+
+      <!-- AHORA: Valor Total del Inventario -->
+      <div class="widget zoom-animation secondary-widget">
+        <div class="widget-icon">
+          <i class="fa-solid fa-dollar-sign" style="color: #090a0b; font-size:30px;"></i>
+        </div>
+        <div class="widget-content">
+          <h4>Valor Inventario</h4>
+          <h2>{{ totalInventoryValue | currency:'USD':'symbol' }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico de tendencia de inventario -->
+    <div class="chart-container">
+      <h3 class="chart-title">Tendencia de Stock (últimos 12 meses)</h3>
+      <apx-chart
+        *ngIf="chartOptions?.series?.length"
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [xaxis]="chartOptions.xaxis"
+        [dataLabels]="chartOptions.dataLabels"
+        [grid]="chartOptions.grid"
+        [tooltip]="chartOptions.tooltip">
+      </apx-chart>
+    </div>
+  </div>
+</div>

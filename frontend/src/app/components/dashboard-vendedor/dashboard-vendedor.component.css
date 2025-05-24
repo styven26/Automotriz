@@ -1,0 +1,489 @@
+/* Estructura principal */
+.filtros-container {
+  display: flex;
+  flex-direction: column; /* Columnas principales */
+  align-items: center; /* Centrar horizontalmente */
+  gap: 10px; /* Espaciado entre filas */
+  background-color: #ffffff; /* Fondo blanco */
+  border: 1px solid #e0e0e0; /* Borde sutil */
+  padding: 15px; /* Espaciado interno */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+/* Contenedor de la tabla */
+.table-container {
+  border: 1px solid rgba(0, 0, 0, 0.12); /* Borde del mismo grosor y color que las líneas de la tabla */
+  border-radius: 8px; /* Bordes redondeados */
+  padding: 10px; /* Espaciado interno */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+/* Ajustes de la tabla */
+.mat-elevation-z8 {
+  box-shadow: none; /* Eliminar sombra interna de la tabla */
+  border: none; /* Eliminar borde de la tabla */
+}
+
+.filtros-row {
+  display: flex; /* Contenedor para año y mes */
+  gap: 10px; /* Espaciado entre los selectores */
+  width: 100%; /* Ancho completo */
+  justify-content: space-between; /* Espaciado entre año y mes */
+}
+
+.filtros-container select {
+  flex: 1; /* Ocupan el mismo espacio */
+  padding: 5px; /* Reduce el espaciado interno */
+  font-size: 12px; /* Reduce el tamaño del texto */
+  height: 30px; /* Establece una altura específica */
+  color: #333; /* Color del texto */
+  border: 1px solid #ccc; /* Borde gris */
+  border-radius: 6px; /* Bordes ligeramente más pequeños */
+  background-color: #f9f9f9; /* Fondo claro */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna reducida */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filtros-container select:focus {
+  border-color: #3f93e7; /* Color de borde al hacer foco */
+  box-shadow: 0 0 4px rgba(63, 147, 231, 0.5); /* Sombra azul */
+  outline: none; /* Quitar el borde azul predeterminado */
+}
+
+.filtros-container button {
+  background-color: #3f93e7; /* Fondo azul */
+  color: white; /* Texto blanco */
+  font-size: 14px; /* Tamaño de texto */
+  padding: 10px 20px; /* Espaciado interno */
+  border: none; /* Sin bordes */
+  border-radius: 8px; /* Bordes redondeados */
+  cursor: pointer; /* Cambiar a puntero */
+  font-weight: 600; /* Texto negrita */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  width: 100%; /* Ocupa el ancho completo del contenedor */
+}
+
+.filtros-container button:hover {
+  background-color: #3a86d1; /* Fondo más oscuro */
+  box-shadow: 0 4px 8px rgba(58, 134, 209, 0.5); /* Sombra más pronunciada */
+  transform: translateY(-2px); /* Efecto de elevación */
+}
+
+.filtros-container button:active {
+  background-color: #336ca5; /* Fondo más oscuro al presionar */
+  transform: translateY(1px); /* Efecto de "pulsar" */
+}
+
+.dropdown-menu {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.dropdown-menu button {
+  background-color: #3f93e7; /* Azul consistente con primary-widget */
+  color: rgb(6, 6, 6);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+/* Adaptación al color del secondary-widget */
+.secondary-widget .dropdown-menu button {
+  background-color: #65e865; /* Verde consistente con secondary-widget */
+}
+
+.dashboard-container {
+  display: flex;
+  overflow-x: hidden; /* Evita el desbordamiento horizontal */
+  background-color: #f9fafc;
+  padding: 0%;
+}
+
+.sidebar {
+  flex-direction: column; /* Organiza los elementos en columna */
+  display: flex;
+  width: 240px;
+  background-color: #e5eae5;
+  color: rgb(82, 96, 93);
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+.sidebar .header {
+  text-align: center;
+}
+
+.sidebar .header img {
+  width: 80px;
+  height: 80px;
+}
+
+.sidebar .header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sidebar .header span {
+  font-size: 14px;
+}
+
+.sidebar .logo {
+  display: flex; /* Para usar Flexbox */
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  margin-bottom: 15px;
+}
+
+.sidebar .logo img {
+  width: 140px;
+  max-width: 100%;
+  height: auto;
+} 
+
+.sidebar nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 15px;
+}
+
+.sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  color: rgb(121, 134, 127);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar nav ul li a img {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.sidebar nav ul li a:hover {
+  background-color: #ecba8c;
+  transform: translateX(10px);
+}
+
+/* Ajustes para submenú */
+.submenu {
+  padding-left: 20px;  /* Espaciado entre el menú principal y el submenú */
+  margin-top: 5px;
+}
+
+.submenu-item {
+  margin-left: 20px;  /* Alineación hacia la derecha para los submenús */
+}
+
+.submenu-item a {
+  font-size: 14px;    /* Tamaño de fuente más pequeño */
+  display: flex;
+  align-items: center;
+}
+
+.submenu-item i {
+  font-size: 14px;    /* Íconos más pequeños */
+  margin-right: 8px;
+}
+
+/* Añadiendo animación al hover en submenú */
+.submenu-item a:hover {
+  transform: translateX(5px);  /* Efecto de hover en el submenú */
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 50px;
+  width: calc(100% - 250px);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+}
+
+/* Cabecera */
+.header {
+  margin-bottom: 30px;
+  text-align: center;
+  color: #243447;
+  font-family: 'Poppins', sans-serif; /* Cambia la tipografía aquí */
+}
+
+.header h2 {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;    /* Centra verticalmente */
+  font-size: 25px;  /* Tamaño del texto más grande */
+  font-weight: 700; /* Texto más grueso */
+  color: #243447;
+  margin: 0;
+  padding-bottom: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;  /* Convierte a mayúsculas */
+}
+
+.header p {
+  font-size: 15px;   /* Texto un poco más grande */
+  color: #707070;    /* Un color gris más suave para el rol */
+  font-weight: 500;  /* Peso medio */
+  text-transform: capitalize;
+}
+
+/* Agregando una pequeña animación */
+.header h2, .header p {
+  animation: fadeIn 1s ease-in-out;  /* Efecto de entrada */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Widgets */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajuste dinámico de columnas */
+  gap: 20px;
+  margin: 0 auto; /* Centra los widgets en pantallas más grandes */
+  width: 100%; /* Asegura que el grid no cause desbordamiento */
+  box-sizing: border-box; /* Asegura que los márgenes y bordes se cuenten en el ancho total */
+}
+
+.primary-widget {
+  background-color: #3f93e7;
+  color: white;
+}
+
+.secondary-widget {
+  background-color: #65e865;
+  color: white;
+}
+
+.widget:hover {
+  transform: translateY(-10px);
+}
+
+.widget-icon img {
+  width: 40px;
+}
+
+.widget h4 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.widget h2 {
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Limita la altura del contenido del dialog y activa scroll */
+
+/* Estiliza el título */
+.alert-dialog-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Reserve espacio para el buscador */
+.alert-search {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/* dentro de styles: [...] */
+
+:host ::ng-deep .mat-dialog-container {
+  padding: 0;             /* quita padding extra si hace falta */
+  box-sizing: border-box;
+}
+
+.alert-dialog-content {
+  max-height: calc(80vh - 128px); /* resta el header y actions */
+  overflow-y: auto;
+  padding: 0 24px;
+}
+
+/* Gráfico */
+.chart-container {
+  margin-top: 40px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Animaciones adicionales */
+.zoom-animation {
+  transition: transform 0.3s ease;
+}
+
+.zoom-animation:hover {
+  transform: scale(1.05);
+}
+
+/* Reloj */
+.reloj-container {
+  margin-top: auto; /* Empuja el reloj hacia el fondo */
+  display: flex;
+  align-items: center; /* Alinear verticalmente el ícono y texto */
+  padding: 10px; /* Espaciado uniforme como en los demás elementos */
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 1.5rem; /* Tamaño de la fuente similar */
+  color: #050505; /* Color de texto */
+  font-weight: bold; /* Fuente en negrita */
+}
+
+.reloj-container i {
+  margin-right: 12px; /* Espacio entre el ícono y el texto */
+  font-size: 1.5rem; /* Aumenta el tamaño del ícono */
+}
+
+.reloj-container:hover {
+  background-color: #ecba8c; /* Efecto hover como los otros elementos */
+  transform: translateX(10px); /* Animación consistente */
+}
+
+/* Para pantallas de tablets (anchos menores a 1024px) */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .main-content {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr); /* Mostrar solo 2 columnas de widgets */
+  }
+
+  .header h2 {
+    font-size: 22px;
+  }
+
+  .widget h2 {
+    font-size: 28px;
+  }
+}
+
+/* Para pantallas de móviles (anchos menores a 768px) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%; /* Hacer que el sidebar ocupe toda la pantalla */
+    position: static; /* Quitar el sidebar fijo */
+    padding: 10px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr; /* Mostrar solo 1 columna de widgets */
+  }
+
+  .widget {
+    padding: 15px;
+  }
+
+  .header h2 {
+    font-size: 20px;
+  }
+
+  .widget h2 {
+    font-size: 24px;
+  }
+}
+
+.chart-title {
+  font-size: 16px; /* Tamaño de letra ligeramente mayor */
+  font-weight: 700; /* Más negrita para resaltar */
+  text-align: center;
+  margin-bottom: 15px; /* Más espacio para separar del gráfico */
+  color: #2c3e50; /* Un tono más oscuro para mayor contraste */
+  text-transform: uppercase; /* Convertir texto a mayúsculas */
+  letter-spacing: 1px; /* Espaciado entre letras */
+  padding-bottom: 3px; /* Espacio adicional debajo del texto */
+  font-family: 'Roboto', sans-serif; /* Fuente moderna (puedes cambiarla si usas otra) */
+}
+
+/* Contenedor del selector de rol */
+.role-switcher {
+  display: inline-block; /* Alinea el selector con el contenido */
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Estilo del selector */
+.role-switcher select {
+  border: none; /* Sin bordes internos */
+  font-size: 14px; /* Tamaño del texto */
+  color: #333333; /* Color del texto */
+  background: transparent; /* Fondo transparente */
+  padding: 5px 5px; /* Espaciado interno */
+  outline: none; /* Sin borde de foco */
+  font-family: 'Poppins', sans-serif; /* Fuente consistente */
+  cursor: pointer; /* Cambiar cursor a mano */
+}
+
+/* Flecha personalizada para el selector */
+.role-switcher select::-ms-expand {
+  display: none; /* Oculta la flecha en IE/Edge */
+}
+
+.role-switcher select:hover {
+  color: #000000; /* Cambiar color del texto al pasar el mouse */
+}
+
+.role-switcher select:focus {
+  outline: none; /* Sin borde predeterminado */
+}
+
+/* Animación al mostrar */
+.role-switcher {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

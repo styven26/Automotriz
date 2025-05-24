@@ -1,0 +1,203 @@
+<div class="dashboard-container">
+  <div class="sidebar">
+    <!-- Logo e imagen del usuario -->
+    <div class="header">
+      <img src="icons/usuario.png" alt="">
+      <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+      <div class="role-switcher">
+        <select (change)="cambiarRol($event)" [value]="rolActivo">
+            <option *ngFor="let rol of roles" [value]="rol" [selected]="rol === rolActivo">
+            {{ rol }}
+            </option>
+        </select>  
+      </div>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav>
+      <ul>
+        <!-- Opción "Dashboard Cliente" -->
+        <li>
+          <a routerLink="/dashboard" class="dashboard active">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">dashboard</span>
+              <span>Dashboard</span>
+            </div>
+          </a>
+        </li>
+
+        <!-- Menú "Vehículo" con submenú -->
+        <li>
+          <a (click)="toggleMenu('mecanicos')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">directions_car</span>
+              <span>Vehículo</span>
+            </div>
+          </a>
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateVehiculoCliente()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">event_available</span>
+                  <span>Registrar Vehículo</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+          <ul *ngIf="showMecanicosMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateListarVehiculos()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">list</span>
+                  <span>Listado</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Citas" con submenú -->
+        <li>
+          <a (click)="toggleMenu('citas')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">calendar_today</span>
+              <span>Citas</span>
+            </div>
+          </a>
+          <ul *ngIf="showCitasMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateCitas()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">event_available</span>
+                  <span>Programar Cita</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Historial" -->
+        <li>
+          <a (click)="toggleMenu('historial')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">history</span>
+              <span>Historial</span>
+            </div>
+          </a>
+          <ul *ngIf="showHistorialMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateHistorial()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">history_toggle_off</span>
+                  <span>Historial de Citas</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Menú "Monitoreo Tiempo Real" con submenú -->
+        <li>
+          <a (click)="toggleMenu('monitoreo')">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">settings</span>
+              <span>Monitoreo TR</span>
+            </div>
+          </a>
+          <ul *ngIf="showMonitoreoMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateMonitoreo()">
+                <div style="display: flex; align-items: center;">
+                  <span class="material-icons">build</span>
+                  <span>Estado del Vehículo</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+        <!-- Opción "Cerrar Sesión" -->
+        <li>
+          <a (click)="logout()">
+            <div style="display: flex; align-items: center;">
+              <span class="material-icons">logout</span>
+              <span>Cerrar Sesión</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Reloj al final del Sidebar -->
+    <div class="reloj-container">
+      <i class="fas fa-clock"></i>
+      <span>{{ tiempoRestante }}</span>
+    </div>
+    
+  </div>
+
+  <!-- Contenido Principal del Dashboard -->
+  <div class="main-content">
+    <!-- Tarjetas de resumen -->
+    <div class="summary-container">
+      <div class="summary-card">
+        <span class="summary-title">Vehículos</span><br><br>
+        <span class="summary-value">{{ vehiculosRegistrados }}</span><br><br>
+        <span class="summary-subtitle">Total de vehículos gestionados</span>
+      </div>    
+
+      <div class="summary-card">
+        <span class="summary-title">Citas Atendidas</span><br><br>
+        <span class="summary-value">{{ proximasCitas }}</span><br><br>
+        <span class="summary-subtitle">Total de citas atentidas</span>
+      </div>
+
+      <div class="summary-card">
+        <span class="summary-title">Facturación Total</span><br><br>
+        <span class="summary-value">
+          ${{ facturacionTotal ? facturacionTotal.toFixed(2) : '0.00' }}
+        </span><br><br>
+        <span class="summary-subtitle">Facturación acumulada por citas atendidas</span>
+      </div>
+      
+    </div><br>
+
+    <!-- Contenedor para gráficos -->
+    <div class="charts-row">
+      <!-- Gráfico: Distribución de Tipos de Servicios Solicitados -->
+      <div class="chart-container">
+        <h4 class="chart-title">Distribución de Servicios Solicitados</h4>
+        <ngx-charts-pie-chart
+          [view]="[700, 470]"
+          [results]="distribucionServicios"
+          [legend]="true"
+          [legendTitle]="'Servicios'"
+          [labels]="true"
+          [doughnut]="true"
+          [gradient]="true"
+          [arcWidth]="0.3"
+          [animations]="true"
+          [tooltipDisabled]="false">
+        </ngx-charts-pie-chart>
+      </div>
+
+      <!-- Gráfico: Ingresos Acumulados por Mes -->
+      <div class="chart-container" *ngIf="ingresosPorMes">
+        <h4 class="chart-title">Facturación Mensual por Citas Atendidas</h4>
+        <ngx-charts-bar-vertical
+            *ngIf="ingresosPorMes.length > 0"
+            [view]="[700, 470]"
+            [results]="ingresosPorMes"
+            [legend]="true"
+            [xAxis]="true"
+            [yAxis]="true"
+            [animations]="true"
+            [tooltipDisabled]="false">
+        </ngx-charts-bar-vertical>
+        <p *ngIf="ingresosPorMes.length === 0">No hay datos disponibles para mostrar.</p>
+      </div>
+      <p *ngIf="!ingresosPorMes">Cargando datos del gráfico...</p>
+    </div>
+  </div>  
+</div>
+  

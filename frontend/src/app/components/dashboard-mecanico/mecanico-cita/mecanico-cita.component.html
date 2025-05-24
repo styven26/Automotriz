@@ -1,0 +1,105 @@
+<div class="dashboard-container">
+    <!-- Sidebar/Menu Lateral -->
+    <div class="sidebar">
+        <div class="header">
+            <img src="icons/usuario.png" alt="">
+            <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+            <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+          
+            <!-- Selector de rol -->
+            <div class="role-switcher">
+                <select (change)="cambiarRol($event)" [value]="rolActivo">
+                    <option *ngFor="let rol of roles" [value]="rol" [selected]="rol === rolActivo">
+                    {{ rol }}
+                    </option>
+                </select>  
+            </div>
+        </div>
+        
+        <nav>
+        <ul>
+            <!-- Opción "Dashboard Administrador" -->
+            <li>
+                <a (click)="navigateDashboard()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+                        <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+                    </div>
+                </a>
+            </li>
+    
+            <!-- Menú "Citas" con submenú -->
+            <li>
+                <a (click)="toggleMenu('citas')">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-calendar-alt" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Citas</span>
+                    </div>
+                </a>
+                <ul *ngIf="showCitasMenu" class="submenu">
+                    <li class="submenu-item">
+                        <a (click)="navigateCitasMecanico()">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-calendar-check" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                <span style="font-size: 14px; color: #050505;">Ver Citas</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+    
+            <!-- Menú "Trabajos" con submenú -->
+            <li>
+                <a (click)="toggleMenu('trabajos')">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Trabajos</span>
+                    </div>
+                </a>
+                <ul *ngIf="showTiposnMenu" class="submenu">
+                    <li class="submenu-item">
+                        <a (click)="navigateTrabajos()">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                <span style="font-size: 14px; color: #050505;">Ver Trabajos</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+                <ul *ngIf="showTiposnMenu" class="submenu">
+                    <li class="submenu-item">
+                        <a (click)="navigateDiagnostico()">
+                            <div style="display: flex; align-items: center;">
+                                <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                <span style="font-size: 14px; color: #050505;">Diagnóstico</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Opción "Cerrar Sesión" -->
+            <li>
+                <a (click)="logout()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        </nav>
+        <!-- Reloj al final del Sidebar -->
+        <div class="reloj-container">
+            <i class="fas fa-clock"></i>
+            <span>{{ tiempoRestante }}</span>
+        </div>
+    </div>
+    
+    <!-- Contenido Principal del Dashboard -->
+    <div class="main-content">
+        <div class="calendar-container">
+            <full-calendar [options]="calendarOptions"></full-calendar>
+        </div>          
+    </div>
+</div>   

@@ -1,0 +1,93 @@
+<mat-dialog-content class="dialog-container">
+  <h2 class="dialog-title">
+    <!-- Información sobre la capacidad -->
+    <p *ngIf="capacidadHoraria">
+      Reserva {{ reservasActuales + 1 }} de {{ capacidadHoraria }}
+    </p>
+    <mat-icon color="primary">calendar_today</mat-icon>
+    Programar Reserva
+  </h2>
+
+  <!-- Fecha seleccionada -->
+  <p class="selected-date"><strong>Fecha:</strong> {{ data.fecha }}</p>
+
+  <!-- Vehículo -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>
+      <mat-icon>directions_car</mat-icon> Vehículo
+    </mat-label>
+    <mat-select [(ngModel)]="idVehiculo" (selectionChange)="actualizarVehiculoSeleccionado()">
+      <mat-option *ngFor="let vehiculo of misVehiculos" [value]="vehiculo.id_vehiculo">
+        {{ vehiculo.marca }} ({{ vehiculo.modelo }})
+      </mat-option>
+    </mat-select>
+    <mat-hint *ngIf="!idVehiculo">Selecciona un vehículo registrado.</mat-hint>
+  </mat-form-field>
+
+  <!-- Servicios Solicitados -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>
+      <mat-icon>build</mat-icon> Servicios
+    </mat-label>
+    <!-- 1) Cambiamos selectionChange para pasar $event.value a onServiciosChange -->
+    <mat-select
+      [(ngModel)]="subtiposSeleccionados"
+      multiple
+      (selectionChange)="onServiciosChange($event.value)"
+    >
+      <mat-option
+        *ngFor="let servicio of servicios"
+        [value]="servicio.id_servicio"
+        [disabled]="isDiagnosticoSelected() && servicio.nombre.toLowerCase() !== 'diagnóstico'"
+      >
+        {{ servicio.nombre }}
+      </mat-option>
+    </mat-select>
+    <mat-hint *ngIf="subtiposSeleccionados.length === 0">
+      Selecciona al menos un servicio.
+    </mat-hint>
+    <mat-hint
+      *ngIf="subtiposSeleccionados.length === 1 && isDiagnosticoSelected()"
+    >
+      El servicio "Diagnóstico" implica que el mecánico evaluará el problema.
+    </mat-hint>
+  </mat-form-field>
+  
+  <!-- Hora de inicio -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>
+      <mat-icon>schedule</mat-icon> Hora de Inicio
+    </mat-label>
+    <input matInput type="time" [(ngModel)]="horaInicio"/>
+    <mat-hint *ngIf="!horaInicio">Selecciona una hora válida.</mat-hint>
+  </mat-form-field>  
+
+  <!-- Información sobre la Hora de Fin -->
+  <div class="info-hora-fin" style="display: flex; align-items: center; gap: 8px; margin: 16px 0;">
+    <mat-icon color="warn">info</mat-icon>
+    <span>La hora de fin será determinada por el mecánico al finalizar el servicio.</span>
+  </div>
+
+  <!-- Resumen de la cita -->
+  <div class="summary-container">
+    <h1 class="dialog-title">
+      <mat-icon color="primary">calendar_today</mat-icon>
+      Resumen de la Cita    
+    </h1>
+    <p><strong>Fecha:</strong> {{ data.fecha }}</p>
+    <p><strong>Vehículo:</strong> {{ vehiculoSeleccionado || 'No seleccionado' }}</p>
+    <p><strong>Servicios:</strong> {{ serviciosSeleccionados || 'No seleccionados' }}</p>
+    <p><strong>Hora de Inicio:</strong> {{ horaInicio || 'No definida' }}</p>
+    <p><strong>Hora de Fin:</strong> Se asignará al finalizar el servicio</p>
+  </div>  
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-footer">
+  <button mat-button (click)="dialogRef.close()" class="btn-cancel">
+    <mat-icon>close</mat-icon> Cancelar
+  </button>
+  <button mat-raised-button (click)="confirmarCita()" class="btn-confirm" 
+    [disabled]="!horaInicio || !idVehiculo || subtiposSeleccionados.length === 0 || reservasActuales >= capacidadHoraria">
+    <mat-icon>check</mat-icon> Confirmar
+  </button>
+</mat-dialog-actions>

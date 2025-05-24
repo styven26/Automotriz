@@ -1,0 +1,57 @@
+<mat-dialog-content class="dialog-container">
+  <h1 class="dialog-title">Actualizar Cita</h1>
+
+  <!-- Fecha seleccionada -->
+  <p class="selected-date">Fecha seleccionada: {{ data.fecha }}</p>
+
+  <!-- Vehículo -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>Vehículo</mat-label>
+    <mat-select [(ngModel)]="idVehiculo" name="idVehiculo">
+      <mat-option *ngFor="let vehiculo of misVehiculos" [value]="vehiculo.id">
+        {{ vehiculo.marca }} ({{ vehiculo.modelo }})
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Servicios Solicitados -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>Servicios Solicitados</mat-label>
+    <mat-select [(ngModel)]="subtiposSeleccionados" multiple (selectionChange)="onSubtiposChange()">
+      <mat-option *ngFor="let servicio of servicios" [value]="servicio.id">
+        {{ servicio.nombre }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Hora de Inicio -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>Hora de Inicio</mat-label>
+    <input
+      matInput
+      type="time"
+      [(ngModel)]="horaInicio"
+      name="horaInicio"
+      (ngModelChange)="calcularHoraFin()"
+    />
+  </mat-form-field>
+
+  <!-- Hora de Fin -->
+  <mat-form-field appearance="outline" class="form-field">
+    <mat-label>Hora de Fin</mat-label>
+    <input matInput [value]="horaFin" readonly />
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-footer">
+  <button mat-button class="btn-cancel" (click)="cancelar()">
+    <mat-icon>close</mat-icon> Cancelar
+  </button>
+  <button
+    mat-raised-button
+    class="btn-confirm"
+    [disabled]="!horaInicio || subtiposSeleccionados.length === 0 || !idVehiculo"
+    (click)="actualizarCita()"> 
+    <mat-icon>check</mat-icon> Guardar
+  </button>
+</mat-dialog-actions>

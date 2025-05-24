@@ -1,0 +1,253 @@
+<div class="dashboard-container">
+    <!-- Sidebar/Menu Lateral -->
+    <div class="sidebar">
+      <div class="header">
+        <img src="icons/usuario.png" alt="">
+        <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
+        <p>Rol actual: {{ rolActivo ? rolActivo : 'Sin rol' }}</p>
+      
+        <!-- Selector de rol -->
+        <div class="role-switcher">
+          <select (change)="cambiarRol($event)">
+            <option *ngFor="let rol of roles" [value]="rol">{{ rol }}</option>
+          </select>
+        </div>
+      </div>
+
+      <nav>
+        <ul>
+          <!-- Opción "Dashboard Administrador" -->
+          <li>
+            <a (click)="navigateDashboardAdmin()">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-gauge-high" style="color: #050505; font-size: 20px; margin-right: 10px;"></i>
+                <span style="font-size: 20px; font-weight: bold; color: #050505;">Dashboard</span>
+              </div>
+            </a>
+          </li>
+  
+          <!-- Menú "Mecánicos" con submenú -->
+          <li>
+            <a (click)="toggleMenu('mecanicos')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user-group" style="color: #0d0d0d; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Mecánicos</span>
+              </div>
+            </a>
+            <!-- Submenú -->
+            <ul *ngIf="showMecanicosMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateToCrearMecanico()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-user-plus" style="color: #0d0d0d; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Agregar Mecánico</span>
+                  </div>
+                </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateListarMecanico()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-list" style="color: #0d0d0d; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Listar Mecánicos</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Menú "Clientes" con submenú -->
+          <li>
+            <a (click)="toggleMenu('clientes')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user-group" style="color: #0d0d0d; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Clientes</span>
+              </div>
+            </a>
+            <!-- Submenú -->
+            <ul *ngIf="showClientesMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateListarClientes()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-list" style="color: #0d0d0d; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Listar Clientes</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+  
+          <!-- Menú "Horarios" con submenú -->
+          <li>
+            <a (click)="toggleMenu('horarios')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-calendar-plus" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Horarios</span>
+              </div>
+            </a>
+            <ul *ngIf="showHorariosMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateToCrearHorario()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-calendar-plus" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Agregar Horario</span>
+                  </div>
+                </a>
+              </li>
+              <li class="submenu-item">
+                <a (click)="navigateToListarHorario()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-calendar-alt" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Listar Horarios</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Menú "Tipos de Servicios" con submenú -->
+          <li>
+            <a (click)="toggleMenu('orden')">
+                <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Tipos de Servicios</span>
+                </div>
+            </a>
+            <ul *ngIf="showOrdenMenu" class="submenu">
+                <li class="submenu-item">
+                  <a (click)="navigateListarOrden()">
+                      <div style="display: flex; align-items: center;">
+                          <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                          <span style="font-size: 14px; color: #050505;">Agregar Tipo de Servicio</span>
+                      </div>
+                  </a>
+                </li>
+                <li class="submenu-item">
+                  <a (click)="navigateListarServicio()">
+                    <div style="display: flex; align-items: center;">
+                      <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                      <span style="font-size: 14px; color: #050505;">Listar Tipos de Servicios</span>
+                    </div>
+                  </a>
+                </li>
+            </ul>
+          </li>
+          
+          <!-- Menú "Servicios" con submenú -->
+          <li>
+            <a (click)="toggleMenu('tipos')">
+                <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-toolbox" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Servicios</span>
+                </div>
+            </a>
+            <ul *ngIf="showTiposnMenu" class="submenu">
+                <li class="submenu-item">
+                <a (click)="navigateArgregarServicio()">
+                    <div style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                        <span style="font-size: 14px; color: #050505;">Agregar Servicio</span>
+                    </div>
+                </a>
+                </li>
+                <li class="submenu-item">
+                  <a (click)="navigateListarSubtipo()">
+                    <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-list" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Listar Servicios</span>
+                    </div>
+                </a>
+                </li>
+            </ul>
+          </li>
+
+          <!-- Menú "Citas" con submenú -->
+          <li>
+            <a (click)="toggleMenu('citas')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-calendar-days" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Citas</span>
+              </div>
+            </a>
+            <ul *ngIf="showCitasMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateListarCitas()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-calendar-check" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Ver Citas de Mecánicos</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+  
+          <!-- Opción "Cerrar Sesión" -->
+          <li>
+            <a (click)="logout()">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-right-from-bracket" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Cerrar Sesión</span>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <!-- Reloj al final del Sidebar -->
+      <div class="reloj-container">
+        <i class="fas fa-clock"></i>
+        <span>{{ tiempoRestante }}</span>
+      </div>
+    </div>
+    
+    <!-- Contenido Principal del Dashboard -->
+    <div class="main-content">
+        <div class="auth-container">
+            <div class="header">
+                <h2>Listado de Tipos de Mantenimiento Automotriz</h2>
+                <p>Tipos de Mantenimiento Automotriz</p>
+            </div><br>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Buscar</mat-label>
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Buscar por nombre o descripción">
+            </mat-form-field>            
+
+            <!-- Contenedor de la tabla -->
+            <div class="table-container">
+                <div class="mat-elevation-z8">
+                    <table mat-table [dataSource]="dataSource" matSort>
+                        <!-- Columnas y filas de la tabla -->
+                        <ng-container matColumnDef="nombre">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre del Mantenimiento Automotriz</th>
+                            <td mat-cell *matCellDef="let tipo"> {{tipo.nombre}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="acciones">
+                            <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
+                            <td mat-cell *matCellDef="let tipo">
+                                <div class="action-buttons">
+                                    <button mat-icon-button color="primary" (click)="editarTipoServicio(tipo)">
+                                        <mat-icon>edit</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="warn" (click)="eliminarTipoServicio(tipo)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                        <!-- No data row -->
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell" colspan="3">No hay datos que coincidan con "{{ filterValue }}"</td>
+                        </tr>
+                    </table>
+
+                    <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

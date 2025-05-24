@@ -1,0 +1,122 @@
+<div class="auth-container">
+  <div class="auth-box">
+    <h2>Regístrate</h2>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="input-row">
+        <!-- Nombre -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Nombre</mat-label>
+          <input matInput type="text" formControlName="nombre" placeholder="Introduce tu nombre" />
+          <mat-error *ngIf="nameErrors">{{ nameErrors }}</mat-error>
+        </mat-form-field>
+
+        <!-- Apellido -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Apellido</mat-label>
+          <input matInput type="text" formControlName="apellido" placeholder="Introduce tu apellido" />
+          <mat-error *ngIf="lastNameErrors">{{ lastNameErrors }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="input-row">
+        <!-- Cédula -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Cédula</mat-label>
+          <input matInput type="text" formControlName="cedula" placeholder="Introduce tu cédula" />
+          <!-- Error si la cédula ya existe -->
+          <mat-error *ngIf="registerForm.get('cedula')?.hasError('taken')">
+            La cédula ya está registrada.
+          </mat-error>
+          <!-- Error si la cédula es inválida -->
+          <mat-error *ngIf="registerForm.get('cedula')?.hasError('invalidCedula')">
+            La cédula no es válida.
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Correo Electrónico -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            formControlName="correo" 
+            placeholder="Introduce tu correo" 
+            required
+          />
+          <!-- Mostrar error si el correo es obligatorio -->
+          <mat-error *ngIf="registerForm.get('correo')?.hasError('required')">
+            El correo electrónico es obligatorio.
+          </mat-error>
+          <!-- Mostrar error si el correo ya está registrado -->
+          <mat-error *ngIf="registerForm.get('correo')?.hasError('taken')">
+            El correo ya ha sido registrado.
+          </mat-error>
+          <!-- Mostrar error si el formato del correo es inválido -->
+          <mat-error *ngIf="registerForm.get('correo')?.hasError('email')">
+            Ingresa un correo válido.
+          </mat-error>
+        </mat-form-field>        
+      </div>
+
+      <div class="input-row">
+        <!-- Teléfono -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Teléfono</mat-label>
+          <span matPrefix class="prefix" style="padding-left: 0.5cm;">+593</span>
+          <input matInput type="text" formControlName="telefono" maxlength="9" placeholder="9XXXXXXXX" />
+          <mat-error *ngIf="phoneErrors">{{ phoneErrors }}</mat-error>
+        </mat-form-field>
+
+        <!-- Dirección Domicilio -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Dirección del Domicilio</mat-label>
+          <input matInput type="text" formControlName="direccion_domicilio" placeholder="Introduce tu dirección" />
+          <mat-error *ngIf="registerForm.get('direccion_domicilio')?.touched && registerForm.get('direccion_domicilio')?.invalid">
+            {{ direccionErrors }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="input-row">
+        <!-- Fecha de Nacimiento -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Fecha de Nacimiento</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fecha_nacimiento" placeholder="Selecciona tu fecha de nacimiento">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="fechaNacimientoErrors">{{ fechaNacimientoErrors }}</mat-error>
+        </mat-form-field>
+
+        <!-- Contraseña -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Introduce tu contraseña" />
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Mostrar u ocultar la contraseña'" [attr.aria-pressed]="!hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="passwordErrors">{{ passwordErrors }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="input-row">
+        <!-- Confirmar Contraseña -->
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Confirmar Contraseña</mat-label>
+          <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Confirma tu contraseña" />
+          <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid">
+            {{ confirmPasswordErrors }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="primary" class="btn-submit" type="submit" [disabled]="registerForm.invalid || registerForm.pristine">Crear Cuenta</button>
+
+      <div class="signup-link">
+        <p>¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a></p>
+      </div>
+    </form>
+  </div>
+</div>

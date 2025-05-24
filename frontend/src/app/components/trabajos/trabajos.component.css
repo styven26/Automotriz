@@ -1,0 +1,538 @@
+/* Estructura principal */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f9fafc;
+    padding: 0%;
+  }
+  
+  .sidebar {
+    flex-direction: column; /* Organiza los elementos en columna */
+    display: flex;
+    width: 240px;
+    background-color: #e5eae5;
+    color: rgb(82, 96, 93);
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar .header {
+    text-align: center;
+  }
+
+  .sidebar .header img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .sidebar .header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .sidebar .header span {
+    font-size: 14px;
+  }
+
+  .sidebar .logo {
+    display: flex; /* Para usar Flexbox */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin-bottom: 15px;
+  }
+
+  .sidebar .logo img {
+    width: 140px;
+    max-width: 100%;
+    height: auto;
+  } 
+
+  .sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .sidebar nav ul li {
+    margin-bottom: 15px;
+  }
+
+  .sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    color: rgb(121, 134, 127);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .sidebar nav ul li a img {
+    width: 20px;
+    margin-right: 10px;
+  }
+
+  .sidebar nav ul li a:hover {
+    background-color: #ecba8c;
+    transform: translateX(10px);
+  }
+  
+  /* Ajustes para submenú */
+  .submenu {
+    padding-left: 20px;  /* Espaciado entre el menú principal y el submenú */
+    margin-top: 5px;
+  }
+  
+  .submenu-item {
+    margin-left: 20px;  /* Alineación hacia la derecha para los submenús */
+  }
+  
+  .submenu-item a {
+    font-size: 14px;    /* Tamaño de fuente más pequeño */
+    display: flex;
+    align-items: center;
+  }
+  
+  .submenu-item i {
+    font-size: 14px;    /* Íconos más pequeños */
+    margin-right: 8px;
+  }
+  
+  /* Añadiendo animación al hover en submenú */
+  .submenu-item a:hover {
+    transform: translateX(5px);  /* Efecto de hover en el submenú */
+  }
+  
+  /* Contenido Principal del Dashboard */
+  .main-content {
+    margin-left: 250px;
+    padding: 50px;
+    width: calc(100% - 250px);
+  }
+
+  /* Cabecera */
+  .header {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #243447;
+    font-family: 'Poppins', sans-serif; /* Cambia la tipografía aquí */
+  }
+    
+  .header h2 {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;    /* Centra verticalmente */
+    font-size: 25px;  /* Tamaño del texto más grande */
+    font-weight: 700; /* Texto más grueso */
+    color: #243447;
+    margin: 0;
+    padding-bottom: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;  /* Convierte a mayúsculas */
+  }
+
+  .header p {
+    font-size: 15px;   /* Texto un poco más grande */
+    color: #707070;    /* Un color gris más suave para el rol */
+    font-weight: 500;  /* Peso medio */
+    text-transform: capitalize;
+  }
+  
+  .reloj-container {
+    margin-top: auto; /* Empuja el reloj hacia el fondo */
+    display: flex;
+    align-items: center; /* Alinear verticalmente el ícono y texto */
+    padding: 10px; /* Espaciado uniforme como en los demás elementos */
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 1.5rem; /* Tamaño de la fuente similar */
+    color: #050505; /* Color de texto */
+    font-weight: bold; /* Fuente en negrita */
+  }
+  
+  .reloj-container i {
+    margin-right: 12px; /* Espacio entre el ícono y el texto */
+    font-size: 1.5rem; /* Aumenta el tamaño del ícono */
+  }
+  
+  .reloj-container:hover {
+    background-color: #ecba8c; /* Efecto hover como los otros elementos */
+    transform: translateX(10px); /* Animación consistente */
+  }
+  
+  /* Agregando una pequeña animación */
+  .header h2, .header p {
+    animation: fadeIn 1s ease-in-out;  /* Efecto de entrada */
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Media Queries para diseño responsive */
+  @media (max-width: 1024px) {
+    .sidebar {
+      width: 180px;
+    }
+  
+    .main-content {
+      margin-left: 180px;
+      width: calc(100% - 180px);
+    }
+  
+    .grid-container {
+      grid-template-columns: repeat(2, 1fr); /* Mostrar solo 2 columnas de widgets */
+    }
+  
+    .header h2 {
+      font-size: 22px;
+    }
+  
+    .widget h2 {
+      font-size: 28px;
+    }
+  }
+  
+  /* Para pantallas de móviles (anchos menores a 768px) */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 100%; /* Hacer que el sidebar ocupe toda la pantalla */
+      position: static; /* Quitar el sidebar fijo */
+      padding: 10px;
+    }
+  
+    .main-content {
+      margin-left: 0;
+      width: 100%;
+    }
+  
+    .grid-container {
+      grid-template-columns: 1fr; /* Mostrar solo 1 columna de widgets */
+    }
+  
+    .widget {
+      padding: 15px;
+    }
+  
+    .header h2 {
+      font-size: 20px;
+    }
+  
+    .widget h2 {
+      font-size: 24px;
+    }
+  }
+  
+  /* ======================================== */
+  /*  Contenedor principal (varias tarjetas)  */
+  /* ======================================== */
+  /* Contenedor principal */
+  .trabajos-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    padding: 18px;
+    gap: 40px; /* Aumenta este valor para más espacio */
+  }
+  
+  /* Cada tarjeta ocupa el 22% del ancho para permitir 4 por fila */
+  .card-wrapper {
+    flex: 0 1 calc(22% - 10px);
+    max-width: calc(22% - 10px);
+    box-sizing: border-box;
+    margin: 10px; /* Aumenta el margen según sea necesario */
+  }
+  
+  /* Estilo para las tarjetas */
+  .card-black {
+    background: #FFFFFF;
+    color: #333333;
+    border-radius: 16px;
+    padding: 22px;
+    width: 100%;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Efecto hover */
+  .card-black:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Imagen dentro de la tarjeta */
+  igx-card-media img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  /* Títulos dentro de la tarjeta */
+  .card-black h3 {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase; /* Texto en mayúsculas */
+    margin-bottom: 4px; /* Espacio reducido con el subtítulo */
+    font-family: 'Poppins', sans-serif;
+    color: #333333;
+  }
+  
+  /* Subtítulo (estado) */
+  .card-black h5 {
+    font-size: 12px; /* Tamaño más pequeño */
+    font-family: 'Poppins', sans-serif; /* Fuente moderna */
+    color: #e91e63; /* Color vibrante */
+    margin-bottom: 12px; /* Espacio ajustado */
+    font-weight: bold; /* Hace el texto más grueso */
+    text-transform: uppercase; /* Texto en mayúsculas */
+    letter-spacing: 0.5px; /* Espaciado entre letras */
+  }
+  
+  /* Texto y contenido dentro de la tarjeta */
+  .card-black p {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 6px 0;
+    margin-bottom: 12px; /* Incrementa el espacio entre párrafos */
+    font-family: 'Poppins', sans-serif;
+    color: #555555;
+    text-transform: uppercase; /* Texto en mayúsculas */
+  }
+  
+  .card-black strong {
+    color: #151414;
+    font-weight: bold;
+  }
+  
+  /* Botones en la sección inferior */
+  .button-row {
+    display: flex;
+    justify-content: center; /* Centra los botones */
+    gap: 5px; /* Espaciado entre botones */
+    padding-top: 16px;
+  }
+  
+  /* Estilo base para los botones */
+  .custom-button {
+    background-color: #f5f5f5; /* Fondo claro */
+    border: 1px solid #e0e0e0; /* Borde gris claro */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    width: 50px; /* Tamaño del botón */
+    height: 50px;
+    border-radius: 50%; /* Botón circular */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+  }
+  
+  /* Estilo para el color del icono por defecto */
+  .custom-button mat-icon {
+    color: #757575; /* Color gris estándar */
+    font-size: 24px; /* Tamaño del icono */
+  }
+  
+  /* Botones con colores específicos */
+  .accent-button mat-icon {
+    color: #e91e63; /* Ícono en rosa */
+  }
+  
+  .warn-button mat-icon {
+    color: #f44336; /* Ícono en rojo */
+  }
+  
+  .success-button mat-icon {
+    color: #f20c86; /* Ícono en verde */
+  }
+  /* Efecto hover */
+  .custom-button:hover {
+    transform: scale(1.1); /* Efecto de agrandamiento */
+    background-color: #e91e63; /* Fondo rosa en hover */
+    border-color: #c2185b; /* Borde más oscuro */
+  }
+  
+  .custom-button:hover mat-icon {
+    color: #ffffff; /* Ícono en blanco en hover */
+  }
+  
+  /* ======================================== */
+  /*  Contenedor de detalles de cada trabajo  */
+  /* ======================================== */
+  /* Contenedor principal */
+  .status-guide-container {
+    margin-top: 30px;
+    padding: 30px;
+    border-radius: 8px;
+  }
+
+  .status-guide-container h3 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+
+  /* Contenedor de las tarjetas */
+  .status-cards {
+    display: flex;
+    gap: 20px;
+    justify-content: right;
+    flex-wrap: wrap;
+  }
+
+  /* Card base */
+  .status-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    width: 250px;
+    height: 180px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+  }
+
+  .status-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Iconos de estado */
+  .status-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+
+  /* Información del estado */
+  .status-info h4 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  .status-info p {
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* Estilos específicos para cada estado */
+  .status-pending {
+    background-color: #ffefcc;
+    color: #ff9900;
+  }
+
+  .status-pending .status-icon {
+    color: #ff9900;
+  }
+
+  .status-in-progress {
+    background-color: #e7f4ff;
+    color: #007bff;
+  }
+
+  .status-in-progress .status-icon {
+    color: #007bff;
+  }
+
+  .status-completed {
+    background-color: #e6ffcc;
+    color: #28a745;
+  }
+
+  .status-completed .status-icon {
+    color: #28a745;
+  }
+
+  .btn-download {
+    background-color: #007bff; /* Color de fondo azul */
+    color: white; /* Texto blanco */
+    font-family: 'Poppins', sans-serif; /* Fuente personalizada */
+    font-size: 16px; /* Tamaño de la fuente */
+    font-weight: 600; /* Grosor de la fuente */
+    padding: 12px 20px; /* Espaciado interno */
+    border: none; /* Sin bordes */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer; /* Cursor de mano al pasar */
+    transition: all 0.3s ease; /* Transición suave */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+}
+
+
+.chart-title {
+  font-size: 16px; /* Tamaño de letra ligeramente mayor */
+  font-weight: 700; /* Más negrita para resaltar */
+  text-align: center;
+  margin-bottom: 15px; /* Más espacio para separar del gráfico */
+  color: #2c3e50; /* Un tono más oscuro para mayor contraste */
+  text-transform: uppercase; /* Convertir texto a mayúsculas */
+  letter-spacing: 1px; /* Espaciado entre letras */
+  padding-bottom: 3px; /* Espacio adicional debajo del texto */
+  font-family: 'Roboto', sans-serif; /* Fuente moderna (puedes cambiarla si usas otra) */
+}
+
+/* Contenedor del selector de rol */
+.role-switcher {
+  display: inline-block; /* Alinea el selector con el contenido */
+  background-color: #ffffff; /* Fondo blanco */
+  border-radius: 8px; /* Bordes redondeados */
+}
+
+/* Estilo del selector */
+.role-switcher select {
+  border: none; /* Sin bordes internos */
+  font-size: 14px; /* Tamaño del texto */
+  color: #333333; /* Color del texto */
+  background: transparent; /* Fondo transparente */
+  padding: 5px 5px; /* Espaciado interno */
+  outline: none; /* Sin borde de foco */
+  font-family: 'Poppins', sans-serif; /* Fuente consistente */
+  cursor: pointer; /* Cambiar cursor a mano */
+}
+
+/* Flecha personalizada para el selector */
+.role-switcher select::-ms-expand {
+  display: none; /* Oculta la flecha en IE/Edge */
+}
+
+.role-switcher select:hover {
+  color: #000000; /* Cambiar color del texto al pasar el mouse */
+}
+
+.role-switcher select:focus {
+  outline: none; /* Sin borde predeterminado */
+}
+
+/* Animación al mostrar */
+.role-switcher {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
