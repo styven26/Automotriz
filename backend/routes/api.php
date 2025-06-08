@@ -81,6 +81,7 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     // Listar citas asignadas al mecánico
     Route::get('/citas',                     [CitasController::class, 'listarCitasMecanico']);
     Route::post('/citas/{cita}/diagnostico', [DiagnosticoController::class, 'store']);
+    Route::apiResource('detalle-repuestos', DetalleRepuestoController::class);
 
     // Diagnósticos
     Route::get('/diagnosticos',                                                  [DiagnosticoController::class, 'index']);
@@ -157,7 +158,6 @@ Route::prefix('vendedor')->middleware('auth:vendedor')->group(function () {
 
     // Repuestos
     Route::apiResource('repuestos', RepuestoController::class);
-    Route::apiResource('detalle-repuestos', DetalleRepuestoController::class);
 });
 
 // Rutas públicas

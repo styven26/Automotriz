@@ -18,7 +18,7 @@ export interface DetalleRepuesto {
   providedIn: 'root'
 })
 export class DetalleRepuestoService {
-  private baseUrl = 'http://localhost:8000/api/vendedor/detalle-repuestos';
+  private baseUrl = 'http://localhost:8000/api/mecanico/detalle-repuestos';
 
   constructor(private http: HttpClient) { }
 

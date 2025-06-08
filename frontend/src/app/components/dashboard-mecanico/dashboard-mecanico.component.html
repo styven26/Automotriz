@@ -108,7 +108,7 @@
                         </div>
                         <mat-card-title>Total de Citas</mat-card-title>
                     </div>
-                    <h2 class="value">{{ citas.length }}</h2>
+                    <h2 class="value">{{ totalCitas  }}</h2>
                 </mat-card-content>
             </mat-card>
       
@@ -120,7 +120,7 @@
                         </div>
                         <mat-card-title>Total de Órdenes de Servicios</mat-card-title>
                     </div>
-                <h2 class="value">{{ ordenes.length }}</h2>
+                <h2 class="value">{{ totalTrabajos }}</h2>
                 </mat-card-content>
             </mat-card>
         </div><br>
@@ -134,14 +134,14 @@
                     [view]="[700, 550]"
                     [legend]="true"
                     [explodeSlices]="true"
-                    [legendTitle]="'Estados de Citas'"           
-                    [labels]="true"
+                    [legendTitle]="'Estados de Citas'"
                     [labels]="true"
                     [customColors]="[
-                    { name: 'Diagnosticado', value: '#3498db' },
-                    { name: 'Confirmada', value: '#9676d8' },
-                    { name: 'Cancelada', value: '#ff7f7f' },
-                    { name: 'Atendida', value: '#27ae60' },
+                        { name: 'Confirmada',   value: '#9676d8' },
+                        { name: 'En Proceso',   value: '#3498db' },
+                        { name: 'Diagnosticado', value: '#2980b9' },
+                        { name: 'Atendida',     value: '#27ae60' },
+                        { name: 'Cancelada',    value: '#ff7f7f' }
                     ]">
                 </ngx-charts-pie-chart>
             </div>

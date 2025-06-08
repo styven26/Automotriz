@@ -109,7 +109,9 @@ export class MecanicoCitaComponent {
                  ? `${cita.fecha_fin}T${cita.hora_fin}` 
                  : (cita.hora_fin ? `${cita.fecha}T${cita.hora_fin}` : null),
           className: 
-                 cita.estado === 'Diagnosticado'
+                cita.estado === 'En Proceso'
+                   ? 'fc-event-purple'
+                   :cita.estado === 'Diagnosticado'
                    ? 'fc-event-orange'
                    : cita.estado === 'Atendida'
                      ? 'fc-event-blue'

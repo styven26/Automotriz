@@ -99,9 +99,8 @@
     
     <!-- Contenido Principal del Dashboard -->
     <div class="main-content">
-        <button (click)="descargarReporte()" class="btn-download">Descargar Reporte en PDF</button>
         <div class="trabajos-container">
-            <div class="card-wrapper" *ngFor="let trabajo of trabajos">
+            <div class="card-wrapper" *ngFor="let trabajo of pagedTrabajos; trackBy: trackById">
                 <div class="card-black">
                     <!-- Sección de imagen (parte superior de la tarjeta) -->
                     <igx-card-media height="150px">
@@ -123,16 +122,69 @@
                             <strong>Cliente:</strong>
                             {{ trabajo?.cita?.cliente?.nombre || 'Sin cliente' }} {{ trabajo?.cita?.cliente?.apellido || '' }}
                         </p>
+
                         <p>
-                            <strong>Servicios Solicitados</strong>
+                            <strong>Placa:</strong>
+                            {{ trabajo.vehiculo.numero_placa ?? 'N/D' }}
                         </p>
-                        <div *ngFor="let detalle of trabajo.detalles_servicios" style="margin-bottom:20px;">
+
+                        <!-- NUEVO: Kilometraje y Último Servicio -->
+                        <p>
+                            <strong>Kilometraje:</strong>
+                            {{ trabajo?.vehiculo?.kilometraje ?? 'N/D' }} km
+                        </p>
+                        <p>
+                            <strong>Último Servicio:</strong>
+                            <span *ngIf="trabajo?.vehiculo?.fecha_ultimo_servicio; else nunca">
+                            {{ trabajo.vehiculo.fecha_ultimo_servicio | date:'dd/MM/yyyy' }}
+                            </span>
+                            <ng-template #nunca>
+                            Nunca
+                            </ng-template>
+                        </p>
+
+                        <div class="section servicios">
                             <p>
-                              <strong>{{ detalle.servicio.nombre }}</strong>
-                              <strong>Progreso:</strong> {{ detalle.progreso }}%<br>
-                              <strong>Descripción:</strong> {{ detalle.descripcion || 'Sin descripción' }}
+                                <strong>Servicios Solicitados</strong>
                             </p>
-                        </div>                          
+                            <div class="listar">
+                                <div *ngFor="let detalle of trabajo.detalles_servicios" style="margin-bottom:20px;">
+                                    <p>
+                                        <strong>{{ detalle.servicio.nombre }}</strong><br>
+                                        <strong>Progreso:</strong> {{ detalle.progreso }}%<br>
+                                        <strong>Descripción:</strong> {{ detalle.descripcion || 'Sin descripción' }}
+                                    </p>
+                                </div>  
+                            </div>
+                        </div>  
+
+                        <!-- Nueva sección: REPUESTOS USADOS -->
+                        <div class="section repuestos"><br>
+                            <p>
+                                <strong>Repuestos Usados</strong>
+                                <button mat-button color="primary"
+                                        (click)="consultarInventario(trabajo)">
+                                    Consultar Repuestos
+                                </button>
+                            </p>
+
+                            <div class="list" *ngIf="trabajo.detalles_repuestos?.length; else sinRepuestos">
+                                <div *ngFor="let dr of trabajo.detalles_repuestos" class="item" style="margin-bottom:16px;">
+                                    <p>
+                                        <strong>{{ dr.repuesto.nombre }}</strong><br>
+                                        Cantidad: {{ dr.cantidad }}<br>
+                                        Subtotal: {{ dr.subtotal | currency }}<br>
+                                        <span *ngIf="dr.repuesto.stock < dr.cantidad"
+                                                style="color:#c0392b;font-weight:bold;">
+                                            ⚠️ Sin stock suficiente en inventario. El cliente deberá buscar este repuesto.
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <ng-template #sinRepuestos>
+                        <p style="font-style: italic;">No se han usado repuestos en esta orden.</p>
+                        </ng-template>
                     </igx-card-content>
 
                     <!-- Sección de acciones (botones) -->
@@ -179,6 +231,13 @@
                 </div>
             </div>
         </div>
+
+        <!-- PAGINACIÓN CENTRADA -->
+        <div class="paginator">
+            <button (click)="goTo(currentPage-1)" [disabled]="currentPage===0">« Anterior</button>
+            <span>Página {{currentPage+1}} de {{ totalPages }}</span>
+            <button (click)="goTo(currentPage+1)" [disabled]="currentPage+1 >= totalPages">Siguiente »</button>
+        </div>
     </div>  
     <div class="status-guide-container">
         <div class="status-cards">
@@ -211,7 +270,7 @@
             </div>
             <div class="status-info">
               <h4>Completado</h4>
-              <p>Todos los progresos están en 100%.</p>
+              <p>Todos los progresos están en 100%. </p>
             </div>
           </div>
         </div>

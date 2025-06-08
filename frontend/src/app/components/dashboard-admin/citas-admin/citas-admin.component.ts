@@ -134,13 +134,15 @@ export class CitasAdminComponent {
             start: `${cita.fecha}T${cita.hora}`,
             end: `${cita.fecha}T${cita.hora_fin}`,
            className: 
-            cita.estado === 'Diagnosticado'
-              ? 'fc-event-orange'
-              : cita.estado === 'Atendida'
-                ? 'fc-event-blue'
-                : cita.estado === 'Confirmada'
-                  ? 'fc-event-green'
-                  : 'fc-event-red',
+           cita.estado === 'En Proceso'
+              ? 'fc-event-purple'
+              :cita.estado === 'Diagnosticado'
+                ? 'fc-event-orange'
+                : cita.estado === 'Atendida'
+                  ? 'fc-event-blue'
+                  : cita.estado === 'Confirmada'
+                    ? 'fc-event-green'
+                    : 'fc-event-red',
             extendedProps: {
               vehiculo: cita.vehiculo,
               clienteNombre: cita.cliente?.nombre,
@@ -200,7 +202,7 @@ export class CitasAdminComponent {
 
     // 7) Lanzar el modal
     Swal.fire({
-      title: '<h5>📅 DETALLES DE LA CITA</h5>',
+      title: '<h5>📅 DETALLES DE LA RESERVA</h5>',
       html: `
         <div style="font-family: Poppins, sans-serif; text-align: center; line-height: 1.5;">
           <p><strong>🙍 Cliente:</strong> ${clienteNombre} ${clienteApellido}</p>

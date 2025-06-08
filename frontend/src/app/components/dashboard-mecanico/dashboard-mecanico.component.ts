@@ -150,7 +150,9 @@ export class DashboardMecanicoComponent {
     })
     .subscribe(({ citas, ordenes }) => {
       this.citas   = citas;
-      this.ordenes = ordenes;             
+      this.ordenes = ordenes;     
+      this.totalCitas   = citas.length;
+      this.totalTrabajos = ordenes.length;        
       this.actualizarGraficosCitas();
       this.generarOrdenesChart();          
     });
@@ -222,13 +224,25 @@ export class DashboardMecanicoComponent {
     });
   }  
 
-  actualizarGraficosCitas(): void {
-    const estados = ['Diagnosticado', 'Confirmada', 'Cancelada', 'Atendida'];
-    this.citasChartData = estados.map((estado) => ({
+  private estadosCitas = [
+    'Confirmada',
+    'En Proceso',
+    'Diagnosticado',
+    'Atendida',
+    'Cancelada'
+  ];
+
+  private actualizarGraficosCitas(): void {
+    this.citasChartData = this.estadosCitas.map(estado => ({
       name: estado,
-      value: this.citas.filter((cita) => cita.estado.toLowerCase() === estado.toLowerCase()).length,
+      value: this.citas.filter(c => {
+        const valorEstado = typeof c.estado === 'string'
+          ? c.estado
+          : c.estado?.nombre_estado;
+        return valorEstado?.toLowerCase() === estado.toLowerCase();
+      }).length
     }));
-  }    
+  }
 
   iniciarReloj(): void {
     const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;

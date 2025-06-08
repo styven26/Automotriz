@@ -596,10 +596,11 @@ class CitasController extends Controller
             return response()->json(['error' => 'Acceso no autorizado'], 403);
         }
 
-        $idsEstados = EstadoCita::whereIn('nombre_estado', ['Confirmada','Cancelada','Atendida','Diagnosticado'])
+        $idsEstados = EstadoCita::whereIn('nombre_estado', ['Confirmada','En Proceso','Cancelada','Atendida','Diagnosticado'])
                                 ->pluck('id_estado');
 
         $citas = Cita::with([
+                    'estado',
                     'cliente:cedula,nombre,apellido',
                     'vehiculo',
                     'horario:id_horario,capacidad_max',

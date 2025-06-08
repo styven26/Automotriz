@@ -332,3 +332,12 @@
   border-radius: 5px;
   padding: 5px;
 }
+
+.fc-event-purple {
+  background-color: #8e44ad !important; /* Púrpura */
+  color:            #ffffff !important; /* Texto blanco */
+  border:           none !important;
+  font-weight:      bold;
+  border-radius:    5px;
+  padding:          5px;
+}

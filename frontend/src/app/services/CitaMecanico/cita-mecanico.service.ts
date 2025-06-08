@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,14 @@ export class CitaMecanicoService {
   }
 
   // Listar citas asignadas al mecánico autenticado
-  listarCitasMecanico(): Observable<any> {
-    return this.http.get(this.apiUrlMecanico, { headers: this.getHeaders() });
+  listarCitasMecanico(): Observable<any[]> {
+    return this.http
+      .get<{ data: any[] } | any[]>(`${this.apiUrlMecanico}`, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        tap(res => console.log('RAW citas:', res)),
+        map(res => (res as any).data ?? (res as any))  // extrae data[] si viene anidado
+      );
   }
 }

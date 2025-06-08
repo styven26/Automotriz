@@ -78,6 +78,7 @@ export class CitasComponent implements OnInit {
 
   // Control de formularios
   vehicleFormGroup: FormGroup;
+  registered = false;      // ← Nueva bandera
 
   constructor(
     private vehiculoService: VehiculoService,
@@ -213,8 +214,7 @@ export class CitasComponent implements OnInit {
       this.vehiculoService.crearVehiculo(formData).subscribe(
         (response) => {
           console.log('Vehículo registrado exitosamente:', response);
-            
-          // Pasar al siguiente paso del stepper
+          this.registered = true;      // ← marcamos registro completo            
           stepper.next();
         },
         (error) => {
@@ -263,7 +263,7 @@ export class CitasComponent implements OnInit {
       });
     }
   }  
-    
+
   finalizarRegistro(): void {
     this.router.navigate(['/calendario']);  // Navega al dashboard del cliente después de registrar
   }

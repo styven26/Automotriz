@@ -138,7 +138,7 @@
   <div class="main-content">
     <!-- Paso del registro de vehículo utilizando mat-stepper -->
     <mat-stepper linear #stepper>
-      <mat-step [stepControl]="vehicleFormGroup">
+      <mat-step [stepControl]="vehicleFormGroup" [editable]="!registered">
         <form [formGroup]="vehicleFormGroup">
           <ng-template matStepLabel>Datos del Vehículo</ng-template>
 
@@ -211,7 +211,7 @@
           </div><br><br>
 
           <!-- Botón Registrar Vehículo -->
-          <div class="button-container">
+          <div class="button-container" *ngIf="!registered">
             <button class="styled-button" type="submit" (click)="registrarVehiculo(stepper)">
               Registrar Vehículo
             </button>
@@ -219,11 +219,22 @@
         </form>
       </mat-step>
 
+      <!-- 2º paso: confirmación -->
       <mat-step>
         <ng-template matStepLabel>Confirmación</ng-template>
         <p>El vehículo ha sido registrado exitosamente.</p>
-        <button mat-button matStepperPrevious>Volver</button>
-        <button mat-button (click)="finalizarRegistro()">Finalizar</button>
+
+        <!-- Sólo dejo “Volver” si aún NO me he registrado -->
+        <button mat-button
+                matStepperPrevious
+                *ngIf="!registered">
+          Volver
+        </button>
+
+        <!-- Botón Finalizar siempre visible en este paso -->
+        <button mat-button (click)="finalizarRegistro()">
+          Finalizar
+        </button>
       </mat-step>
     </mat-stepper>
   </div>    

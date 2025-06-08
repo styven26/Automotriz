@@ -5,7 +5,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
-import { OrdenService, Orden, DetalleServicio } from '../../services/Orden/orden.service';
+import { RepuestoService, Repuesto } from '../../services/Repuesto/repuesto.service';
+import { DetalleRepuestoService } from '../../services/DetalleRepuesto/detallerepuesto.service';
+import { OrdenService, Orden } from '../../services/Orden/orden.service';
 import { SubtipoService } from '../../services/Subtiposervicios/subtipo.service';
 import { DiagnosticoService } from '../../services/Diagnostico/diagnostico.service';
 import { IgxCardModule, IgxButtonModule, IgxRippleModule, IgxIconModule } from 'igniteui-angular';
@@ -31,6 +33,10 @@ export class TrabajosComponent {
 
   tiempoRestante: string = '';
   trabajos: Orden[] = [];
+  inventario: Repuesto[] = [];
+  pageSize = 2;       // items por página
+  currentPage = 0;
+  public Math = Math;
 
   // Para el formulario de actualización (ejemplo simple)
   selectedTrabajoId: number | null = null;
@@ -48,7 +54,7 @@ export class TrabajosComponent {
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
 
-  constructor(private authService: AuthService, private router: Router,  private serviciosService:SubtipoService, private diagnosticoService: DiagnosticoService, private ordenService: OrdenService) {}
+  constructor(private authService: AuthService, private router: Router,  private serviciosService:SubtipoService, private repuestoService: RepuestoService, private detalleRepuestoService: DetalleRepuestoService, private diagnosticoService: DiagnosticoService, private ordenService: OrdenService) {}
 
   // Funciones de navegación del menú
   ngOnInit(): void {  
@@ -63,6 +69,7 @@ export class TrabajosComponent {
     this.trabajos = []; // Inicializa como un array vacío
     this.cargarTrabajos();
     this.iniciarReloj();
+    this.loadInventario();
   }
 
   cambiarRol(event: Event): void {
@@ -98,16 +105,138 @@ export class TrabajosComponent {
     }
   }
 
+  get pagedTrabajos(): Orden[] {
+    const start = this.currentPage * this.pageSize;
+    return this.trabajos.slice(start, start + this.pageSize);
+  }
+  get totalPages(): number {
+    return Math.ceil(this.trabajos.length / this.pageSize);
+  }
+
+  goTo(page: number) {
+    if (page < 0 || page >= this.totalPages) { return; }
+    this.currentPage = page;
+  }
+
   descargarReporte(): void {
     this.ordenService.descargarReporte();
   }
 
   private cargarTrabajos(): void {
-    this.ordenService.listarConfirmadas().subscribe({
-      next: ordenes => this.trabajos = ordenes,
-      error: err => console.error(err)
+    this.ordenService.listarConfirmadas()
+      .subscribe({
+        next: ordenes => {
+          this.trabajos = ordenes;
+          // ahora cada orden.trabajo.detalle_repuestos ya viene poblado
+        },
+        error: err => console.error(err)
+      });
+  }
+
+  trackById(index:number, trabajo:Orden) {
+    return trabajo.id_orden;
+  }
+
+  private loadInventario() {
+    this.repuestoService.getAll().subscribe(
+      inv => this.inventario = inv,
+      _ => Swal.fire('Error','No cargó inventario','error')
+    );
+  }
+
+  // Firma explícita para que TS sepa que devuelve un Promise<any>
+  consultarInventario(trabajo: Orden): Promise<any> {
+    const opciones = this.inventario
+      .map(r => ({
+        id: r.id_repuesto,
+        texto: `${r.nombre} (stock: ${r.stock})`,
+        stock: r.stock,
+        precio: r.precio_final
+      }))
+      .filter(r => r.stock > 0);
+
+    if (opciones.length === 0) {
+      // Devuelve un Promise<any> aquí
+      return Swal.fire(
+        'Sin inventario',
+        'No hay repuestos en stock. El cliente deberá buscar el repuesto.',
+        'info'
+      );
+    }
+
+    const optsHtml = opciones
+      .map(o => `<option value="${o.id}"
+                        data-precio="${o.precio}"
+                        data-stock="${o.stock}">
+                    ${o.texto}
+                  </option>`)
+      .join('');
+
+    // ¡AÑADE return aquí!
+    return Swal.fire({
+      title: `<h3 style="
+          font-family: Roboto, sans-serif;
+          font-size: 30px;
+          font-weight: 900;
+          text-align: center;
+        ">
+          <strong>Selecciona Repuesto</strong>
+      </h3>`,
+      html: `
+        <select
+          id="swal-repuesto"
+          class="swal2-select"
+          style="width:80%; padding:0.75rem 1rem; font-size:1rem; line-height:1.4; border:1px solid #ccc; border-radius:0.375rem; box-sizing:border-box; appearance:none; background-image:url('data:image/svg+xml;charset=UTF-8,%3Csvg width=&quot;10&quot; height=&quot;6&quot; viewBox=&quot;0 0 10 6&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cpath d=&quot;M0 0l5 6 5-6H0z&quot; fill=&quot;%23666&quot;/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 1rem center; background-size:0.65rem auto; margin-bottom:1.5rem;"
+        >
+          <option value="" disabled selected>-- elige repuesto --</option>
+          ${optsHtml}
+        </select>
+        <label
+          for="swal-cantidad"
+          style="display:block; margin-bottom:0.5rem; font-size:1.2rem; font-weight:600;"
+        >
+          Cantidad
+        </label>
+        <input
+          id="swal-cantidad"
+          type="number"
+          class="swal2-input"
+          placeholder="Cantidad"
+          min="1"
+          value="1"
+          style="width:80%; padding:0.75rem 1rem; font-size:1rem; line-height:1.4; border:1px solid #ccc; border-radius:0.375rem; box-sizing:border-box; margin-bottom:1rem;"
+        />
+      `,
+      focusConfirm: false,
+      preConfirm: () => {
+        const sel = document.getElementById('swal-repuesto') as HTMLSelectElement;
+        const qty = parseInt((document.getElementById('swal-cantidad') as HTMLInputElement).value, 10);
+        if (!sel.value) Swal.showValidationMessage('Debes seleccionar un repuesto');
+        const precio = parseFloat(sel.selectedOptions[0].dataset['precio']!);
+        const stock  = parseInt(sel.selectedOptions[0].dataset['stock']!, 10);
+        if (qty < 1 || qty > stock) {
+          Swal.showValidationMessage(`Cantidad entre 1 y ${stock}`);
+        }
+        return { id_repuesto: +sel.value, cantidad: qty, precio };
+      }
+    }).then(res => {
+      if (!res.isConfirmed) return;
+      const { id_repuesto, cantidad, precio } = res.value!;
+      this.detalleRepuestoService.create({
+        id_repuesto,
+        id_orden: trabajo.id_orden,
+        cantidad,
+        precio
+      }).subscribe({
+        next: () => {
+          Swal.fire('Éxito','Repuesto registrado','success');
+          this.cargarTrabajos();
+          this.loadInventario();
+        },
+        error: e => Swal.fire('Error', e.error?.error || 'No guardó','error')
+      });
     });
-  } 
+  }
   
   iniciarReloj(): void {
     const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;

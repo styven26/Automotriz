@@ -18,6 +18,13 @@ export interface DetalleServicio {
   };
 }
 
+export interface DetalleRepuesto {
+  id_detalle_repuesto: number;
+  cantidad: number;
+  subtotal: number;
+  repuesto: { id_repuesto: number; nombre: string; stock: number; precio_final: number };
+}
+
 export interface Orden {
   id_orden: number;
   id_cita: number;
@@ -39,8 +46,9 @@ export interface Orden {
     cliente: { cedula: string; nombre: string; apellido: string; correo?: string; };
     cedula_mecanico: string;    // ← agregado
   };
-  vehiculo: { id_vehiculo: number; marca: string; modelo: string; imagen?: string; };
+  vehiculo: { id_vehiculo: number; marca: string; modelo: string; imagen?: string; kilometraje?:number; numero_placa?: string; fecha_ultimo_servicio?:string; };
   detalles_servicios: DetalleServicio[];
+  detalles_repuestos: DetalleRepuesto[];
 }
 
 @Injectable({

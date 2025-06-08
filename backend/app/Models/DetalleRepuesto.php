@@ -3,16 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DetalleRepuesto extends Model
 {
-    use SoftDeletes;
-
     protected $table = 'detalle_repuesto';
     protected $primaryKey = 'id_detalle_repuesto';
     public $incrementing = true;
     protected $keyType = 'int';
+
+    public $timestamps = false;
 
     protected $fillable = [
         'id_repuesto',

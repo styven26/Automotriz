@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DetalleRepuesto;
 use App\Models\Repuesto;
+use App\Models\OrdenServicio;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -40,18 +41,23 @@ class DetalleRepuestoController extends Controller
         ]);
 
         return DB::transaction(function() use($data) {
-            // 1) Verificar stock
+            // 1) Verificar & descontar stock…
             $rep = Repuesto::findOrFail($data['id_repuesto']);
             if ($rep->stock < $data['cantidad']) {
                 return response()->json(['error'=>'Stock insuficiente.'], 422);
             }
-
-            // 2) Descontar stock
             $rep->decrement('stock', $data['cantidad']);
 
-            // 3) Crear detalle
+            // 2) Crear detalle
             $data['subtotal'] = round($data['cantidad'] * $data['precio'], 2);
             $det = DetalleRepuesto::create($data);
+
+            // 3) **Recalcular total_repuestos en la orden padre**
+            $orden = OrdenServicio::findOrFail($data['id_orden']);
+            $nuevoTotal = $orden
+                ->detallesRepuestos()
+                ->sum('subtotal');
+            $orden->update(['total_repuestos' => $nuevoTotal]);
 
             return response()->json($det, 201);
         });
@@ -93,8 +99,15 @@ class DetalleRepuestoController extends Controller
             $rep = Repuesto::findOrFail($det->id_repuesto);
             $rep->increment('stock', $det->cantidad);
 
-            // Soft-delete del detalle
+            // Soft-delete
             $det->delete();
+
+            // **Recalcular total_repuestos en la orden padre**
+            $orden = OrdenServicio::findOrFail($det->id_orden);
+            $nuevoTotal = $orden
+                ->detallesRepuestos()
+                ->sum('subtotal');
+            $orden->update(['total_repuestos' => $nuevoTotal]);
 
             return response()->json(['message'=>'Detalle de repuesto eliminado y stock restaurado.']);
         });

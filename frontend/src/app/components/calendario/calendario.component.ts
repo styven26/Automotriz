@@ -116,6 +116,7 @@ export class CalendarioComponent {
     if (
       !cita.extendedProps ||
       (cita.extendedProps.estado !== 'Atendida' &&
+       cita.extendedProps.estado !== 'En Proceso' &&
        cita.extendedProps.estado !== 'Confirmada' &&
        cita.extendedProps.estado !== 'Diagnosticado')
     ) {
@@ -254,13 +255,15 @@ export class CalendarioComponent {
           start: `${cita.fecha}T${cita.hora}`,
           end: `${cita.fecha_fin}T${cita.hora_fin}`,
           className: 
-            cita.estado === 'Diagnosticado'
-              ? 'fc-event-orange'
-              : cita.estado === 'Atendida'
-                ? 'fc-event-blue'
-                : cita.estado === 'Confirmada'
-                  ? 'fc-event-green'
-                  : 'fc-event-red',
+            cita.estado === 'En Proceso'
+              ? 'fc-event-purple'
+              :cita.estado === 'Diagnosticado'
+                ? 'fc-event-orange'
+                : cita.estado === 'Atendida'
+                  ? 'fc-event-blue'
+                  : cita.estado === 'Confirmada'
+                    ? 'fc-event-green'
+                    : 'fc-event-red',
           extendedProps: {
             id_cliente: cita.cliente.cedula, 
             nombre_cliente: cita.cliente.nombre,
