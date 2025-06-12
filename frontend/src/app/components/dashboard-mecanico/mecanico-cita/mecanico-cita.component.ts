@@ -57,6 +57,17 @@ export class MecanicoCitaComponent {
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
       },
+      displayEventTime: true,
+      eventTimeFormat: {
+        hour:   '2-digit',
+        minute: '2-digit',
+        hour12: false      // si prefieres 24h; pon true para AM/PM
+      },
+      height:            'auto',
+      contentHeight:     'auto',
+      expandRows:        true,
+      handleWindowResize:true,
+      aspectRatio:       1.8,
       events: [], // Inicialmente vacío, se llenará con `cargarCitasMecanico`
       eventClick: this.mostrarDetallesCita.bind(this),
     };

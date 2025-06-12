@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -79,17 +79,11 @@ export class DashboardMecanicoComponent {
   ordenesChartData: { name: string; value: number }[] = [];
   
   // Datos para gráficos
-  citasChartData: any[] = [];
-  trabajosChartData: any[] = [];
-  trabajosSemanaData: any[] = [];
+  citasChartData: { name: string; value: number }[] = [];
 
   // Filtros
   filtroCitas: string = ''; // Filtro para citas
   filtroTrabajos: string = ''; // Filtro para trabajos
-
-  // Listas filtradas
-  citasHoyFiltradas: any[] = [];
-  trabajosHoyFiltradas: any[] = [];
 
   // Variables de usuario
   nombreUsuario: string = '';
@@ -189,7 +183,19 @@ export class DashboardMecanicoComponent {
           confirmButtonColor: '#2ecc71',
         });
       }
-    );          
+    );       
+    
+    this.citasService.listarCitasMecanico().subscribe(citas => {
+      this.citasChartData = this.ESTADOS.map(estado => ({
+        name: estado,
+        value: citas.filter(c => {
+          const valor = typeof c.estado === 'string'
+            ? c.estado
+            : c.estado?.nombre_estado;
+          return valor === estado;
+        }).length
+      })).filter(d => d.value > 0);
+    });
     
     this.iniciarReloj();
   
@@ -204,7 +210,27 @@ export class DashboardMecanicoComponent {
       this.totalCitas   = citas.length;
       this.totalTrabajos = ordenes.length;      
       this.agruparCitas();
+      this.actualizarDistribucionEstados();
     });
+  }
+
+  private actualizarDistribucionEstados(): void {
+    this.citasChartData = this.ESTADOS.map(estado => ({
+      name: estado,
+      value: this.citas.filter(c => {
+        const valor = typeof c.estado === 'string'
+          ? c.estado
+          : c.estado?.nombre_estado;
+        return valor === estado;
+      }).length
+    }));
+  }
+
+  // formato para las etiquetas de la tarta
+  formatLabel(data: { name: string; value: number }): string {
+    const total = this.citasChartData.reduce((sum, d) => sum + d.value, 0);
+    const percent = total ? Math.round(100 * data.value / total) : 0;
+    return `${data.name}: ${data.value} (${percent}%)`;
   }
 
   cambiarRol(event: Event): void {

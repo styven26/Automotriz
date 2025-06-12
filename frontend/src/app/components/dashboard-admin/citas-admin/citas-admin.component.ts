@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CitaadminService } from '../../../services/CitaAdmin/citaadmin.service';
 import { CommonModule } from '@angular/common'; // Importar CommonModule para usar *ngIf
@@ -11,7 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon'; 
 import { AuthService } from '../../../services/auth.service';
-import { FullCalendarModule } from '@fullcalendar/angular'; // Import FullCalendarModule
+import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -71,16 +71,27 @@ export class CitasAdminComponent {
     this.apellidoUsuario = user.apellido || 'Sin Apellido';
 
     this.calendarOptions = {
-      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+      plugins: [ dayGridPlugin, timeGridPlugin, interactionPlugin ],
       initialView: 'dayGridMonth',
       locale: esLocale,
       headerToolbar: {
-        left: 'prev,next today',
+        left:   'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+        right:  'dayGridMonth,timeGridWeek,timeGridDay'
       },
-      events: [], // Inicialmente vacío, se llenará con `cargarCitasMecanico`
-      eventClick: this.mostrarDetallesCita.bind(this),
+      displayEventTime: true,
+      eventTimeFormat: {
+        hour:   '2-digit',
+        minute: '2-digit',
+        hour12: false      // si prefieres 24h; pon true para AM/PM
+      },
+      height:            'auto',
+      contentHeight:     'auto',
+      expandRows:        true,
+      handleWindowResize:true,
+      aspectRatio:       1.8,
+      events:            [], 
+      eventClick:        this.mostrarDetallesCita.bind(this)
     };
 
     this.cargarCitasGlobal();

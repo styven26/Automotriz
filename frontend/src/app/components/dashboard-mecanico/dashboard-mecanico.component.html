@@ -119,7 +119,7 @@
             <div class="chart-container">
                 <h4 class="chart-title">Distribución Diaria de Estados de Citas</h4>
                 <ngx-charts-bar-vertical-2d
-                    [view]="[780,500]"
+                    [view]="[870,600]"
                     [scheme]="colorScheme"
                     [results]="citasPorDiaData"
                     [xAxis]="true"
@@ -134,24 +134,22 @@
                 </ngx-charts-bar-vertical-2d>
             </div>
 
-            <!-- Gráfico de Citas por Mes (Línea) -->
+            <!-- Gráfico de Distribución de Estados de Citas -->
             <div class="chart-container">
-                <h4 class="chart-title">Tendencia Mensual de Estados de Citas</h4>
-                <ngx-charts-line-chart
-                    [view]="[780,500]"
+                <h4 class="chart-title">Distribución de Estados de Citas</h4>
+                <ngx-charts-pie-chart
+                    [view]="[870,600]"
                     [scheme]="colorScheme"
-                    [results]="citasPorMesData"
-                    [xAxis]="true"
-                    [yAxis]="true"
+                    [results]="citasChartData"
                     [legend]="true"
                     [legendTitle]="'Estados de Citas'"
-                    [showGridLines]="true"
-                    [showXAxisLabel]="true"
-                    [showYAxisLabel]="true"
-                    [xAxisLabel]="'Mes'"
-                    [yAxisLabel]="'Nº de Citas'">
-                </ngx-charts-line-chart>
-            </div>    
+                    [labels]="true"
+                    [explodeSlices]="false"
+                    [doughnut]="false"
+                    [gradient]="false"
+                    [animations]="false">
+                </ngx-charts-pie-chart>
+            </div>
         </div>
     </div>
 </div>

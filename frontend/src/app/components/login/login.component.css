@@ -1,29 +1,33 @@
 /* Contenedor principal */
 .login-container {
+  position: fixed;    /* fija al viewport */
+  top: 0;
+  left: 0;
+  width: 100%;        /* ancho total */
+  height: 100%;       /* alto total */
   display: flex;
-  height: 100vh;
-  width: 100vw;   /* Asegúrate de que ocupe todo el ancho disponible */
-  margin: 0;      /* Sin márgenes */
-  padding: 0;     /* Sin relleno */
+  margin: 0;
+  padding: 0;
 }
 
 /* Formulario centrado verticalmente */
 .login-form-container {
   position: relative;
+  flex: 1;               /* ocupa todo el espacio disponible */
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden; /* Evita scroll si la imagen es más grande */
+  overflow: hidden;
 }
 
 .login-form-container img {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Hace que la imagen cubra todo sin deformarse */
-  z-index: -1; /* Envía la imagen al fondo */
+  object-fit: cover;
+  z-index: -1;
 }
 
 /* Ajusta el formulario para que pueda crecer dinámicamente */

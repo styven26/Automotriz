@@ -1,12 +1,7 @@
 /* Estructura principal */
 .dashboard-container {
   display: flex;
-  height: 100vh;
-  background-color: #f4f7f6;
-  font-family: 'Poppins', sans-serif;
-  overflow-x: hidden; /* Elimina el scroll horizontal */
-  padding: 0;
-  margin: 0;
+  padding: 0%;
 }
 
 /* Sidebar */
@@ -157,25 +152,75 @@
 }
 
 .color-box {
-    width: 15px;
-    height: 15px;
-    display: inline-block;
-    border-radius: 3px;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  border-radius: 3px;
 }
 
 .color-box.green {
-    background-color: #4caf50;
+  background-color: #4caf50;
 }
 
 /* Contenido principal */
 .main-content {
   margin-left: 300px;
+  position: absolute;
   padding: 0;
-  width: calc(100% - 200px); /* Ajusta este valor si es necesario */
-  height: 100%; /* Usa toda la altura disponible */
-  display: flex;
-  justify-content: center; /* Centra horizontalmente si es necesario */
-  align-items: flex-start; /* Asegura que se pegue al principio */
+}
+
+.calendar-container {
+  width: 72%;
+  transform: scale(1.3845705882);
+  transform-origin: top left;
+}
+
+:host ::ng-deep .fc-daygrid-day-frame {
+  min-height: 94px;
+}
+
+:host ::ng-deep .fc-col-header-cell {
+  font-size: 0.9rem;      /* antes: 1rem–1.2rem */
+  padding: 0.3em 0;       /* menos espacio arriba/abajo */
+}
+
+:host ::ng-deep .fc-daygrid-day-number {
+  font-size: 0.8rem;      /* antes: 1rem */
+  top: 0.2em;             /* acercarlo un poco al borde */
+}
+
+:host ::ng-deep .fc-toolbar-title {
+  font-size: 1.4rem;      /* antes: 1.8rem */
+}
+:host ::ng-deep .fc-button {
+  font-size: 0.75rem;     /* antes: 0.85rem–1rem */
+  padding: 4px 8px;
+}
+
+:host ::ng-deep .fc-daygrid-event {
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  min-height: auto !important;
+}
+
+:host ::ng-deep .fc-daygrid-event .fc-event-title {
+  font-size: 0.75rem !important;   /* antes: ~0.85rem–1rem */
+  line-height: 1.1 !important;     /* más compacto */
+}
+
+:host ::ng-deep .fc-daygrid-event .fc-event-main-frame {
+  padding: 2px 4px !important;
+}
+
+:host ::ng-deep .fc-event {
+  font-size: 0.75rem !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+}
+
+/*  Quita el puntito que aparece antes del título del evento  */
+:host ::ng-deep .fc-daygrid-event-dot {
+  display: none !important;
 }
 
 .header {

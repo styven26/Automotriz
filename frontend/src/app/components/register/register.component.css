@@ -1,13 +1,17 @@
 /* Contenedor principal */
 .auth-container {
+  position: fixed;      /* fija al viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://www.tallerestraba.es/images/coches-talleres-mecanicos-lousame.jpg') no-repeat center center fixed;
+
+  /* Tu degradado + fondo, cubriendo TODO */
+  background: linear-gradient( rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://www.tallerestraba.es/images/coches-talleres-mecanicos-lousame.jpg') no-repeat center center fixed;
   background-size: cover;
-  padding: 0px;
-  box-sizing: border-box;
 }
 
 /* Título */

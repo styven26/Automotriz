@@ -66,6 +66,17 @@ export class CalendarioComponent {
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
       },
+      displayEventTime: true,
+      eventTimeFormat: {
+        hour:   '2-digit',
+        minute: '2-digit',
+        hour12: false      // si prefieres 24h; pon true para AM/PM
+      },
+      height:            'auto',
+      contentHeight:     'auto',
+      expandRows:        true,
+      handleWindowResize:true,
+      aspectRatio:       1.8,
       events: [], // Se llenará con cargarCitas()
       dateClick: this.abrirModalCita.bind(this),
       eventClick: this.mostrarDetallesCita.bind(this),

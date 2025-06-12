@@ -1,12 +1,9 @@
 /* Estructura principal */
-.dashboard-container {
+  .dashboard-container {
     display: flex;
-    height: 100vh;
-    padding: 0%;
-    background-color: #f9fafc;
     padding: 0%;
   }
-  
+
   .sidebar {
     flex-direction: column; /* Organiza los elementos en columna */
     display: flex;
@@ -109,16 +106,66 @@
   .submenu-item a:hover {
     transform: translateX(5px);  /* Efecto de hover en el submenú */
   }
-  
-  /* Contenido principal */
+
   .main-content {
-    margin-left: 270px;
+    margin-left: 270px; /* tu sidebar */
+    position: absolute;
     padding: 0;
-    width: calc(100% - 220px); /* Ajusta este valor si es necesario */
-    height: 100%; /* Usa toda la altura disponible */
-    display: flex;
-    justify-content: center; /* Centra horizontalmente si es necesario */
-    align-items: flex-start; /* Asegura que se pegue al principio */
+  }
+
+ .calendar-container {
+    width: 72%;
+    transform: scale(1.3845705882);
+    transform-origin: top left;
+  }
+
+  :host ::ng-deep .fc-daygrid-day-frame {
+    min-height: 94px;
+  }
+
+  :host ::ng-deep .fc-col-header-cell {
+    font-size: 0.9rem;      /* antes: 1rem–1.2rem */
+    padding: 0.3em 0;       /* menos espacio arriba/abajo */
+  }
+
+  :host ::ng-deep .fc-daygrid-day-number {
+    font-size: 0.8rem;      /* antes: 1rem */
+    top: 0.2em;             /* acercarlo un poco al borde */
+  }
+
+  :host ::ng-deep .fc-toolbar-title {
+    font-size: 1.4rem;      /* antes: 1.8rem */
+  }
+  
+  :host ::ng-deep .fc-button {
+    font-size: 0.75rem;     /* antes: 0.85rem–1rem */
+    padding: 4px 8px;
+  }
+
+  :host ::ng-deep .fc-daygrid-event {
+    padding: 2px 4px !important;
+    border-radius: 4px !important;
+    min-height: auto !important;
+  }
+
+  :host ::ng-deep .fc-daygrid-event .fc-event-title {
+    font-size: 0.75rem !important;   /* antes: ~0.85rem–1rem */
+    line-height: 1.1 !important;     /* más compacto */
+  }
+
+  :host ::ng-deep .fc-daygrid-event .fc-event-main-frame {
+    padding: 2px 4px !important;
+  }
+
+  :host ::ng-deep .fc-event {
+    font-size: 0.75rem !important;
+    padding: 2px 4px !important;
+    border-radius: 4px !important;
+  }
+
+  /*  Quita el puntito que aparece antes del título del evento  */
+  :host ::ng-deep .fc-daygrid-event-dot {
+    display: none !important;
   }
   
   /* Cabecera */
@@ -185,74 +232,6 @@
       opacity: 1;
       transform: translateY(0);
     }
-  }
-  
-  /* Widgets */
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 40px;
-  }
-  
-  .widget {
-    background-color: #ffffff;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: transform 0.3s ease;
-  }
-  
-  .primary-widget {
-    background-color: #3f93e7;
-    color: white;
-  }
-  
-  .secondary-widget {
-    background-color: #65e865;
-    color: white;
-  }
-  
-  .widget:hover {
-    transform: translateY(-10px);
-  }
-  
-  .widget-icon img {
-    width: 40px;
-  }
-  
-  .widget h4 {
-    font-size: 16px;
-    margin: 0;
-    font-weight: 500;
-  }
-  
-  .widget h2 {
-    font-size: 30px;
-    font-weight: 600;
-    margin: 0;
-  }
-  
-  /* Gráfico */
-  .chart-container {
-    margin-top: 40px;
-    background-color: #ffffff;
-    padding: 0px;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-  }
-  
-  /* Animaciones adicionales */
-  .zoom-animation {
-    transition: transform 0.3s ease;
-  }
-  
-  .zoom-animation:hover {
-    transform: scale(1.05);
   }
   
   /* Media Queries para diseño responsive */

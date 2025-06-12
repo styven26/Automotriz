@@ -78,7 +78,7 @@ export class DashboardAdminComponent implements OnInit {
     series: [],
     chart: {
       type: 'bar',
-      height: 530,
+      height: 620,
     },
     xaxis: {
       categories: [],

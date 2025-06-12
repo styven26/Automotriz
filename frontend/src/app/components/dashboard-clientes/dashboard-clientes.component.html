@@ -159,8 +159,7 @@
         </span><br><br>
         <span class="summary-subtitle">Facturación acumulada por citas atendidas</span>
       </div>
-      
-    </div><br>
+    </div>
 
     <!-- Contenedor para gráficos -->
     <div class="charts-row">
@@ -168,7 +167,7 @@
       <div class="chart-container">
         <h4 class="chart-title">Distribución de Servicios Solicitados</h4>
         <ngx-charts-pie-chart
-          [view]="[700, 470]"
+          [view]="[700, 620]"
           [results]="distribucionServicios"
           [legend]="true"
           [legendTitle]="'Servicios'"
@@ -186,7 +185,7 @@
         <h4 class="chart-title">Facturación Mensual por Citas Atendidas</h4>
         <ngx-charts-bar-vertical
             *ngIf="ingresosPorMes.length > 0"
-            [view]="[700, 470]"
+            [view]="[700, 620]"
             [results]="ingresosPorMes"
             [legend]="true"
             [xAxis]="true"
