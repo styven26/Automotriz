@@ -19,11 +19,16 @@ class OrdenServicio extends Model
         'id_vehiculo',
         'fecha_inicio',
         'fecha_fin',
-        'diagnostico',
-        'servicios_recomendados',
         'descripcion',
+        'servicios_recomendados',
+        'correo_enviado',
         'total_servicios',
         'total_repuestos',
+    ];
+
+    /** ← Esto es lo que faltaba: */
+    protected $casts = [
+        'servicios_recomendados' => 'array',
     ];
 
     /**

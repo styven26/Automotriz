@@ -205,10 +205,19 @@ class CitasController extends Controller
            return response()->json(['error'=>'Ya existe una cita para este vehículo en la fecha seleccionada.'], 422);
         }
 
-        // Establecer el estado "confirmada"
-        $estado = EstadoCita::where('nombre_estado', 'Confirmada')->first();
+        // 8) Determinar si el servicio "Diagnóstico" está entre los seleccionados
+        $diagnosticoId = Servicio::where('nombre', 'Diagnóstico')->value('id_servicio');
+        $idsServicios  = $validated['servicios'];
+
+        // Si incluye diagnóstico → diagnosticado, sino → confirmada
+        if (in_array($diagnosticoId, $idsServicios, true)) {
+            $estado = EstadoCita::where('nombre_estado', 'Diagnosticado')->first();
+        } else {
+            $estado = EstadoCita::where('nombre_estado', 'Confirmada')->first();
+        }
+
         if (! $estado) {
-            return response()->json(['error' => 'Estado "Confirmada" no existe'], 422);
+            return response()->json(['error' => "Estado indicado no existe"], 422);
         }
     
         // 7B) Verificar que NO exista otra cita para el MISMO vehículo y la MISMA fecha

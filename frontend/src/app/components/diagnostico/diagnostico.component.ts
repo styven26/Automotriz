@@ -92,8 +92,8 @@ export class DiagnosticoComponent {
   constructor(private authService: AuthService, public dialog: MatDialog, private subtipoService:SubtipoService, private diagnosticoService: DiagnosticoService, private router: Router, private http: HttpClient) {}
 
   // 1) En tu DiagnosticoComponent, define una variable para guardar todos los subtipos
-  subtipos: any[] = [];           // Array de subtipos completos
-  subtiposMap: { [key: number]: string } = {}; // Mapa id -> nombre para fácil lookup
+  servicios: { id: number; nombre: string }[] = [];
+  serviciosMap: { [key:number]:string } = {};
 
   // Funciones de navegación del menú
   ngOnInit(): void {
@@ -102,21 +102,21 @@ export class DiagnosticoComponent {
     this.rolActivo = sessionStorage.getItem('rol_activo') ?? '';
 
     // 1. Primero obtén todos los subtipos y guárdalos en `subtipos` y `subtiposMap`
-    this.subtipoService.obtenerSubtiposServicios().subscribe({
-      next: (respSubtipos) => {
-        this.subtipos = respSubtipos;
+    this.subtipoService.obtenerSubtiposServicios()
+    .subscribe((resp: any[]) => {
+      // resp es realmente un array de Servicio { id_servicio, id_tipo, nombre, … }
+      this.servicios = resp
+        // opcional: filtra aquí el servicio “Diagnóstico” si no quieres mostrarlo
+        .filter(s => s.nombre.toLowerCase() !== 'diagnóstico')
+        // y lo mapeas a {id,nombre}
+        .map(s => ({ id: s.id_servicio, nombre: s.nombre }));
 
-        // Crea un "mapa" de id -> nombre
-        respSubtipos.forEach((s: any) => {
-          this.subtiposMap[s.id] = s.nombre;
-        });
+      // creas el mapa id→nombre
+      this.serviciosMap = this.servicios
+        .reduce((m, s) => ({ ...m, [s.id]: s.nombre }), {});
 
-        // 2. Luego de tener subtipos, carga los diagnósticos
-        this.cargarDiagnosticos();
-      },
-      error: (err) => {
-        console.error('Error al obtener subtipos', err);
-      }
+      // YA puedes cargar los diagnósticos
+      this.cargarDiagnosticos();
     });
 
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
@@ -125,7 +125,6 @@ export class DiagnosticoComponent {
     this.apellidoUsuario = user.apellido || '';         
     
     this.iniciarReloj();
-    this.cargarDiagnosticos();
   }
 
   cambiarRol(event: Event): void {
@@ -162,29 +161,39 @@ export class DiagnosticoComponent {
   }
 
   cargarDiagnosticos() {
-    this.diagnosticoService.listarDiagnosticos().subscribe({
-      next: (resp) => {
-        resp.forEach((diag: any) => {
-          // Convertir string a array, etc...
-          if (typeof diag.servicios_recomendados === 'string') {
-            diag.servicios_recomendados = JSON.parse(diag.servicios_recomendados);
+  this.diagnosticoService.listarDiagnosticos().subscribe({
+    next: (resp) => {
+      resp.forEach((diag: any) => {
+        // 1) FORZAMOS a que _siempre_ sea un array de números:
+        let arr = diag.servicios_recomendados;
+        if (typeof arr === 'string') {
+          try {
+            arr = JSON.parse(arr);
+          } catch {
+            arr = [];
           }
-          // Mapea IDs -> nombres
-          diag.servicios_recomendados_nombres = diag.servicios_recomendados?.map(
-            (id: number) => this.subtiposMap[id] || 'Desconocido'
-          ) || [];
-        });
-  
-        // Asigna al dataSource
-        this.dataSource = new MatTableDataSource(resp);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      },
-      error: (err) => {
-        console.error('Error al listar diagnósticos', err);
-      }
-    });
-  }  
+        }
+        if (!Array.isArray(arr)) {
+          arr = [];
+        }
+        // 2) deduplicamos y convertimos a entero:
+        arr = Array.from(new Set(arr.map((x: any) => +x)));
+        diag.servicios_recomendados = arr;
+
+        // 3) ahora montamos los nombres
+        diag.servicios_recomendados_nombres = diag.servicios_recomendados
+          .map((id: number) => this.serviciosMap[id] || 'Desconocido');
+      });
+
+      console.log('🔍 Diagnósticos tras normalizar:', resp);
+      this.dataSource = new MatTableDataSource(resp);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    },
+    error: (err) => console.error('Error al listar diagnósticos', err)
+  });
+}
+
 
   filterValue: string = '';
 
@@ -239,125 +248,107 @@ export class DiagnosticoComponent {
   }
 
   openUpdateDialog(diag: any): void {
-    // Asegurarse de que diag.servicios_recomendados sea un array
-    let recomendadosActuales = diag.servicios_recomendados || [];
-    if (typeof recomendadosActuales === 'string') {
-      recomendadosActuales = JSON.parse(recomendadosActuales);
-    }
-  
-    // 1. Filtrar los subtipos para excluir "Diagnóstico"
-    const subtiposFiltrados = this.subtipos.filter(
-      (sub) => sub.nombre.toLowerCase() !== 'diagnóstico'
-    );
-  
-    // 2. Construir el HTML con checkboxes
-    let optionsHtml = `<div style="text-align: left; padding: 0 20px;">`;
-    subtiposFiltrados.forEach((subtipo) => {
-      // Marcar check si el subtipo.id está en recomendadosActuales
-      const isChecked = recomendadosActuales.includes(subtipo.id) ? 'checked' : '';
-      optionsHtml += `
-        <div style="margin-bottom: 8px;">
-          <input
-            type="checkbox"
-            id="servicio-${subtipo.id}"
-            value="${subtipo.id}"
-            ${isChecked}
-            style="margin-right: 6px;"
-          />
-          <label
-            for="servicio-${subtipo.id}"
-            style="font-family: 'Poppins', sans-serif; font-size: 16px;"
-          >
-            ${subtipo.nombre}
-          </label>
-        </div>
-      `;
-    });
-    optionsHtml += `</div>`;
-  
-    // 3. Mostrar el SweetAlert2 con textarea y checkboxes
+    // 1) IDs actuales
+    const actuales: number[] = diag.servicios_recomendados;
+
+    // 2) HTML de los checkboxes sin checked
+    const optionsHtml = this.servicios.map(s => `
+      <div style="margin-bottom:8px;">
+        <input
+          type="checkbox"
+          id="serv-${s.id}"
+          value="${s.id}"
+          style="margin-right:6px;"
+        />
+        <label for="serv-${s.id}"
+          style="font-family:'Poppins',sans-serif;font-size:16px;"
+        >${s.nombre}</label>
+      </div>
+    `).join('');
+
     Swal.fire({
-      title: `
-        <h4 style="
-          font-family: Roboto, sans-serif;
-          font-size: 30px;
-          font-weight: bold;
-          text-align: center;
+      title: ` <h3 style="
+          font-family:Roboto,sans-serif;
+          font-size:30px;
+          font-weight:bold;
+          text-align:center;
         ">
           <strong>Actualizar Diagnóstico</strong>
-        </h4>
-      `,
+        </h3> `,
       html: `
-        <div style="margin-bottom: 10px; text-align: center;">
+        <div style="margin-bottom:10px;text-align:center;">
           <textarea
             id="descripcion"
             placeholder="Describa el problema encontrado"
             style="
-              width: 100%;
-              height: 80px;
-              font-family: 'Poppins', sans-serif;
-              font-size: 15px;
-              padding: 8px;
-              margin: 0 0 20px 0;
-              border-radius: 5px;
-              border: 1px solid #ccc;
-              resize: none;
-            "
-          >${diag.descripcion || ''}</textarea>
+              width:90%;
+              height:100px;
+              font-family:'Poppins',sans-serif;
+              font-size:15px;
+              padding:8px;
+              border:1px solid #ccc;
+              border-radius:5px;
+              resize:none;
+              box-sizing:border-box;
+            ">${diag.descripcion || ''}</textarea>
         </div>
+        <br />
         <div style="
-          text-align: center; 
-          font-family: 'Poppins', sans-serif; 
-          font-weight: bold; 
-          font-size: 16px; 
-          margin-bottom: 5px;
+          text-align:center;
+          font-family:'Poppins',sans-serif;
+          font-weight:bold;
+          font-size:16px;
+          margin-bottom:5px;
         ">
           Servicios Recomendados
         </div>
-        ${optionsHtml}
+        <br />
+        <div style="text-align:left;padding:0 20px;">
+          ${optionsHtml}
+        </div>
       `,
       focusConfirm: false,
       showCancelButton: true,
-      confirmButtonText: `<span style="font-family: Roboto, sans-serif; border-radius: 50px;">Guardar</span>`,
-      cancelButtonText: `<span style="font-family: Roboto, sans-serif; border-radius: 50px;">Cancelar</span>`,
-      customClass: {
-        confirmButton: 'rounded-button',
-        cancelButton: 'rounded-button',
+      confirmButtonText: 'Guardar',
+      didOpen: () => {
+        const popup = Swal.getPopup()!;
+        actuales.forEach(id => {
+          const cb = popup.querySelector<HTMLInputElement>(`#serv-${id}`);
+          if (cb) cb.checked = true;
+        });
       },
       preConfirm: () => {
-        const descripcionInput = (
-          document.getElementById('descripcion') as HTMLTextAreaElement
-        )?.value.trim();
-  
-        if (!descripcionInput) {
+        const popup = Swal.getPopup()!;
+        const descripcion = (popup.querySelector<HTMLTextAreaElement>('#descripcion')!).value.trim();
+        if (!descripcion) {
           Swal.showValidationMessage('La descripción no puede estar vacía');
           return;
         }
-  
-        // Recoger los checkboxes seleccionados
-        const serviciosRecomendados: number[] = [];
-        subtiposFiltrados.forEach((subtipo) => {
-          const checkbox = document.getElementById(
-            `servicio-${subtipo.id}`
-          ) as HTMLInputElement;
-          if (checkbox && checkbox.checked) {
-            serviciosRecomendados.push(Number(checkbox.value));
+        const seleccionados = Array.from(
+          popup.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked')
+        );
+        return {
+          descripcion,
+          serviciosRecomendados: seleccionados.map(cb => +cb.value)
+        };
+      }
+    }).then(result => {
+      if (!result.isConfirmed) return;
+      const { descripcion, serviciosRecomendados } = result.value!;
+      this.diagnosticoService
+        .updateDiagnostico(diag.id_orden, descripcion, serviciosRecomendados)
+        .subscribe({
+          next: () => {
+            Swal.fire('Éxito', 'Diagnóstico actualizado.', 'success');
+            this.cargarDiagnosticos();
+          },
+          error: err => {
+            console.error(err);
+            Swal.fire('Error', 'No se pudo actualizar el diagnóstico.', 'error');
           }
         });
-  
-        return {
-          descripcion: descripcionInput,
-          serviciosRecomendados,
-        };
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const { descripcion, serviciosRecomendados } = result.value;
-        // Llamada a tu método de actualización
-        this.updateDiagnostico(diag.id, descripcion, serviciosRecomendados);
-      }
     });
-  }        
+  }
   
   updateDiagnostico(diagnosticoId: number, descripcion: string, serviciosRecomendados: any[]) {
     this.diagnosticoService.updateDiagnostico(diagnosticoId, descripcion, serviciosRecomendados)
@@ -414,8 +405,10 @@ export class DiagnosticoComponent {
     this.router.navigate(['/trabajo-mecanico']);
   }
 
-    // Método para enviar correo cuando NO hay servicios recomendados
-  sendEmailNoServices(diag: any): void {
+  /**
+   * Método para enviar correo cuando NO hay servicios recomendados
+   */
+  sendEmailNoServices(idOrden: number): void {
     Swal.fire({
       title: 'Notificar al Cliente',
       text: 'No se han seleccionado servicios recomendados. ¿Desea enviar un correo informando que la mecánica no cuenta con esos servicios?',
@@ -424,24 +417,45 @@ export class DiagnosticoComponent {
       confirmButtonText: 'Enviar Notificación',
       cancelButtonText: 'Cancelar'
     }).then(result => {
-      if (result.isConfirmed) {
-        this.diagnosticoService.enviarCorreoSinServicios(diag.id).subscribe({
-          next: (resp) => {
-            Swal.fire('Correo enviado', 'Se ha notificado al cliente que la mecánica no cuenta con esos servicios.', 'success');
-          },
-          error: (err) => {
-            Swal.fire('Error', 'No se pudo enviar el correo.', 'error');
-            console.error(err);
-          }
-        });
-      }
+      if (!result.isConfirmed) return;
+
+      // Usar id_orden en lugar de id
+      this.diagnosticoService.enviarCorreoSinServicios(idOrden).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Correo enviado',
+            text: 'Se ha notificado al cliente que la mecánica no cuenta con esos servicios.',
+            icon: 'success',
+            customClass: {
+              popup: 'custom-swal-popup',
+              title: 'custom-swal-title',
+              confirmButton: 'custom-swal-confirm-button'
+            }
+          });
+        },
+        error: err => {
+          console.error(err);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo enviar el correo.',
+            icon: 'error',
+            customClass: {
+              popup: 'custom-swal-popup',
+              title: 'custom-swal-title',
+              confirmButton: 'custom-swal-confirm-button'
+            }
+          });
+        }
+      });
     });
   }
 
-  // Método para enviar correo cuando SÍ hay servicios recomendados
+  /**
+   * Método para enviar correo cuando SÍ hay servicios recomendados
+   */
   sendEmailRecommended(diagnostic: any): void {
-    const servicios = diagnostic.servicios_recomendados_nombres?.join(', ') || 'Ninguno';
-  
+    const servicios = diagnostic.servicios_recomendados_nombres?.join(', ') ?? 'Ninguno';
+
     Swal.fire({
       title: 'Confirmar Servicios Recomendados',
       html: `
@@ -493,46 +507,41 @@ export class DiagnosticoComponent {
         confirmButton: 'custom-swal-confirm-button',
         cancelButton: 'custom-swal-cancel-button'
       }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.diagnosticoService.enviarCorreoServiciosRecomendados(diagnostic.id).subscribe({
-          next: () => {
-            // Notificación de éxito
-            Swal.fire({
-              title: 'Correo enviado',
-              text: 'Se ha enviado el correo al cliente con los servicios recomendados.',
-              icon: 'success',
-              customClass: {
-                popup: 'custom-swal-popup',
-                title: 'custom-swal-title',
-                confirmButton: 'custom-swal-confirm-button'
-              }
-            });
-  
-            // OPCIÓN A) Eliminarlo de la tabla local:
-            this.dataSource.data = this.dataSource.data.filter(
-              (d: any) => d.id !== diagnostic.id
-            );
-  
-            // OPCIÓN B) O actualizar un estado local, p.ej.:
-            // diagnostic.estado = 'enviado';
-            // (y luego deshabilitar los botones en la vista)
-          },
-          error: (error) => {
-            Swal.fire({
-              title: 'Error',
-              text: 'No se pudo enviar el correo.',
-              icon: 'error',
-              customClass: {
-                popup: 'custom-swal-popup',
-                title: 'custom-swal-title',
-                confirmButton: 'custom-swal-confirm-button'
-              }
-            });
-            console.error(error);
-          }
-        });
-      }
+    }).then(result => {
+      if (!result.isConfirmed) return;
+
+      // Nuevamente usamos id_orden
+      this.diagnosticoService.enviarCorreoServiciosRecomendados(diagnostic.id_orden).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Correo enviado',
+            text: 'Se ha enviado el correo al cliente con los servicios recomendados.',
+            icon: 'success',
+            customClass: {
+              popup: 'custom-swal-popup',
+              title: 'custom-swal-title',
+              confirmButton: 'custom-swal-confirm-button'
+            }
+          });
+          // Opcional: actualizar fila o eliminarla localmente
+          this.dataSource.data = this.dataSource.data.filter(
+            (d: any) => d.id_orden !== diagnostic.id_orden
+          );
+        },
+        error: err => {
+          console.error(err);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo enviar el correo.',
+            icon: 'error',
+            customClass: {
+              popup: 'custom-swal-popup',
+              title: 'custom-swal-title',
+              confirmButton: 'custom-swal-confirm-button'
+            }
+          });
+        }
+      });
     });
   }    
 }

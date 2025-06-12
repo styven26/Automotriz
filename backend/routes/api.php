@@ -85,9 +85,9 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
 
     // Diagnósticos
     Route::get('/diagnosticos',                                                  [DiagnosticoController::class, 'index']);
-    Route::put('/diagnosticos/{diagnostico}',                                    [DiagnosticoController::class, 'update']);
-    Route::post('diagnosticos/{diagnosticoId}/enviarCorreoServiciosRecomendados',[DiagnosticoController::class, 'enviarCorreoServiciosRecomendados']);
-    Route::post('diagnosticos/{diagnosticoId}/enviarCorreoSinServicios',         [DiagnosticoController::class, 'enviarCorreoSinServicios']);
+    Route::put('/diagnosticos/{ordenServicio}',                                  [DiagnosticoController::class, 'update']);
+    Route::post('diagnosticos/{idOrden}/enviarCorreoServiciosRecomendados',      [DiagnosticoController::class, 'enviarCorreoServiciosRecomendados']);
+    Route::post('diagnosticos/{idOrden}/enviarCorreoSinServicios',               [DiagnosticoController::class, 'enviarCorreoSinServicios']);
 
     // Orden de servicio 
     Route::get   ('/ordenes',                        [OrdenServicioController::class,'index']);
@@ -99,12 +99,12 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     Route::post  ('/ordenes/{id}/finalizar-auto',    [OrdenServicioController::class,'finalizarOrdenAutomatico']);
 
     // Reportes
-    Route::get('/reporte-trabajos',                    [ReportController::class, 'descargarReporte']);
+    Route::get('/reporte-trabajos',                  [ReportController::class, 'descargarReporte']);
 });
 
     // Rutas abiertas para que el cliente no autenticado haga clic
-    Route::get('mecanico/diagnosticos/{diagnosticoId}/aceptar',  [DiagnosticoController::class, 'aceptarServiciosRecomendados']);
-    Route::get('mecanico/diagnosticos/{diagnosticoId}/rechazar', [DiagnosticoController::class, 'rechazarServiciosRecomendados']);
+    Route::get('mecanico/diagnosticos/{idOrden}/aceptar',  [DiagnosticoController::class, 'aceptarServiciosRecomendados']);
+    Route::get('mecanico/diagnosticos/{idOrden}/rechazar', [DiagnosticoController::class, 'rechazarServiciosRecomendados']);
 
 // Rutas exclusivas del cliente
 Route::prefix('cliente')->middleware('auth:cliente')->group(function () {
@@ -138,8 +138,8 @@ Route::prefix('cliente')->middleware('auth:cliente')->group(function () {
     Route::post('/citas/horarios/almuerzo',     [CitasController::class, 'obtenerHorarioAlmuerzo']);
 
     // Monitoreo de vehículos
-    Route::get('/monitoreos',     [DetalleServicioController::class, 'monitoreosCliente']);
-    Route::get('/monitoreo/{idVehiculo}', [DetalleServicioController::class, 'monitoreoVehiculo']);
+    Route::get('/monitoreos',                   [DetalleServicioController::class, 'monitoreosCliente']);
+    Route::get('/monitoreo/{idVehiculo}',       [DetalleServicioController::class, 'monitoreoVehiculo']);
 
     // Historial de servicios
     Route::get('/historial',                    [HistorialController::class, 'index']);

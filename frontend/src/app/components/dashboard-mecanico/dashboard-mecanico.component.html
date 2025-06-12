@@ -111,58 +111,47 @@
                     <h2 class="value">{{ totalCitas  }}</h2>
                 </mat-card-content>
             </mat-card>
-      
-            <mat-card class="kpi-card kpi-card-income">
-                <mat-card-content>
-                    <div class="kpi-header">
-                        <div class="icon-wrapper icon-income">
-                            <i class="fas fa-wallet" style="font-size: 24px; color: white;"></i>
-                        </div>
-                        <mat-card-title>Total de Órdenes de Servicios</mat-card-title>
-                    </div>
-                <h2 class="value">{{ totalTrabajos }}</h2>
-                </mat-card-content>
-            </mat-card>
-        </div><br>
+        </div>
       
         <!-- Gráficos -->
         <div class="charts-container">
-            <!-- Gráfico de Pie -->
-            <div class="chart">
-                <ngx-charts-pie-chart
-                    [results]="citasChartData"
-                    [view]="[700, 550]"
-                    [legend]="true"
-                    [explodeSlices]="true"
-                    [legendTitle]="'Estados de Citas'"
-                    [labels]="true"
-                    [customColors]="[
-                        { name: 'Confirmada',   value: '#9676d8' },
-                        { name: 'En Proceso',   value: '#3498db' },
-                        { name: 'Diagnosticado', value: '#2980b9' },
-                        { name: 'Atendida',     value: '#27ae60' },
-                        { name: 'Cancelada',    value: '#ff7f7f' }
-                    ]">
-                </ngx-charts-pie-chart>
-            </div>
-            <!-- Gráfico de Barras -->
-            <div class="chart">
-                <ngx-charts-bar-vertical
-                    [results]="ordenesChartData"
-                    [view]="[800, 550]"
-                    [legend]="true"
-                    [legendTitle]="'Estados de Órdenes'"
+            <!-- Gráfico de Citas por Día (Barra Vertical Agrupada) -->
+            <div class="chart-container">
+                <h4 class="chart-title">Distribución Diaria de Estados de Citas</h4>
+                <ngx-charts-bar-vertical-2d
+                    [view]="[780,500]"
+                    [scheme]="colorScheme"
+                    [results]="citasPorDiaData"
                     [xAxis]="true"
                     [yAxis]="true"
-                    [animations]="true"
-                    [customColors]="[
-                        { name: 'Pendiente', value: '#ff7f7f' },
-                        { name: 'En_proceso', value: '#9676d8' },
-                        { name: 'Completado', value: '#7fb3ff' },
-                        { name: 'Cancelado', value: '#ffbf7f' }
-                    ]">
-                </ngx-charts-bar-vertical>
+                    [legend]="true"
+                    [legendTitle]="'Estados de Citas'"
+                    [showGridLines]="true"
+                    [showXAxisLabel]="true"
+                    [showYAxisLabel]="true"
+                    [xAxisLabel]="'Día'"
+                    [yAxisLabel]="'Nº de Citas'">
+                </ngx-charts-bar-vertical-2d>
             </div>
+
+            <!-- Gráfico de Citas por Mes (Línea) -->
+            <div class="chart-container">
+                <h4 class="chart-title">Tendencia Mensual de Estados de Citas</h4>
+                <ngx-charts-line-chart
+                    [view]="[780,500]"
+                    [scheme]="colorScheme"
+                    [results]="citasPorMesData"
+                    [xAxis]="true"
+                    [yAxis]="true"
+                    [legend]="true"
+                    [legendTitle]="'Estados de Citas'"
+                    [showGridLines]="true"
+                    [showXAxisLabel]="true"
+                    [showYAxisLabel]="true"
+                    [xAxisLabel]="'Mes'"
+                    [yAxisLabel]="'Nº de Citas'">
+                </ngx-charts-line-chart>
+            </div>    
         </div>
     </div>
 </div>

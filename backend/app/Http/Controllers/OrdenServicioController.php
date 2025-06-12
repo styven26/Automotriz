@@ -38,7 +38,7 @@ class OrdenServicioController extends Controller
     }
 
     /**
-     * 2) Listar sólo las órdenes con cita en estado
+     * 2) Listar sólo las órdenes con cita en estado trabajos mecánicos
      */
     public function listarOrdenesConfirmadas()
     {
@@ -56,7 +56,7 @@ class OrdenServicioController extends Controller
             ->whereHas('cita', function($q) use($mec) {
                 $q->where('cedula_mecanico', $mec->cedula)
                 ->whereHas('estado', function($q2) {
-                    $q2->whereIn('nombre_estado', ['Pendiente','Confirmada','En Proceso','Diagnosticado']);
+                    $q2->whereIn('nombre_estado', ['Confirmada']);
                 });
             })
             ->get();

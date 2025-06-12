@@ -357,13 +357,26 @@
   }
 }
 
+.chart-title {
+  display: block;            /* ahora ocupa todo el ancho */
+  width: 100%;               /* se asegura de usar todo el espacio disponible */
+  text-align: center;        /* centra el texto horizontalmente */
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Roboto', sans-serif;
+}
+
 /* KPIs */
 .kpi-container {
   display: flex;
   gap: 20px;
 
   .kpi-card {
-    width: calc(50% - 10px);
+    width: 100%;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -428,8 +441,8 @@
 /* Gráficos */
 .charts-container {
   display: flex;
-  gap: 20px;
-  margin-top: 30px;
+  gap: 30px;
+  margin-top: 20px;
 
   .chart {
     flex: 1;

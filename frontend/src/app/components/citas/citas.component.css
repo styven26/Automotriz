@@ -1,14 +1,30 @@
 /* Seleccionar Imagen */
 .row {
   display: flex;
+  gap: 24px;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
 }
 
 .left-section {
-  flex: 1 1 25%; /* Toma el 60% del ancho */
+  flex: 2; /* Toma el 60% del ancho */
   padding: 10px;
+}
+
+/* Para hacer filas de dos campos */
+.form-row {
+  display: flex;
+  gap: 16px;      
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+/* Cada campo ocupa la mitad del ancho total */
+.half-width {
+  flex: 1 1 calc(50% - 8px);
+  min-width: 160px; /* evita que se encojan demasiado */
 }
 
 .right-section {
@@ -56,7 +72,7 @@ input[type="file"] {
 /* Botón */
 .button-container {
   text-align: center; /* Centra el botón */
-  margin-top: 20px; /* Espacio superior */
+  margin-top: 120px; /* Espacio superior */
 }
 
 .styled-button {

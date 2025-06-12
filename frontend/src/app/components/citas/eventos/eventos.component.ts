@@ -153,20 +153,22 @@ export class EventosComponent {
 
   cargarServicios(): void {
     this.subtipoService.obtenerSubtiposServicios().subscribe(
-      (response) => {
+      (response: any[]) => {
         this.servicios = response;
 
-        // Buscar el servicio "Diagnóstico" (comparación insensible a mayúsculas)
+        // Buscar el servicio "Diagnóstico"
         const diagnosticoServicio = this.servicios.find(
-          (s: any) => s.nombre.toLowerCase() === 'diagnóstico'
+          s => s.nombre.toLowerCase() === 'diagnóstico'
         );
-        this.diagnosticoId = diagnosticoServicio ? diagnosticoServicio.id : null;
+        // Asegúrate de leer id_servicio, no id
+        this.diagnosticoId = diagnosticoServicio
+          ? diagnosticoServicio.id_servicio
+          : null;
+
         this.actualizarServiciosSeleccionados();
         this.onServiciosChange(this.subtiposSeleccionados);
       },
-      (error) => {
-        console.error('Error al cargar servicios:', error);
-      }
+      error => { console.error(error); }
     );
   }
 
@@ -190,7 +192,7 @@ export class EventosComponent {
       this.subtiposSeleccionados = [this.diagnosticoId as number];
       Swal.fire({
         title: 'Información',
-        html: `<div style="font-family: 'Poppins', sans-serif; text-align: center; color: #d9534f; font-weight: bold; font-size: 20px;">
+        html: `<div style="font-family: 'Poppins', sans-serif; text-align: center; color: #d9534f; font-size: 18px;">
                  Solo se permite seleccionar "Diagnóstico" de forma exclusiva.
                </div>`,
         icon: 'info',

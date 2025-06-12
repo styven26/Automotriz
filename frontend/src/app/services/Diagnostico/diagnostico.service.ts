@@ -10,6 +10,7 @@ export class DiagnosticoService {
 
   // Ajusta la URL a la ruta real de tu backend para mecánicos
   private apiUrlMecanico = 'http://localhost:8000/api/mecanico/citas'; 
+  private apiUrlDiagnosticos = 'http://localhost:8000/api/mecanico/diagnosticos';
 
   constructor(private http: HttpClient) {}
 
@@ -40,6 +41,19 @@ export class DiagnosticoService {
     );
   }
 
+  guardarDiagnostico(
+    citaId: number,
+    descripcion: string,
+    serviciosRecomendados: any[] = []
+  ): Observable<any> {
+    const body = { descripcion, servicios_recomendados: serviciosRecomendados };
+    return this.http.post(
+      `${this.apiUrlMecanico}/${citaId}/diagnostico`,
+      body,
+      { headers: this.getHeaders() }
+    );
+  }
+
   // src/app/services/Diagnostico/diagnostico.service.ts
   listarDiagnosticos(): Observable<any> {
     return this.http.get(
@@ -48,26 +62,22 @@ export class DiagnosticoService {
     );
   }
 
+  /** ACTUALIZA un diagnóstico existente (PUT) */
   updateDiagnostico(
     diagnosticoId: number,
     descripcion: string,
-    serviciosRecomendados: any[]
+    serviciosRecomendados: number[]
   ): Observable<any> {
-    const body = {
-      descripcion,
-      servicios_recomendados: serviciosRecomendados
-    };
-  
     return this.http.put(
-      `http://localhost:8000/api/mecanico/diagnosticos/${diagnosticoId}`,
-      body,
+      `${this.apiUrlDiagnosticos}/${diagnosticoId}`,
+      { descripcion, servicios_recomendados: serviciosRecomendados },
       { headers: this.getHeaders() }
     );
   }
 
   enviarCorreoSinServicios(diagnosticoId: number): Observable<any> {
     return this.http.post(
-      `http://localhost:8000/api/mecanico/diagnosticos/${diagnosticoId}/enviarCorreoSinServicios`,
+      `${this.apiUrlDiagnosticos}/${diagnosticoId}/enviarCorreoSinServicios`,
       {},
       { headers: this.getHeaders() }
     );
@@ -75,7 +85,7 @@ export class DiagnosticoService {
   
   enviarCorreoServiciosRecomendados(diagnosticoId: number): Observable<any> {
     return this.http.post(
-      `http://localhost:8000/api/mecanico/diagnosticos/${diagnosticoId}/enviarCorreoServiciosRecomendados`,
+      `${this.apiUrlDiagnosticos}/${diagnosticoId}/enviarCorreoServiciosRecomendados`,
       {},
       { headers: this.getHeaders() }
     );

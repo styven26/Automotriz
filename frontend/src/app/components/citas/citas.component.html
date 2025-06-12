@@ -145,59 +145,97 @@
           <div class="row">
             <!-- Izquierda: Campos del formulario -->
             <div class="left-section">
-              <mat-form-field appearance="fill">
-                <mat-label>Marca</mat-label>
-                <input matInput formControlName="marca" placeholder="Marca del vehículo" />
-              </mat-form-field><br><br>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Modelo</mat-label>
-                <input matInput formControlName="modelo" placeholder="Modelo del vehículo" />
-              </mat-form-field><br><br>
+              <!-- PRIMERA FILA: Marca + Modelo -->
+              <div class="form-row">
+                <!-- Marca -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Marca *</mat-label>
+                  <input matInput formControlName="marca" />
+                  <mat-error *ngIf="marca.hasError('required')">La marca es obligatoria</mat-error>
+                  <mat-error *ngIf="marca.hasError('pattern')">Sólo letras y espacios</mat-error>
+                </mat-form-field>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Año</mat-label>
-                <input matInput type="number" formControlName="anio" placeholder="Año del vehículo" />
-              </mat-form-field><br><br>
+                <!-- Modelo -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Modelo *</mat-label>
+                  <input matInput formControlName="modelo" />
+                  <mat-error *ngIf="modelo.hasError('required')">El modelo es obligatorio</mat-error>
+                  <mat-error *ngIf="modelo.hasError('pattern')">Letras, números y espacios</mat-error>
+                </mat-form-field>
+              </div><br><br>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Número de Placa</mat-label>
-                <input
-                  matInput
-                  formControlName="numero_placa"
-                  placeholder="Número de placa"
-                  (blur)="verificarPlaca()"
-                />
-              </mat-form-field><br><br>
+              <!-- SEGUNDA FILA: Año + Placa -->
+              <div class="form-row">
+                <!-- Año -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Año *</mat-label>
+                  <input matInput type="number" formControlName="anio" />
+                  <mat-error *ngIf="anio.hasError('required')">El año es obligatorio</mat-error>
+                  <mat-error *ngIf="anio.hasError('min')">Debe ser ≥ 1886</mat-error>
+                  <mat-error *ngIf="anio.hasError('max')">
+                    No puede ser mayor a {{ anio.errors?.['max'].max }}
+                  </mat-error>
+                </mat-form-field>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Kilometraje</mat-label>
-                <input matInput type="number" formControlName="kilometraje" placeholder="Ej. 50000" />
-              </mat-form-field><br><br> 
+                <!-- Placa -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Número de Placa *</mat-label>
+                  <input matInput formControlName="numero_placa" (blur)="verificarPlaca()" />
+                  <mat-error *ngIf="numero_placa.hasError('required')">La placa es obligatoria</mat-error>
+                  <mat-error *ngIf="numero_placa.hasError('pattern')">
+                    Sólo mayúsculas, dígitos y guiones
+                  </mat-error>
+                </mat-form-field>
+              </div><br><br>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Transmisión</mat-label>
-                <mat-select formControlName="transmision">
-                  <mat-option value="Manual">Manual</mat-option>
-                  <mat-option value="Automática">Automática</mat-option>
-                  <mat-option value="Semi-automática">Semi-automática</mat-option>
-                </mat-select>
-              </mat-form-field><br><br>
+              <!-- TERCERA FILA: Kilometraje + Transmisión -->
+              <div class="form-row">
+                <!-- Kilometraje -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Kilometraje *</mat-label>
+                  <input matInput type="number" formControlName="kilometraje" />
+                  <mat-error *ngIf="kilometraje.hasError('required')">
+                    El kilometraje es obligatorio
+                  </mat-error>
+                  <mat-error *ngIf="kilometraje.hasError('min')">
+                    Debe ser un número ≥ 0
+                  </mat-error>
+                </mat-form-field>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Tipo de Combustible</mat-label>
-                <mat-select formControlName="tipo_combustible">
-                  <mat-option value="Gasolina">Gasolina</mat-option>
-                  <mat-option value="Diesel">Diesel</mat-option>
-                </mat-select>
-              </mat-form-field><br><br>
+                <!-- Transmisión -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Transmisión *</mat-label>
+                  <mat-select formControlName="transmision">
+                    <mat-option value="Manual">Manual</mat-option>
+                    <mat-option value="Automática">Automática</mat-option>
+                    <mat-option value="Semi-automática">Semi-automática</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div><br><br>
 
-              <mat-form-field appearance="fill">
-                <mat-label>Último Día de Servicio</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio">
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field><br>           
+              <!-- CUARTA FILA: Combustible + Fecha último servicio -->
+              <div class="form-row">
+                <!-- Combustible -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Combustible *</mat-label>
+                  <mat-select formControlName="tipo_combustible">
+                    <mat-option value="Gasolina">Gasolina</mat-option>
+                    <mat-option value="Diesel">Diesel</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Fecha último servicio -->
+                <mat-form-field appearance="fill" class="half-width">
+                  <mat-label>Último Servicio *</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio" />
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-error *ngIf="fecha_ultimo_servicio.hasError('required')">
+                    La fecha es obligatoria
+                  </mat-error>
+                </mat-form-field>       
+              </div><br><br>
             </div>
 
             <!-- Derecha: Seleccionar Imagen y vista previa -->
@@ -205,10 +243,17 @@
               <div class="image-upload-container">
                 <label for="imagen" class="custom-file-label">Seleccionar Imagen</label>
                 <input id="imagen" type="file" (change)="onFileChange($event)" />
+                <mat-error *ngIf="imagen.hasError('required')"
+                  style= "font-size:0.875rem;
+                          font-weight:500;
+                          color:#e74c3c;
+                          margin-top:4px;">
+                  La imagen es obligatoria
+                </mat-error>
               </div>
               <img *ngIf="previewImage" [src]="previewImage" alt="Vista previa" class="preview-image" />
             </div>
-          </div><br><br>
+          </div>
 
           <!-- Botón Registrar Vehículo -->
           <div class="button-container" *ngIf="!registered">

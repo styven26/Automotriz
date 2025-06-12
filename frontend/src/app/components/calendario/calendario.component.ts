@@ -117,6 +117,7 @@ export class CalendarioComponent {
       !cita.extendedProps ||
       (cita.extendedProps.estado !== 'Atendida' &&
        cita.extendedProps.estado !== 'En Proceso' &&
+       cita.extendedProps.estado !== 'Cancelada' &&
        cita.extendedProps.estado !== 'Confirmada' &&
        cita.extendedProps.estado !== 'Diagnosticado')
     ) {
@@ -136,7 +137,8 @@ export class CalendarioComponent {
     // - El usuario es el dueño,
     // - El estado es "confirmada"
     // - Y la cita aún no ha iniciado (hora actual < hora de inicio)
-    const canDelete = isOwner && cita.extendedProps.estado === 'Confirmada' && now < appointmentStart;
+    // Después: permitimos eliminar también si está Diagnosticado
+    const canDelete = isOwner && (cita.extendedProps.estado === 'Confirmada' || cita.extendedProps.estado === 'Diagnosticado') && now < appointmentStart;
   
     // Construir los datos a mostrar
     const vehiculo = cita.extendedProps?.vehiculo

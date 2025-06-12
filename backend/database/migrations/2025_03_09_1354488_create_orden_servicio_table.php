@@ -31,9 +31,9 @@ return new class extends Migration
             // Campos
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
-            $table->text('diagnostico')->nullable();
-            $table->text('servicios_recomendados')->nullable();
             $table->text('descripcion')->nullable();
+            $table->text('servicios_recomendados')->nullable();
+            $table->boolean('correo_enviado')->default(false);
             $table->decimal('total_servicios', 10, 2)->default(0);
             $table->decimal('total_repuestos', 10, 2)->default(0);
         });

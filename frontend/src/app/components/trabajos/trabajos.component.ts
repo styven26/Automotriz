@@ -570,9 +570,9 @@ export class TrabajosComponent {
     // Generamos el HTML y lo metemos en un wrapper fijo
     const inputsHtml = `
       <div style="
-        max-height: 40vh;      /* altura máxima del contenedor */
-        overflow-y: auto;      /* scroll vertical si supera esa altura */
-        padding-right: 10px;    /* espacio para el scrollbar */
+        max-height: 40vh;
+        overflow-y: auto;
+        padding-right: 10px;
       ">
         ${detalles.map((d, i) => `
           <div style="margin-bottom:20px;text-align:center;">
@@ -584,9 +584,7 @@ export class TrabajosComponent {
               data-id-detalle="${d.id_detalle}"
               class="swal2-textarea"
               placeholder="Descripción"
-              style="font-family:'Poppins',sans-serif;"
-              >${d.descripcion || ''}
-            </textarea>
+              style="font-family:'Poppins',sans-serif;">${d.descripcion || ''}</textarea>
           </div>
         `).join('')}
       </div>

@@ -38,7 +38,7 @@
       <mat-option
         *ngFor="let servicio of servicios"
         [value]="servicio.id_servicio"
-        [disabled]="isDiagnosticoSelected() && servicio.nombre.toLowerCase() !== 'diagnóstico'"
+        [disabled]="isDiagnosticoSelected() && servicio.id_servicio !== diagnosticoId"
       >
         {{ servicio.nombre }}
       </mat-option>

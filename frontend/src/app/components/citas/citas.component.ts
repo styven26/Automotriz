@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { VehiculoService } from '../../services/Vehiculo/vehiculo.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { MatStepperModule } from '@angular/material/stepper';
+import { MatStepperModule, MatStepper  } from '@angular/material/stepper';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -27,6 +27,7 @@ import Swal from 'sweetalert2';
         CommonModule,
         MatTreeModule,
         MatIconModule,
+        MatStepper,
         MatDatepickerModule,
         MatNativeDateModule, 
         MatButtonModule,
@@ -88,32 +89,33 @@ export class CitasComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.vehicleFormGroup = this.fb.group({
-      id_cliente: [null, Validators.required], // Asociar el cliente autenticado
-      marca: ['', Validators.required],
-      modelo: ['', Validators.required],
-      anio: ['', [Validators.required, Validators.min(1886), Validators.max(new Date().getFullYear())]],
-      numero_placa: ['', Validators.required],
-      transmision: ['Manual', Validators.required], // Transmisión por defecto
-      kilometraje: [null, [Validators.min(0)]],
-      fecha_ultimo_servicio: [null],
-      tipo_combustible: ['Gasolina', Validators.required], // Tipo de combustible por defecto
-      imagen: [null] // Para manejar la imagen cargada
-    });        
-  }
-
-  onFileChange(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.previewImage = reader.result as string; // Guardar la vista previa
-      };
-      reader.readAsDataURL(file);
-  
-      this.vehicleFormGroup.patchValue({
-        imagen: file,
-      });
-    }
+      id_cliente: [null, Validators.required],
+      marca: ['', [
+        Validators.required,
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)
+      ]],
+      modelo: ['', [
+        Validators.required,
+        Validators.pattern(/^[A-Za-z0-9\s]+$/)
+      ]],
+      anio: ['', [
+        Validators.required,
+        Validators.min(1886),
+        Validators.max(new Date().getFullYear())
+      ]],
+      numero_placa: ['', [
+        Validators.required,
+        Validators.pattern(/^[A-Z0-9\-]+$/)
+      ]],
+      transmision: ['Manual', Validators.required],
+      tipo_combustible: ['Gasolina', Validators.required],
+      kilometraje: [null, [
+        Validators.required,
+        Validators.min(0)
+      ]],
+      fecha_ultimo_servicio: [null, Validators.required],
+      imagen: [null, Validators.required]
+    });       
   }
 
   ngOnInit(): void {
@@ -136,6 +138,30 @@ export class CitasComponent implements OnInit {
     this.apellidoUsuario = user.apellido || '';
     this.iniciarReloj();
   }  
+
+  // getters para el template
+  get marca(): AbstractControl { return this.vehicleFormGroup.get('marca')!; }
+  get modelo(): AbstractControl { return this.vehicleFormGroup.get('modelo')!; }
+  get anio(): AbstractControl { return this.vehicleFormGroup.get('anio')!; }
+  get numero_placa(): AbstractControl { return this.vehicleFormGroup.get('numero_placa')!; }
+  get kilometraje(): AbstractControl { return this.vehicleFormGroup.get('kilometraje')!; }
+  get fecha_ultimo_servicio(): AbstractControl { return this.vehicleFormGroup.get('fecha_ultimo_servicio')!;}
+  get imagen(): AbstractControl { return this.vehicleFormGroup.get('imagen')!; }
+
+  onFileChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewImage = reader.result as string; // Guardar la vista previa
+      };
+      reader.readAsDataURL(file);
+  
+      this.vehicleFormGroup.patchValue({
+        imagen: file,
+      });
+    }
+  }
 
   cambiarRol(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -170,99 +196,104 @@ export class CitasComponent implements OnInit {
     }
   }
 
-  registrarVehiculo(stepper: any): void {
-    // Obtener el usuario autenticado desde sessionStorage
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-  
-    // Verificar que el usuario esté autenticado
-    if (!user.id) {
-      console.error('Error: id_cliente no encontrado en sessionStorage.');
-      Swal.fire({
-        icon: 'error',
-        title: 'Error de autenticación',
-        text: 'No se encontró el cliente autenticado. Por favor, inicia sesión nuevamente.',
-        confirmButtonText: 'Aceptar',
-      });
+  registrarVehiculo(stepper: MatStepper): void {
+  // 1) Si el formulario es inválido, marcamos todo como touched para mostrar errores y salimos
+  if (this.vehicleFormGroup.invalid) {
+    this.vehicleFormGroup.markAllAsTouched();
+    Swal.fire({
+      icon: 'error',
+      title: 'Formulario Inválido',
+      text: 'Por favor, completa correctamente todos los campos antes de registrar.',
+      confirmButtonText: 'Entendido'
+    });
+    return;
+  }
+
+  // 2) Nos aseguramos de que hay un usuario autenticado
+  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  if (!user.id) {
+    console.error('Error: id_cliente no encontrado en sessionStorage.');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de autenticación',
+      text: 'No se encontró el cliente autenticado. Por favor, inicia sesión nuevamente.',
+      confirmButtonText: 'Aceptar'
+    });
+    return;
+  }
+  this.vehicleFormGroup.patchValue({ id_cliente: user.id });
+
+  // 3) Diálogo de confirmación para registrar o volver a editar
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Revisa bien los datos antes de registrar el vehículo.',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Registrar',
+    cancelButtonText: 'Editar'
+  }).then(result => {
+    if (!result.isConfirmed) {
+      // El usuario eligió "Editar", no continuamos
       return;
     }
-  
-    // Asignar el id_cliente al formulario
-    this.vehicleFormGroup.patchValue({ id_cliente: user.id });
-  
-    // Validar el formulario antes de enviar los datos
-    if (this.vehicleFormGroup.valid) {
-      // Crear un objeto FormData para manejar el envío del archivo
-      const formData = new FormData();
 
-      // Preparamos la fecha_ultimo_servicio para que sea 'YYYY-MM-DD'
-      let fechaRaw = this.vehicleFormGroup.value.fecha_ultimo_servicio;
-      if (fechaRaw) {
-        // Convierte a objeto Date y a formato 'YYYY-MM-DD'
-        const dateObj = new Date(fechaRaw);
-        const isoString = dateObj.toISOString().split('T')[0]; 
-        this.vehicleFormGroup.patchValue({ fecha_ultimo_servicio: isoString });
-      }
-
-      Object.keys(this.vehicleFormGroup.value).forEach((key) => {
-        const value = this.vehicleFormGroup.value[key];
-        if (value !== null && value !== undefined) {
-          formData.append(key, value);
-        }
-      });
-  
-      // Llamar al servicio para registrar el vehículo
-      this.vehiculoService.crearVehiculo(formData).subscribe(
-        (response) => {
-          console.log('Vehículo registrado exitosamente:', response);
-          this.registered = true;      // ← marcamos registro completo            
-          stepper.next();
-        },
-        (error) => {
-          console.error('Error al registrar el vehículo:', error);
-  
-          // Manejar errores específicos del servidor
-          if (error.status === 422 && error.error.errors?.numero_placa) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Placa Duplicada',
-              text: 'La placa ingresada ya está registrada. Por favor, elige otra.',
-              confirmButtonText: 'Aceptar',
-            });
-          } else if (error.status === 400) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error de Validación',
-              text: 'Por favor, revisa los datos ingresados.',
-              confirmButtonText: 'Aceptar',
-            });
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error Desconocido',
-              text: 'Ocurrió un error inesperado. Por favor, intenta nuevamente más tarde.',
-              confirmButtonText: 'Aceptar',
-            });
-          }
-        }
-      );
-    } else {
-      // Si el formulario no es válido, mostrar errores en la consola y al usuario
-      console.log('Formulario no válido, revisa los errores.');
-      Object.keys(this.vehicleFormGroup.controls).forEach((key) => {
-        const controlErrors = this.vehicleFormGroup.get(key)?.errors;
-        if (controlErrors) {
-          console.error(`Error en el campo "${key}":`, controlErrors);
-        }
-      });
-  
-      Swal.fire({
-        icon: 'error',
-        title: 'Formulario Inválido',
-        text: 'Por favor, completa todos los campos correctamente antes de enviar.',
-        confirmButtonText: 'Aceptar',
-      });
+    // 4) Preparamos FormData con todos los campos (incluida la imagen y la fecha formateada)
+    const formData = new FormData();
+    // Convertir fecha a 'YYYY-MM-DD'
+    const rawDate = this.vehicleFormGroup.value.fecha_ultimo_servicio;
+    if (rawDate) {
+      const iso = new Date(rawDate).toISOString().split('T')[0];
+      this.vehicleFormGroup.patchValue({ fecha_ultimo_servicio: iso });
     }
-  }  
+
+    Object.entries(this.vehicleFormGroup.value).forEach(([key, val]) => {
+      if (val === null || val === undefined) return;
+
+      if (val instanceof File) {
+        // imagen u otros archivos
+        formData.append(key, val, val.name);
+      } else {
+        // todo lo demás lo convertimos a string
+        formData.append(key, val.toString());
+      }
+    });
+
+    // 5) Llamada al servicio
+    this.vehiculoService.crearVehiculo(formData).subscribe({
+      next: response => {
+        console.log('Vehículo registrado exitosamente:', response);
+        this.registered = true;     // Deshabilita edición
+        stepper.next();             // Avanza al siguiente paso
+      },
+      error: err => {
+        console.error('Error al registrar el vehículo:', err);
+        // Gestión de errores específicos
+        if (err.status === 422 && err.error.errors?.numero_placa) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Placa duplicada',
+            text: 'La placa ingresada ya está registrada. Elige otra.',
+            confirmButtonText: 'Aceptar'
+          });
+        } else if (err.status === 400) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de validación',
+            text: 'Por favor, revisa los datos ingresados.',
+            confirmButtonText: 'Aceptar'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error desconocido',
+            text: 'Ocurrió un error inesperado. Intenta nuevamente más tarde.',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      }
+    });
+  });
+}  
 
   finalizarRegistro(): void {
     this.router.navigate(['/calendario']);  // Navega al dashboard del cliente después de registrar

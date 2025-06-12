@@ -17,24 +17,9 @@ import { forkJoin } from 'rxjs';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { MatCardModule } from '@angular/material/card';
+import { ScaleType, Color } from '@swimlane/ngx-charts';
 import Swal from 'sweetalert2';
 
-// 1) Definimos el tipo de estados y el mapeo a etiquetas legibles
-type EstadoOrden = 'pendiente' | 'en_proceso' | 'completado' | 'cancelado';
-
-const estados: EstadoOrden[] = [
-  'pendiente',
-  'en_proceso',
-  'completado',
-  'cancelado'
-];
-
-const etiquetas: Record<EstadoOrden, string> = {
-  pendiente:  'Pendiente',
-  en_proceso: 'En proceso',
-  completado: 'Completado',
-  cancelado:  'Cancelado'
-};
 
 @Component({
     selector: 'app-dashboard-mecanico',
@@ -58,9 +43,31 @@ const etiquetas: Record<EstadoOrden, string> = {
 })
 export class DashboardMecanicoComponent {
   
+  // Decláralo como propiedad de la clase:
+  readonly ESTADOS: string[] = [
+    'Confirmada',
+    'En Proceso',
+    'Diagnosticado',
+    'Atendida',
+    'Cancelada'
+  ];
+
+  // define colorScheme como un Color válido:
+  colorScheme: Color = {
+    name: 'estadosCitas',
+    selectable: true,
+    group: ScaleType.Ordinal,
+    domain: [
+      '#2ecc71', // Confirmada
+      '#e67e22', // En Proceso
+      '#9b59b6', // Diagnosticado
+      '#3498db', // Atendida
+      '#e74c3c'  // Cancelada
+    ]
+  };
+
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
-
 
   fechaActual = new Date();
   totalCitas = 0;
@@ -99,6 +106,49 @@ export class DashboardMecanicoComponent {
 
   constructor(private authService: AuthService, private ordenSvc: OrdenService, private citasService: CitaMecanicoService, private router: Router, private notificacionesService: NotificacionesService, private http: HttpClient) {
     registerLocaleData(localeEs, 'es');
+  }
+
+  citasPorDiaData: { name: string; series: { name: string; value: number }[] }[] = [];
+  citasPorMesData: { name: string; series: { name: string; value: number }[] }[] = [];
+
+  private agruparCitas(): void {
+    // 1) Lista de días
+    const dias = Array.from(new Set(
+      this.citas.map(c => c.fecha.split('T')[0])
+    )).sort();
+
+    // 2) Series por día
+    this.citasPorDiaData = this.ESTADOS.map((estado: string) => ({
+      name: estado,
+      series: dias.map((dia: string) => ({
+        name: dia,
+        value: this.citas.filter((c: any) => {
+          const valor = typeof c.estado === 'string'
+            ? c.estado
+            : c.estado?.nombre_estado;
+          return valor === estado && c.fecha.startsWith(dia);
+        }).length
+      }))
+    }));
+
+    // 3) Lista de meses YYYY-MM
+    const meses = Array.from(new Set(
+      this.citas.map(c => c.fecha.slice(0, 7))
+    )).sort();
+
+    // 4) Series por mes
+    this.citasPorMesData = this.ESTADOS.map((estado: string) => ({
+      name: estado,
+      series: meses.map((mes: string) => ({
+        name: mes,
+        value: this.citas.filter((c: any) => {
+          const valor = typeof c.estado === 'string'
+            ? c.estado
+            : c.estado?.nombre_estado;
+          return valor === estado && c.fecha.startsWith(mes);
+        }).length
+      }))
+    }));
   }
 
   // Funciones de navegación del menú
@@ -152,36 +202,9 @@ export class DashboardMecanicoComponent {
       this.citas   = citas;
       this.ordenes = ordenes;     
       this.totalCitas   = citas.length;
-      this.totalTrabajos = ordenes.length;        
-      this.actualizarGraficosCitas();
-      this.generarOrdenesChart();          
+      this.totalTrabajos = ordenes.length;      
+      this.agruparCitas();
     });
-  }
-
-  private generarOrdenesChart() {
-    this.ordenesChartData = estados.map(est => ({
-      name: etiquetas[est],
-      value: this.ordenes.filter(o => {
-        // 1) Si está cancelada según el estado de la cita
-        if (est === 'cancelado') {
-          return o.cita?.estado?.toLowerCase() === 'cancelada';
-        }
-
-        // 2) Recogemos todos los progresos
-        const progresos = o.detalles_servicios.map(d => d.progreso);
-
-        // 3) Pendiente = todos a 0
-        if (est === 'pendiente') {
-          return progresos.every(p => p === 0);
-        }
-        // 4) Completado = todos a 100
-        if (est === 'completado') {
-          return progresos.every(p => p === 100);
-        }
-        // 5) Resto es en_proceso (al menos uno entre 1 y 99)
-        return progresos.some(p => p > 0 && p < 100);
-      }).length
-    }));
   }
 
   cambiarRol(event: Event): void {
@@ -220,29 +243,8 @@ export class DashboardMecanicoComponent {
   cargarCitas(): void {
     this.citasService.listarCitasMecanico().subscribe((data) => {
       this.citas = data; // Asignar las citas originales
-      this.actualizarGraficosCitas(); // Actualiza los gráficos si es necesario
     });
   }  
-
-  private estadosCitas = [
-    'Confirmada',
-    'En Proceso',
-    'Diagnosticado',
-    'Atendida',
-    'Cancelada'
-  ];
-
-  private actualizarGraficosCitas(): void {
-    this.citasChartData = this.estadosCitas.map(estado => ({
-      name: estado,
-      value: this.citas.filter(c => {
-        const valorEstado = typeof c.estado === 'string'
-          ? c.estado
-          : c.estado?.nombre_estado;
-        return valorEstado?.toLowerCase() === estado.toLowerCase();
-      }).length
-    }));
-  }
 
   iniciarReloj(): void {
     const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;

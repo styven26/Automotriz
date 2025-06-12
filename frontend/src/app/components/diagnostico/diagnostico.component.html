@@ -92,7 +92,7 @@
           <div class="header">
             <h2>Listado de Diagnóstico</h2>
             <p>Diagnósticos</p>
-          </div>
+          </div><br>
 
             <!-- Filtro de búsqueda -->
             <mat-form-field appearance="outline">
@@ -140,9 +140,9 @@
             
                     <!-- RECOMENDADOS (servicios_recomendados) -->
                     <ng-container matColumnDef="recomendados">
-                        <th mat-header-cell *matHeaderCellDef> Servicios Recomendados </th>
+                        <th mat-header-cell *matHeaderCellDef>Servicios Recomendados</th>
                         <td mat-cell *matCellDef="let diag">
-                          {{ diag.servicios_recomendados_nombres?.join(', ') }}
+                            {{ diag.servicios_recomendados_nombres?.join(', ') || '—' }}
                         </td>
                     </ng-container>
                       
@@ -156,23 +156,22 @@
                           </button>
                       
                           <!-- Botón para notificar al cliente cuando NO hay servicios recomendados -->
-                            <button *ngIf="!diag.servicios_recomendados || diag.servicios_recomendados.length === 0"
-                                mat-icon-button color="warn" (click)="sendEmailNoServices(diag)" matTooltip="Notificar: Sin Servicios">
+                            <button
+                                *ngIf="!diag.servicios_recomendados?.length"
+                                mat-icon-button
+                                    color="warn"
+                                    (click)="sendEmailNoServices(diag.id_orden)"
+                                    matTooltip="Notificar: Sin Servicios">
                                 <mat-icon>mail_outline</mat-icon>
                             </button>
 
                             <!-- Botón para confirmar servicios recomendados (si existen) -->
                             <button
-                                *ngIf="
-                                    diag.servicios_recomendados
-                                    && diag.servicios_recomendados.length > 0
-                                    && !diag.correo_enviado
-                                "
+                                *ngIf="diag.servicios_recomendados?.length && !diag.correo_enviado"
                                 mat-icon-button
-                                color="accent"
-                                (click)="sendEmailRecommended(diag)"
-                                matTooltip="Confirmar Servicios"
-                                >
+                                    color="accent"
+                                    (click)="sendEmailRecommended(diag)"
+                                    matTooltip="Confirmar Servicios">
                                 <mat-icon>check_circle</mat-icon>
                             </button>
                         </td>
