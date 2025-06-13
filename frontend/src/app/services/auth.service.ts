@@ -17,24 +17,24 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap((response: any) => {
         // 1) Almacenar el token
-        sessionStorage.setItem('token', response.token);
+        localStorage.setItem('token', response.token);
 
         // 2) Almacenar los roles
-        sessionStorage.setItem('roles', JSON.stringify(response.roles));
+        localStorage.setItem('roles', JSON.stringify(response.roles));
 
         // 3) Almacenar la información del usuario
-        sessionStorage.setItem('user', JSON.stringify(response.user));
+        localStorage.setItem('user', JSON.stringify(response.user));
 
         // 4) Calcular y almacenar tiempo de expiración del token
         const currentTime = Math.floor(Date.now() / 1000);           // Ahora en segundos
         const expirationTime = currentTime + response.expires_in;    // + duración del token
-        sessionStorage.setItem('token_expiration', expirationTime.toString());
+        localStorage.setItem('token_expiration', expirationTime.toString());
 
         // 5) Elegir rol activo según prioridad
         const roles: string[] = response.roles;
         const prioridad = ['admin', 'mecanico', 'vendedor', 'cliente'];
         const rolActivo = prioridad.find(r => roles.includes(r)) || roles[0] || null;
-        sessionStorage.setItem('rol_activo', rolActivo!);
+        localStorage.setItem('rol_activo', rolActivo!);
 
         // 6) Redirigir al dashboard correspondiente
         this.redirectUser(rolActivo!);
@@ -54,7 +54,7 @@ export class AuthService {
       { rol: nuevoRol },
       { headers }
     ).pipe(
-      tap(r => sessionStorage.setItem('rol_activo', r.rol_activo))
+      tap(r => localStorage.setItem('rol_activo', r.rol_activo))
     );
   }
 
@@ -90,7 +90,7 @@ export class AuthService {
   // Método para cerrar sesión
   logout(): void {
     // Limpia todos los datos de autenticación
-    sessionStorage.clear();
+    localStorage.clear();
 
     // Redirige al login
     this.router.navigate(['/login']).then(() => {
@@ -99,23 +99,30 @@ export class AuthService {
   }
 
   getUser(): any {
-    return JSON.parse(sessionStorage.getItem('user') || '{}');
+    return JSON.parse(localStorage.getItem('user') || '{}');
   }
 
   // Obtener roles
   getRoles(): string[] {
-    return JSON.parse(sessionStorage.getItem('roles') || '[]');
+    return JSON.parse(localStorage.getItem('roles') || '[]');
   }
 
   // Obtener token almacenado
   getToken(): string | null {
-    return sessionStorage.getItem('token');
+    return localStorage.getItem('token');
+  }
+
+  /**
+   * Devuelve el rol activo desde localStorage
+   */
+  getRolActivo(): string | null {
+    return localStorage.getItem('rol_activo');
   }
 
   // Verificar si el usuario está autenticado
   isAuthenticated(): boolean {
     const token = this.getToken();
-    const expiration = sessionStorage.getItem('token_expiration');
+    const expiration = localStorage.getItem('token_expiration');
     if (!token || !expiration) {
       return false;
     }

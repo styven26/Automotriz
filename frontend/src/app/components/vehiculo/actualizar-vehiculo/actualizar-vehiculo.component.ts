@@ -51,8 +51,8 @@ export class ActualizarVehiculoComponent {
     // Cargar la imagen actual para mostrar la vista previa inicial
     this.previewImage = data.imagen ? `http://localhost:8000/${data.imagen}` : null;
 
-    // Agregamos el `id_cliente` automáticamente desde el `sessionStorage`.
-    const clienteId = JSON.parse(sessionStorage.getItem('user') || '{}').id;
+    // Agregamos el `id_cliente` automáticamente desde el `localStorage`.
+    const clienteId = JSON.parse(localStorage.getItem('user') || '{}').id;
     this.vehiculoForm.patchValue({ id_cliente: clienteId });
   }
 

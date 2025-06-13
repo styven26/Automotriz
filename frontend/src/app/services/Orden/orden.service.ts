@@ -61,7 +61,7 @@ export class OrdenService {
 
   /** Construye los headers con el token JWT */
   private getAuthHeaders(): HttpHeaders {
-    const token = sessionStorage.getItem('token') || '';
+    const token = localStorage.getItem('token') || '';
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -127,7 +127,7 @@ export class OrdenService {
 
   descargarReporte(): void {
     const url = 'http://localhost:8000/api/mecanico/reporte-trabajos';
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${sessionStorage.getItem('token')}`);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token')}`);
 
     this.http.get(url, { headers, responseType: 'blob' }).subscribe({
         next: (response: Blob) => {

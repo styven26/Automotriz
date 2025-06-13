@@ -119,14 +119,14 @@ export class CitasComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.roles = JSON.parse(sessionStorage.getItem('roles') ?? '[]');
-    this.rolActivo = sessionStorage.getItem('rol_activo') ?? '';
+    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
+    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
     
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     console.log('Usuario autenticado:', user);
   
     if (!user.id) {
-      console.error('El id_cliente no existe en sessionStorage.');
+      console.error('El id_cliente no existe en localStorage.');
       return;
     }
   
@@ -210,9 +210,9 @@ export class CitasComponent implements OnInit {
   }
 
   // 2) Nos aseguramos de que hay un usuario autenticado
-  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   if (!user.id) {
-    console.error('Error: id_cliente no encontrado en sessionStorage.');
+    console.error('Error: id_cliente no encontrado en localStorage.');
     Swal.fire({
       icon: 'error',
       title: 'Error de autenticación',
@@ -337,7 +337,7 @@ export class CitasComponent implements OnInit {
   }
 
   iniciarReloj(): void {
-    const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;
+    const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
 
     if (!expirationTime) {
       this.tiempoRestante = '00:00';

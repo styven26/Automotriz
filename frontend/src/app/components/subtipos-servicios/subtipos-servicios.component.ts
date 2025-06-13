@@ -66,11 +66,11 @@ export class SubtiposServiciosComponent {
   ) {}
 
   ngOnInit(): void {
-    this.roles = JSON.parse(sessionStorage.getItem('roles') ?? '[]');
-    this.rolActivo = sessionStorage.getItem('rol_activo') ?? '';
+    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
+    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
 
-    // Obtener datos del usuario del sessionStorage
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    // Obtener datos del usuario del localStorage
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.nombreUsuario = user.nombre || '';
     this.apellidoUsuario = user.apellido || '';
     this.obtenerSubtiposServicios();
@@ -119,7 +119,7 @@ export class SubtiposServiciosComponent {
   }
 
   iniciarReloj(): void {
-    const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;
+    const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
 
     if (!expirationTime) {
       this.tiempoRestante = '00:00';

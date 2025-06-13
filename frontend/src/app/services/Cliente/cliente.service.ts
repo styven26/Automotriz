@@ -12,7 +12,7 @@ export class ClienteService {
 
   // Obtener encabezados con token de autorización
   private getHeaders(): HttpHeaders {
-    const token = sessionStorage.getItem('token') || ''; // Manejo en caso de que no exista el token
+    const token = localStorage.getItem('token') || ''; // Manejo en caso de que no exista el token
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',

@@ -24,9 +24,9 @@ export class CitasService {
 
   constructor(private http: HttpClient) {}
 
-  // Método para obtener el token desde el sessionStorage
+  // Método para obtener el token desde el localStorage
   private getHeaders(): HttpHeaders {
-    const token = sessionStorage.getItem('token'); // Obtén el token almacenado
+    const token = localStorage.getItem('token'); // Obtén el token almacenado
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -83,7 +83,7 @@ export class CitasService {
   // Obtener horarios disponibles
   obtenerHorarioAlmuerzo(data: { fecha: string }) {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${sessionStorage.getItem('token')}`, // Token desde sessionStorage
+      'Authorization': `Bearer ${localStorage.getItem('token')}`, // Token desde localStorage
       'Content-Type': 'application/json'
     });
     return this.http.post<any>(`${this.apiUrl}/horarios/almuerzo`, data, { headers });

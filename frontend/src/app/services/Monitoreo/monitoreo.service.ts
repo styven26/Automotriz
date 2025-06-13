@@ -26,7 +26,7 @@ export class MonitoreoService {
 
   // Método para obtener todos los monitoreos del cliente autenticado
   obtenerTodosMonitoreos(): Observable<Monitoreo[]> {
-    const token = sessionStorage.getItem('token'); // Obtener el token del cliente
+    const token = localStorage.getItem('token'); // Obtener el token del cliente
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<Monitoreo[]>(this.apiUrl, { headers });
   }

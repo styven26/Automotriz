@@ -58,7 +58,7 @@ export class VehiculoService {
 
   // Obtener encabezados de autorización
   private getHeaders(): HttpHeaders {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 

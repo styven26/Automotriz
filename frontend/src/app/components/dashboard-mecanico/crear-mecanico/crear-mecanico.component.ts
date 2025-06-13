@@ -105,11 +105,11 @@ export class CrearMecanicoComponent {
 
   ngOnInit(): void {
 
-    this.roles = JSON.parse(sessionStorage.getItem('roles') ?? '[]');
-    this.rolActivo = sessionStorage.getItem('rol_activo') ?? '';
+    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
+    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
 
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    console.log('Usuario en sessionStorage después de parsear:', user);
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    console.log('Usuario en localStorage después de parsear:', user);
   
     this.nombreUsuario = user.nombre || 'Sin Nombre';
     this.apellidoUsuario = user.apellido || 'Sin Apellido';
@@ -188,7 +188,7 @@ export class CrearMecanicoComponent {
   }
 
   iniciarReloj(): void {
-    const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;
+    const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
 
     if (!expirationTime) {
       this.tiempoRestante = '00:00';

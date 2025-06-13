@@ -87,7 +87,7 @@ export class ListarRepuestosComponent {
   ngOnInit(): void {
     this.user = this.authService.getUser();
     this.roles     = this.authService.getRoles();
-    this.rolActivo = sessionStorage.getItem('rol_activo') || '';
+    this.rolActivo = localStorage.getItem('rol_activo') || '';
 
       const user = this.authService.getUser();
   
@@ -340,7 +340,7 @@ export class ListarRepuestosComponent {
   }
 
   iniciarReloj(): void {
-    const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;
+    const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
 
     if (!expirationTime) {
       this.tiempoRestante = '00:00';

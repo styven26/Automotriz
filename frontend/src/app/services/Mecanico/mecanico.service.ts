@@ -14,7 +14,7 @@ export class MecanicoService {
   // Crear mecánico
   crearMecanico(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Asegúrate de que el token esté almacenado correctamente
+      'Authorization': `Bearer ${localStorage.getItem('token')}` // Asegúrate de que el token esté almacenado correctamente
     });
   
     return this.http.post(this.apiUrl, data, { headers });
@@ -23,7 +23,7 @@ export class MecanicoService {
   // Actualizar mecánico
   actualizarMecanico(id: number, data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Token de autenticación
+      'Authorization': `Bearer ${localStorage.getItem('token')}` // Token de autenticación
     });
   
     return this.http.put(`${this.apiUrl}/${id}`, data, { headers });
@@ -32,14 +32,14 @@ export class MecanicoService {
   // Eliminar mecánico
   eliminarMecanico(id: number): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Token de autenticación
+      'Authorization': `Bearer ${localStorage.getItem('token')}` // Token de autenticación
     });
   
     return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
 
   obtenerMecanicos(): Observable<any> {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   
     return this.http.get(this.apiUrl, { headers }).pipe(

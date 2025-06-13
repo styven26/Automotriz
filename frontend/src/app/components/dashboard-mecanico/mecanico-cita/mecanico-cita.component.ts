@@ -40,10 +40,10 @@ export class MecanicoCitaComponent {
 
   // Funciones de navegación del menú
   ngOnInit(): void {
-    this.roles = JSON.parse(sessionStorage.getItem('roles') ?? '[]');
-    this.rolActivo = sessionStorage.getItem('rol_activo') ?? '';
+    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
+    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
 
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
   
     this.nombreUsuario = user.nombre || '';
     this.apellidoUsuario = user.apellido || '';
@@ -226,7 +226,7 @@ export class MecanicoCitaComponent {
   }                          
   
   iniciarReloj(): void {
-    const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;
+    const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
 
     if (!expirationTime) {
       this.tiempoRestante = '00:00';

@@ -74,16 +74,16 @@ export class MonitoreoComponent {
   }
 
   ngOnInit(): void {
-    this.roles = JSON.parse(sessionStorage.getItem('roles') ?? '[]');
-    this.rolActivo = sessionStorage.getItem('rol_activo') ?? '';
+    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
+    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
 
-    const user = sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')!) : null;
+    const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
   
     if (user) {
       this.nombreUsuario = user.nombre || '';
       this.apellidoUsuario = user.apellido || '';
     } else {
-      console.log('Usuario no autenticado o datos faltantes en el sessionStorage.');
+      console.log('Usuario no autenticado o datos faltantes en el localStorage.');
       this.router.navigate(['/login']); // Redirigir al login si no hay datos
     }
 
@@ -257,7 +257,7 @@ export class MonitoreoComponent {
   }
   
   cargarMonitoreos(): void {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (!token) {
       console.log('No hay token disponible, deteniendo monitoreo');
       return;
@@ -306,7 +306,7 @@ export class MonitoreoComponent {
   }       
   
   iniciarReloj(): void {
-    const expirationTime = Number(sessionStorage.getItem('token_expiration')) || 0;
+    const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
 
     if (!expirationTime) {
       this.tiempoRestante = '00:00';
