@@ -282,7 +282,7 @@ export class DiagnosticoComponent {
             placeholder="Describa el problema encontrado"
             style="
               width:90%;
-              height:100px;
+              height:150px;
               font-family:'Poppins',sans-serif;
               font-size:15px;
               padding:8px;

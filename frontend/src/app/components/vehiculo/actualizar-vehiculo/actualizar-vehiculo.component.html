@@ -10,56 +10,64 @@
   <!-- Formulario del modal -->
   <form [formGroup]="vehiculoForm" (ngSubmit)="guardarCambios()">
     <div class="modal-body">
-      <mat-form-field appearance="outline">
-        <mat-label>Marca</mat-label>
-        <input matInput formControlName="marca" placeholder="Ingrese la marca">
-      </mat-form-field>
+      <div class="row">
+        <mat-form-field appearance="outline">
+          <mat-label>Marca</mat-label>
+          <input matInput formControlName="marca" placeholder="Ingrese la marca">
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Modelo</mat-label>
-        <input matInput formControlName="modelo" placeholder="Ingrese el modelo">
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Modelo</mat-label>
+          <input matInput formControlName="modelo" placeholder="Ingrese el modelo">
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Año</mat-label>
-        <input matInput type="number" formControlName="anio" placeholder="Ingrese el año">
-      </mat-form-field>
+      <div class="row">
+        <mat-form-field appearance="outline">
+          <mat-label>Año</mat-label>
+          <input matInput type="number" formControlName="anio" placeholder="Ingrese el año">
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Número de Placa</mat-label>
-        <input matInput formControlName="numero_placa" placeholder="Ingrese el número de placa">
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Número de Placa</mat-label>
+          <input matInput formControlName="numero_placa" placeholder="Ingrese el número de placa">
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Transmisión</mat-label>
-        <mat-select formControlName="transmision">
-          <mat-option value="Manual">Manual</mat-option>
-          <mat-option value="Automática">Automática</mat-option>
-          <mat-option value="Semi-automática">Semi-automática</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="row">
+        <mat-form-field appearance="outline">
+          <mat-label>Transmisión</mat-label>
+          <mat-select formControlName="transmision">
+            <mat-option value="Manual">Manual</mat-option>
+            <mat-option value="Automática">Automática</mat-option>
+            <mat-option value="Semi-automática">Semi-automática</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Combustible</mat-label>
+          <mat-select formControlName="tipo_combustible">
+            <mat-option value="Gasolina">Gasolina</mat-option>
+            <mat-option value="Diesel">Diesel</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
       
-      <mat-form-field appearance="outline">
-        <mat-label>Tipo de Combustible</mat-label>
-        <mat-select formControlName="tipo_combustible">
-          <mat-option value="Gasolina">Gasolina</mat-option>
-          <mat-option value="Diesel">Diesel</mat-option>
-        </mat-select>
-      </mat-form-field>
-      
-      <!-- Kilometraje -->
-      <mat-form-field appearance="outline">
-        <mat-label>Kilometraje</mat-label>
-        <input matInput type="number" formControlName="kilometraje" placeholder="Ingrese el kilometraje">
-      </mat-form-field>
+      <div class="row">
+        <!-- Kilometraje -->
+        <mat-form-field appearance="outline">
+          <mat-label>Kilometraje</mat-label>
+          <input matInput type="number" formControlName="kilometraje" placeholder="Ingrese el kilometraje">
+        </mat-form-field>
 
-      <!-- Fecha Último Servicio -->
-      <mat-form-field appearance="outline">
-        <mat-label>Fecha Último Servicio</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio" placeholder="Elige la fecha">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+        <!-- Fecha Último Servicio -->
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha Último Servicio</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio" placeholder="Elige la fecha">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
       
       <div class="image-upload-container">
         <label for="imagen" class="custom-file-label">Cargar Imagen</label>
@@ -69,7 +77,6 @@
         <img *ngIf="previewImage" [src]="previewImage" alt="Vista previa" class="preview-image" />
         <span *ngIf="!previewImage">No se ha cargado una imagen</span>
       </div>      
-
     </div>
 
     <!-- Footer con los botones de Cancelar y Guardar -->

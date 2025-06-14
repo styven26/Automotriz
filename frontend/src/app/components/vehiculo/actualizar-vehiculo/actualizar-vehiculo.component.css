@@ -1,7 +1,5 @@
 /* Contenedor general del modal */
 .modal-container {
-  width: 100%;
-  max-width: 600px;
   background-color: white;
   border-radius: 8px;
   overflow: hidden;
@@ -24,12 +22,34 @@
   font-weight: bold;
 }
 
+/* Cada campo Material ocupa todo su celda */
+.modal-body .form-grid mat-form-field {
+  width: 100%;
+}
+
 /* Estilo para el cuerpo del modal */
 .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;                     /* espacio vertical entre filas */
   padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+}
+
+.modal-body .row {
+  display: flex;
+  gap: 24px;        /* separación entre columnas */
+  width: 100%;      /* ocupa todo el ancho interior */
+}
+
+.modal-body .row > mat-form-field {
+  flex: 1 1 0;      /* crece y encoge según el espacio */
+  min-width: 0;     /* para que el flex no se desborde en Firefox */
+  width: 100%;      /* fuerza al mat-form-field a rellenar su flex-basis */
+}
+
+.modal-body .row .mat-form-field {
+  flex: 1;         /* cada campo ocupa el mismo ancho */
+  min-width: 0;    /* evita que Firefox los ensanche por su contenido */
 }
 
 /* Estilo para los campos del formulario */
