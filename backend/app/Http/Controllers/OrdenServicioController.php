@@ -56,7 +56,7 @@ class OrdenServicioController extends Controller
             ->whereHas('cita', function($q) use($mec) {
                 $q->where('cedula_mecanico', $mec->cedula)
                 ->whereHas('estado', function($q2) {
-                    $q2->whereIn('nombre_estado', ['Confirmada']);
+                    $q2->whereIn('nombre_estado', ['Confirmada','En Proceso']);
                 });
             })
             ->get();
@@ -124,7 +124,7 @@ class OrdenServicioController extends Controller
                 'id_estado' => $idAtendida,
                 'fecha_fin' => now()->toDateString(),
                 'hora_fin'  => now()->toTimeString(),
-                'activo'    => false,
+                'activo'    => false
             ]);
 
             // 7.c) Enviar notificación por correo
@@ -141,82 +141,53 @@ class OrdenServicioController extends Controller
     }
 
     /**
-     * 4) Completar la orden (requiere fecha_fin y hora_fin por parte del mecánico).
-    */
-    public function completarOrden(Request $request, $idOrden)
-    {
-        $orden = OrdenServicio::with('detallesServicios','cita')->findOrFail($idOrden);
-
-        // validar que todos los detalles estén 100%
-        $progs = $orden->detallesServicios->pluck('progreso');
-        if (! $progs->every(fn($x)=> $x==100)) {
-            return response()->json(['error'=>'No todos los servicios al 100%'],400);
-        }
-        // autorizar mecánico
-        if ($orden->cita->cedula_mecanico !== Auth::id()) {
-            return response()->json(['error'=>'No autorizado'],403);
-        }
-
-        $v = $request->validate([
-            'fecha_fin'=>'required|date_format:Y-m-d',
-            'hora_fin' =>'required|date_format:H:i'
-        ]);
-
-        $inicio = Carbon::parse("{$orden->cita->fecha} {$orden->cita->hora}");
-        $fin    = Carbon::parse("{$v['fecha_fin']} {$v['hora_fin']}");
-
-        if ($fin->lte($inicio)) {
-            return response()->json(['error'=>'Finalización debe ser posterior al inicio'],422);
-        }
-        $hfin = $v['hora_fin'];
-        if ($hfin < '07:00' || $hfin > '15:00') {
-            return response()->json(['error'=>'Hora de fin fuera de 07:00–15:00'],422);
-        }
-        if (in_array($fin->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY])) {
-            return response()->json(['error'=>'No puede terminar en fin de semana'],422);
-        }
-
-        // actualizar cita
-        $orden->cita->update([
-            'fecha_fin'=> $v['fecha_fin'],
-            'hora_fin' => $v['hora_fin'],
-            'estado'   => 'atendida'
-        ]);
-        // actualizar orden
-        $orden->update(['fecha_fin'=> $fin->toDateTimeString()]);
-
-        // correo
-        $this->enviarCorreoOrdenCompletada($orden);
-
-        return response()->json([
-            'message'=>'Orden y cita finalizadas correctamente',
-            'fecha_fin'=>$v['fecha_fin'],
-            'hora_fin' =>$v['hora_fin']
-        ],200);
-    }
-
-    /**
      * 5) Finalizar automáticamente (sin input) cuando el mecánico lo indique.
     */
     public function finalizarOrdenAutomatico(Request $request, $idOrden)
     {
-        $orden = OrdenServicio::with(['detallesServicios', 'cita.estado'])->findOrFail($idOrden);
+        // Cargamos la orden con cita, estado y horario
+        $orden = OrdenServicio::with([
+            'detallesServicios',
+            'cita.estado',
+            'cita.horario'
+        ])->findOrFail($idOrden);
 
         // 1) Autorizar mecánico
         if ($orden->cita->cedula_mecanico !== Auth::id()) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        // 2) Validar tiempos
-        $now    = Carbon::now();
-        $inicio = Carbon::parse("{$orden->cita->fecha} {$orden->cita->hora}");
-        if ($now->lte($inicio)) {
-            return response()->json(['error' => 'Aún no ha iniciado'], 422);
+        // 2) Validar que haya un horario asignado
+        $horario = $orden->cita->horario;
+        if (! $horario) {
+            return response()->json(['error' => 'No existe horario configurado para esta cita'], 422);
         }
-        $hf = $now->format('H:i');
-        if ($hf < '07:00' || $hf > '15:00') {
-            return response()->json(['error' => "Hora automática {$hf} fuera de 07–15"], 422);
+
+        $now   = Carbon::now();
+        $fecha = $orden->cita->fecha;
+
+        // Construimos dos Carbon: inicio y fin del rango de atención
+        $inicioAtencion = Carbon::parse("$fecha {$horario->manana_inicio}");
+        $finAtencion    = Carbon::parse("$fecha {$horario->tarde_fin}");
+
+        // 2.a) Aún no llegó la hora de inicio
+        if ($now->lt($inicioAtencion)) {
+            return response()->json([
+                'error'   => 'Aún no es la hora de finalización',
+                'mensaje' => "Esta orden podrá finalizar a partir de {$horario->manana_inicio} del {$fecha}."
+            ], 422);
         }
+
+        // 2.b) Ya pasó el horario de atención
+        if ($now->gt($finAtencion)) {
+            $hf = $now->format('H:i');
+            return response()->json([
+                'error'   => "Hora automática {$hf} fuera de horario de atención",
+                'mensaje' => "El horario de atención es de {$horario->manana_inicio} a {$horario->tarde_fin}."
+            ], 422);
+        }
+
+        // 2.c) No finalizar en fin de semana
         if (in_array($now->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY])) {
             return response()->json(['error' => 'No puede finalizar en fin de semana'], 422);
         }
@@ -232,7 +203,7 @@ class OrdenServicioController extends Controller
             'id_estado' => $idAtendida,
             'fecha_fin' => $now->toDateString(),
             'hora_fin'  => $now->toTimeString(),
-            'activo'    => false,
+            'activo'    => false
         ]);
 
         // 6) Actualizar orden con fecha fin
@@ -241,7 +212,9 @@ class OrdenServicioController extends Controller
         // 7) Envío de correo
         $this->enviarCorreoOrdenCompletada($orden);
 
-        return response()->json(['message' => 'Orden finalizada automáticamente y cita desactivada'], 200);
+        return response()->json([
+            'message' => 'Orden finalizada automáticamente y cita desactivada'
+        ], 200);
     }
 
     /**
@@ -305,34 +278,37 @@ class OrdenServicioController extends Controller
             return;
         }
 
-        // Cargamos relaciones necesarias
+        // 1) Cargamos relaciones
         $ordenServicio->load([
             'vehiculo',
             'detallesServicios.servicio',
             'detallesRepuestos.repuesto'
         ]);
 
-        $vehiculo         = $ordenServicio->vehiculo;
-        $detalles         = $ordenServicio->detallesServicios;
-        $repuestos       = $ordenServicio->detallesRepuestos;
-        $totalServicios   = $ordenServicio->total_servicios;
-        $totalRepuestos   = $ordenServicio->total_repuestos;
-        $total            = $totalServicios + $totalRepuestos;
+        $vehiculo   = $ordenServicio->vehiculo;
+        $detalles   = $ordenServicio->detallesServicios;
+        $repuestos  = $ordenServicio->detallesRepuestos;
 
+        // 2) Recalcular totales a partir de la colección
+        $totalServicios = $detalles->sum(fn($d) => $d->servicio->precio);
+        $totalRepuestos = $repuestos->sum('subtotal');
+        $total          = $totalServicios + $totalRepuestos;
+
+        // 3) Datos para la vista
         $data = [
-            'cliente'          => $cliente,
-            'vehiculo'         => $vehiculo,
-            'detalles'         => $detalles,
+            'cliente'         => $cliente,
+            'vehiculo'        => $vehiculo,
+            'detalles'        => $detalles,
             'repuestos'       => $repuestos,
-            'totalServicios'   => $totalServicios,
-            'totalRepuestos'   => $totalRepuestos,
-            'total'            => $total,
+            'totalServicios'  => $totalServicios,
+            'totalRepuestos'  => $totalRepuestos,
+            'total'           => $total,
         ];
 
         try {
             Mail::send('emails.orden-completada', $data, function($m) use($cliente) {
                 $m->to($cliente->correo)
-                ->subject('¡Su servicio está completado! 🚗');
+                ->subject('✅ Su servicio está completado');
             });
             Log::info("Email de orden completada enviado a {$cliente->correo}");
         } catch (\Throwable $e) {

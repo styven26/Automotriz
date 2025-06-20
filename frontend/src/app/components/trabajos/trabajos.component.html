@@ -158,13 +158,16 @@
                             </div>
                         </div>  
 
-                        <!-- Nueva sección: REPUESTOS USADOS -->
-                        <div class="section repuestos"><br>
+                        <!-- Nueva sección: REPUESTOS -->
+                        <div class="section repuestos" *ngIf="isCitaIniciada(trabajo)"><br>
                             <p>
-                                <strong>Repuestos Usados</strong>
-                                <button mat-button color="primary"
-                                        (click)="consultarInventario(trabajo)">
-                                    Consultar Repuestos
+                                <strong>Repuestos</strong>
+                                <button 
+                                mat-button 
+                                color="primary"
+                                (click)="validarHoraCita(trabajo) && consultarInventario(trabajo)"
+                                >
+                                Consultar Repuestos
                                 </button>
                             </p>
 
@@ -175,59 +178,70 @@
                                         Cantidad: {{ dr.cantidad }}<br>
                                         Subtotal: {{ dr.subtotal | currency }}<br>
                                         <span *ngIf="dr.repuesto.stock < dr.cantidad"
-                                                style="color:#c0392b;font-weight:bold;">
-                                            ⚠️ Sin stock suficiente en inventario. El cliente deberá buscar este repuesto.
+                                            style="color:#c0392b;font-weight:bold;">
+                                        ⚠️ Sin stock suficiente en inventario. El cliente deberá buscar este repuesto.
                                         </span>
                                     </p>
                                 </div>
                             </div>
                         </div>
+
                         <ng-template #sinRepuestos>
                         <p style="font-style: italic;">No se han usado repuestos en esta orden.</p>
                         </ng-template>
+
                     </igx-card-content>
 
                     <!-- Sección de acciones (botones) -->
                     <mat-card-actions class="button-row">
-                        <!-- Botón Diagnóstico (solo se muestra si la cita está en estado 'confirmada') -->
+
+                        <!-- Diagnóstico: sólo si ya empezó y está en Diagnosticado -->
                         <button
-                                mat-icon-button
-                                class="custom-button accent-button"
-                                *ngIf="trabajo?.cita?.estado === 'Diagnosticado' && esMecanicoAsignado(trabajo) && isDiagnostico(trabajo)"
-                                (click)="abrirModalDiagnostico(trabajo)"
-                                >
+                            mat-icon-button
+                            class="custom-button accent-button"
+                            *ngIf="isCitaIniciada(trabajo)
+                                && trabajo.cita.estado === 'Diagnosticado'
+                                && esMecanicoAsignado(trabajo)
+                                && isDiagnostico(trabajo)"
+                            (click)="validarHoraCita(trabajo) && abrirModalDiagnostico(trabajo)"
+                        >
                             <mat-icon>medical_services</mat-icon>
                         </button>
 
-                        <!-- Botones que se muestran únicamente cuando el estado NO es "diagnosticado" -->
+                        <!-- Actualizar progreso: sólo si ya empezó y NO está en Diagnosticado -->
                         <button
                             mat-icon-button
-                                class="custom-button accent-button"
-                                *ngIf="trabajo?.cita?.estado !== 'Diagnosticado'"
-                                (click)="abrirModalActualizar(trabajo)"
-                                >
+                            class="custom-button accent-button"
+                            *ngIf="isCitaIniciada(trabajo)
+                                && trabajo.cita.estado !== 'Diagnosticado'"
+                            (click)="validarHoraCita(trabajo) && abrirModalActualizar(trabajo)"
+                        >
                             <mat-icon>update</mat-icon>
                         </button>
 
+                        <!-- Actualizar descripción: igual -->
                         <button
                             mat-icon-button
-                                class="custom-button accent-button"
-                                *ngIf="trabajo?.cita?.estado !== 'Diagnosticado'"
-                                (click)="abrirModalDescripcion(trabajo)"
-                                >
+                            class="custom-button accent-button"
+                            *ngIf="isCitaIniciada(trabajo)
+                                && trabajo.cita.estado !== 'Diagnosticado'"
+                            (click)="validarHoraCita(trabajo) && abrirModalDescripcion(trabajo)"
+                        >
                             <mat-icon>description</mat-icon>
                         </button>
 
+                        <!-- Finalizar trabajo: igual -->
                         <button
                             mat-icon-button
                             class="custom-button warn-button"
-                            *ngIf="trabajo?.cita?.estado !== 'Diagnosticado'"
-                            (click)="finalizarTrabajo(trabajo)"
+                            *ngIf="isCitaIniciada(trabajo)
+                                && trabajo.cita.estado !== 'Diagnosticado'"
+                            (click)="validarHoraCita(trabajo) && finalizarTrabajo(trabajo)"
                         >
                             <mat-icon>done_all</mat-icon>
-                      </button>
-                      
-                    </mat-card-actions>                    
+                        </button>
+
+                    </mat-card-actions>
                 </div>
             </div>
         </div>

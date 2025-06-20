@@ -153,7 +153,7 @@
       <!-- Tarjetas de resumen -->
       <div class="summary-container">
         <div class="summary-card">
-          <span class="summary-title">Vehículos en Diagnóstico</span><br><br>
+          <span class="summary-title">Vehículos en Revisión</span><br><br>
           <span class="summary-value">{{ categoryData[0].value || 0 }}</span><br><br>
           <span class="summary-subtitle">Actualizado en tiempo real</span>
         </div>
@@ -165,7 +165,7 @@
         </div>
     
         <div class="summary-card">
-          <span class="summary-title">Vehículos Completados</span><br><br>
+          <span class="summary-title">Vehículos Finalizados</span><br><br>
           <span class="summary-value">{{ categoryData[2].value || 0 }}</span><br><br>
           <span class="summary-subtitle">Listos para entrega</span>
         </div>
@@ -187,7 +187,7 @@
             [animations]="true"
             [tooltipDisabled]="false"
             [customColors]="[
-              { name: 'Diagnóstico', value: '#f974a0' },  
+              { name: 'Revisión', value: '#f974a0' },  
               { name: 'Reparación', value: '#14b1f4' }, 
               { name: 'Finalización', value: '#9b63fd' }
             ]">

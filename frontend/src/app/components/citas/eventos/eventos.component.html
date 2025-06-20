@@ -5,7 +5,7 @@
       Reserva {{ reservasActuales + 1 }} de {{ capacidadHoraria }}
     </p>
     <mat-icon color="primary">calendar_today</mat-icon>
-    Programar Reserva
+    Programar Cita
   </h2>
 
   <!-- Fecha seleccionada -->
@@ -17,8 +17,15 @@
       <mat-icon>directions_car</mat-icon> Vehículo
     </mat-label>
     <mat-select [(ngModel)]="idVehiculo" (selectionChange)="actualizarVehiculoSeleccionado()">
-      <mat-option *ngFor="let vehiculo of misVehiculos" [value]="vehiculo.id_vehiculo">
+      <mat-option 
+          *ngFor="let vehiculo of misVehiculos" 
+          [value]="vehiculo.id_vehiculo"
+          [disabled]="busyVehicleIds.includes(vehiculo.id_vehiculo)"
+        >
         {{ vehiculo.marca }} ({{ vehiculo.modelo }})
+        <small *ngIf="busyVehicleIds.includes(vehiculo.id_vehiculo)">
+          — Ocupado
+        </small>
       </mat-option>
     </mat-select>
     <mat-hint *ngIf="!idVehiculo">Selecciona un vehículo registrado.</mat-hint>
@@ -29,7 +36,7 @@
     <mat-label>
       <mat-icon>build</mat-icon> Servicios
     </mat-label>
-    <!-- 1) Cambiamos selectionChange para pasar $event.value a onServiciosChange -->
+
     <mat-select
       [(ngModel)]="subtiposSeleccionados"
       multiple
@@ -43,12 +50,11 @@
         {{ servicio.nombre }}
       </mat-option>
     </mat-select>
+
     <mat-hint *ngIf="subtiposSeleccionados.length === 0">
       Selecciona al menos un servicio.
     </mat-hint>
-    <mat-hint
-      *ngIf="subtiposSeleccionados.length === 1 && isDiagnosticoSelected()"
-    >
+    <mat-hint *ngIf="subtiposSeleccionados.length === 1 && isDiagnosticoSelected()">
       El servicio "Diagnóstico" implica que el mecánico evaluará el problema.
     </mat-hint>
   </mat-form-field>
@@ -58,7 +64,7 @@
     <mat-label>
       <mat-icon>schedule</mat-icon> Hora de Inicio
     </mat-label>
-    <input matInput type="time" [(ngModel)]="horaInicio"/>
+    <input matInput type="time" [(ngModel)]="horaInicio" (ngModelChange)="onHoraChange($event)"/>
     <mat-hint *ngIf="!horaInicio">Selecciona una hora válida.</mat-hint>
   </mat-form-field>  
 
@@ -86,7 +92,7 @@
   <button mat-button (click)="dialogRef.close()" class="btn-cancel">
     <mat-icon>close</mat-icon> Cancelar
   </button>
-  <button mat-raised-button (click)="confirmarCita()" class="btn-confirm" 
+  <button mat-raised-button (click)="onConfirmClick()" class="btn-confirm" 
     [disabled]="!horaInicio || !idVehiculo || subtiposSeleccionados.length === 0 || reservasActuales >= capacidadHoraria">
     <mat-icon>check</mat-icon> Confirmar
   </button>

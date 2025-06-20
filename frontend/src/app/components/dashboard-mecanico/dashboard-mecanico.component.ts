@@ -20,7 +20,6 @@ import { MatCardModule } from '@angular/material/card';
 import { ScaleType, Color } from '@swimlane/ngx-charts';
 import Swal from 'sweetalert2';
 
-
 @Component({
     selector: 'app-dashboard-mecanico',
     imports: [
@@ -42,16 +41,6 @@ import Swal from 'sweetalert2';
     styleUrls: ['./dashboard-mecanico.component.css']
 })
 export class DashboardMecanicoComponent {
-  
-  // Decláralo como propiedad de la clase:
-  readonly ESTADOS: string[] = [
-    'Confirmada',
-    'En Proceso',
-    'Diagnosticado',
-    'Atendida',
-    'Cancelada'
-  ];
-
   // define colorScheme como un Color válido:
   colorScheme: Color = {
     name: 'estadosCitas',
@@ -65,6 +54,15 @@ export class DashboardMecanicoComponent {
       '#e74c3c'  // Cancelada
     ]
   };
+
+  // Decláralo como propiedad de la clase:
+ readonly ESTADOS = [
+    'Confirmada',
+    'En Proceso',
+    'Diagnosticado',
+    'Atendida',
+    'Cancelada'
+  ];
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
@@ -102,44 +100,38 @@ export class DashboardMecanicoComponent {
     registerLocaleData(localeEs, 'es');
   }
 
+  // Para el selector de año
+  availableYears: number[] = [];
+  selectedYear!: number;
+
   citasPorDiaData: { name: string; series: { name: string; value: number }[] }[] = [];
   citasPorMesData: { name: string; series: { name: string; value: number }[] }[] = [];
+  citasPorMesStacked: { name: string; series: { name: string; value: number }[] }[] = [];
+
+  private allCitas: any[] = [];
 
   private agruparCitas(): void {
-    // 1) Lista de días
-    const dias = Array.from(new Set(
-      this.citas.map(c => c.fecha.split('T')[0])
-    )).sort();
+    const year = this.fechaActual.getFullYear();
 
-    // 2) Series por día
-    this.citasPorDiaData = this.ESTADOS.map((estado: string) => ({
-      name: estado,
-      series: dias.map((dia: string) => ({
-        name: dia,
-        value: this.citas.filter((c: any) => {
-          const valor = typeof c.estado === 'string'
+    // 1) Genera array de todos los meses del año { id: '2025-01', label: 'Ene' }
+    const meses = Array.from({ length: 12 }, (_, i) => {
+      const mesNum = i + 1;
+      const id = `${year}-${mesNum.toString().padStart(2, '0')}`;
+      const label = new Intl.DateTimeFormat('es-ES', { month: 'short' })
+        .format(new Date(year, i, 1));
+      return { id, label };
+    });
+
+    // 2) Construye el stacked series, usando label para el eje X
+    this.citasPorMesStacked = meses.map(({ id, label }) => ({
+      name: label,    // p. ej. "ene", "feb", …
+      series: this.ESTADOS.map(estado => ({
+        name: estado, 
+        value: this.citas.filter(c => {
+          const val = typeof c.estado === 'string'
             ? c.estado
             : c.estado?.nombre_estado;
-          return valor === estado && c.fecha.startsWith(dia);
-        }).length
-      }))
-    }));
-
-    // 3) Lista de meses YYYY-MM
-    const meses = Array.from(new Set(
-      this.citas.map(c => c.fecha.slice(0, 7))
-    )).sort();
-
-    // 4) Series por mes
-    this.citasPorMesData = this.ESTADOS.map((estado: string) => ({
-      name: estado,
-      series: meses.map((mes: string) => ({
-        name: mes,
-        value: this.citas.filter((c: any) => {
-          const valor = typeof c.estado === 'string'
-            ? c.estado
-            : c.estado?.nombre_estado;
-          return valor === estado && c.fecha.startsWith(mes);
+          return val === estado && c.fecha.startsWith(id);
         }).length
       }))
     }));
@@ -154,6 +146,26 @@ export class DashboardMecanicoComponent {
   
     this.nombreUsuario = user.nombre || '';
     this.apellidoUsuario = user.apellido || '';
+
+    this.citasService.listarCitasMecanico().subscribe(citas => {
+      this.allCitas = citas;
+
+      // 1) Extrae años únicos de tus datos:
+      const years = Array.from(
+        new Set(citas.map(c => +c.fecha.slice(0,4)))
+      ).sort((a,b) => a - b);
+      this.availableYears = years;
+
+      // 2) Setea el año seleccionado por defecto:
+      this.selectedYear = new Date().getFullYear();
+      if (!years.includes(this.selectedYear)) {
+        // si no hay datos del año en curso, toma el primero disponible
+        this.selectedYear = years[0];
+      }
+
+      // 3) Genera el chart mensual
+      this.updateMonthlyChart();
+    });
 
     this.notificacionesService.subscribeToNotifications(
       `notificaciones-mecanico-${user.mecanicoId}`,
@@ -212,6 +224,33 @@ export class DashboardMecanicoComponent {
       this.agruparCitas();
       this.actualizarDistribucionEstados();
     });
+  }
+
+  updateMonthlyChart(): void {
+    // Genera los 12 meses del año seleccionado:
+    const meses = Array.from({length:12}, (_, i) => {
+      const m = i + 1;
+      const id = `${this.selectedYear}-${m.toString().padStart(2,'0')}`;
+      const label = new Intl.DateTimeFormat('es-ES',{month:'short'})
+                    .format(new Date(this.selectedYear, i, 1));
+      return { id, label };
+    });
+
+    // Reconstruye el stacked series
+    this.citasPorMesStacked = meses.map(({id,label}) => ({
+      name: label, 
+      series: this.ESTADOS.map(estado => ({
+        name: estado,
+        value: this.allCitas
+          .filter(c => {
+            const estadoName = typeof c.estado==='string'
+              ? c.estado
+              : c.estado?.nombre_estado;
+            return estadoName === estado && c.fecha.startsWith(id);
+          })
+          .length
+      }))
+    }));
   }
 
   private actualizarDistribucionEstados(): void {

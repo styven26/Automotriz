@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 // Define la interfaz Monitoreo para tipar los datos
 export interface Monitoreo {
   id: number;
-  etapa: 'Diagnóstico' | 'Reparación' | 'Finalización' | 'Cancelado';
+  etapa: 'Revisión' | 'Reparación' | 'Finalización' | 'Cancelado';
   vehiculo: {
     marca: string;
     modelo: string;

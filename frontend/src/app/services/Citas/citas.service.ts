@@ -74,6 +74,13 @@ export class CitasService {
     return this.http.get(`${this.apiUrl}/listar`, { headers: this.getHeaders() });
   }
 
+  // citas.service.ts
+  busyVehicles(fecha: string, hora: string): Observable<number[]> {
+    return this.http.get<number[]>(
+      `http://localhost:8000/api/cliente/citas/ocupados`,
+      { params: { fecha, hora }, headers: this.getHeaders() }
+    );
+  }
 
   // Listar citas atentidas
   listarCitasAtendidas(): Observable<any> {

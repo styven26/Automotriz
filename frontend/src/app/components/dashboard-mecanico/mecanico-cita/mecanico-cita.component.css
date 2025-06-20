@@ -115,13 +115,13 @@
 }
 
 .calendar-container {
-  width: 72%;
-  transform: scale(1.3845705882);
+  width: 71%;
+  transform: scale(1.3839);
   transform-origin: top left;
 }
 
 :host ::ng-deep .fc-daygrid-day-frame {
-  min-height: 94px;
+  min-height: 92px;
 }
 
 :host ::ng-deep .fc-col-header-cell {

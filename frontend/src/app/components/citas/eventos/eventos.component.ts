@@ -34,6 +34,7 @@ export class EventosComponent {
 
   misVehiculos: any[] = [];
   servicios: any[] = [];
+  busyVehicleIds: number[] = [];
   // Arreglo de IDs de servicios seleccionados
   subtiposSeleccionados: number[] = [];
   // Variable para almacenar el ID del servicio "Diagnóstico" (si existe)
@@ -67,6 +68,10 @@ export class EventosComponent {
       this.obtenerCapacidad();
     }
 
+    if (this.data.fecha && this.horaInicio) {
+      this.loadBusyVehicles();
+    }
+
     // Se pueden inicializar valores desde data si vienen preseleccionados
     this.idVehiculo = this.data.idVehiculo || 0;
     this.horaInicio = this.data.horaInicio || '';
@@ -74,6 +79,19 @@ export class EventosComponent {
 
     this.cargarVehiculos();
     this.cargarServicios();
+  }
+
+  // Llama al backend para saber qué vehículos están ocupados
+  loadBusyVehicles() {
+    this.citasService
+      .busyVehicles(this.data.fecha, this.horaInicio)
+      .subscribe(ids => this.busyVehicleIds = ids);
+  }
+
+  // Cada vez que el usuario cambie la hora de inicio...
+  onHoraChange(newHora: string) {
+    this.horaInicio = newHora;
+    this.loadBusyVehicles();
   }
 
   /** Busca el nombre del servicio por su id */
@@ -170,6 +188,23 @@ export class EventosComponent {
       },
       error => { console.error(error); }
     );
+  }
+
+  onConfirmClick(): void {
+    Swal.fire({
+      title: '¿Deseas actualizar los datos?',
+      text: 'Ya no será posible retroceder después de confirmar.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, confirmar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+    }).then(result => {
+      if (result.isConfirmed) {
+        // Si confirma, llama al método que ya tienes
+        this.confirmarCita();
+      }
+    });
   }
 
   onServiciosChange(selectedIds: number[]) {

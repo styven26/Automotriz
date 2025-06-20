@@ -107,16 +107,7 @@ export class OrdenService {
     );
   }
 
-  /** 6) Completar la orden con fecha_fin y hora_fin */
-  completarOrden(id: number, fecha_fin: string, hora_fin: string): Observable<{ message: string; fecha_fin: string; hora_fin: string }> {
-    return this.http.post<{ message: string; fecha_fin: string; hora_fin: string }>(
-      `${this.base}/${id}/completar`,
-      { fecha_fin, hora_fin },
-      { headers: this.getAuthHeaders() }
-    );
-  }
-
-  /** 7) Finalizar automáticamente */
+  /** 6) Finalizar automáticamente */
   finalizarAutomatico(id: number): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(
       `${this.base}/${id}/finalizar-auto`,

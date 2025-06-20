@@ -85,11 +85,11 @@ export class CitasAdminComponent {
         minute: '2-digit',
         hour12: false      // si prefieres 24h; pon true para AM/PM
       },
+      allDaySlot: false,
       height:            'auto',
       contentHeight:     'auto',
       expandRows:        true,
       handleWindowResize:true,
-      aspectRatio:       1.8,
       events:            [], 
       eventClick:        this.mostrarDetallesCita.bind(this)
     };

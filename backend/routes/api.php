@@ -95,7 +95,6 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     Route::get   ('/ordenes/{id}',                   [OrdenServicioController::class,'show']);
     Route::patch ('/ordenes/{id}/progreso',          [OrdenServicioController::class,'actualizarProgreso']);
     Route::patch ('/ordenes/{id}/descripciones',     [OrdenServicioController::class,'actualizarDescripcion']);
-    Route::post  ('/ordenes/{id}/completar',         [OrdenServicioController::class,'completarOrden']);
     Route::post  ('/ordenes/{id}/finalizar-auto',    [OrdenServicioController::class,'finalizarOrdenAutomatico']);
 
     // Reportes
@@ -128,6 +127,7 @@ Route::prefix('cliente')->middleware('auth:cliente')->group(function () {
     Route::delete('/citas/{id}',                     [CitasController::class, 'destroy']);
     Route::post('/citas/obtener-capacidad',          [CitasController::class, 'obtenerCapacidad']);
     Route::post('/citas/horarios-sugeridos-despues', [CitasController::class, 'obtenerHorariosSugeridosDespues']);
+    Route::get('citas/ocupados',                     [CitasController::class, 'vehiculosOcupados']);
 
     // Reportes
     Route::get('/citas/facturacion',            [CitasController::class, 'obtenerFacturacionTotal']);

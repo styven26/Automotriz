@@ -86,7 +86,7 @@ class DetalleServicioController extends Controller
             ])->toArray();
 
             // Lógica sencilla de etapa
-            $etapa = 'Diagnóstico';
+            $etapa = 'Revisión';
             if (count($servicios) && collect($servicios)->every(fn($s)=>$s['progreso']>=100)) {
                 $etapa = 'Finalización';
             } elseif (collect($servicios)->some(fn($s)=> $s['progreso']>0 && $s['progreso']<100)) {

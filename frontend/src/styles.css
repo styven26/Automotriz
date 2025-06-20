@@ -14,7 +14,7 @@
     width: 100%;
     zoom: 0.85;
   }
-
+  
   /* Estilo de los widgets */
   .widget {
     background-color: #fff;
@@ -299,7 +299,7 @@
 
   /* Estilo para los eventos cancelados */
   .fc-event-red {
-    background-color: #d5958d !important; /* Rojo para citas canceladas */
+    background-color: #ffb9b0 !important; /* Rojo para citas canceladas */
     color: #000000 !important;           /* Texto blanco */
     border: none;
     font-weight: bold;
@@ -308,7 +308,7 @@
   }
 
   .fc-event-blue {
-    background-color: #ccdeef !important; /* Azul para citas pendientes */
+    background-color: #7dc0ff !important; /* Azul para citas pendientes */
     color: #000000 !important;           /* Texto blanco */
     border: none;
     font-weight: bold;
@@ -326,7 +326,7 @@
   }
 
   .fc-event-purple {
-    background-color: #c5a2d3 !important; /* Púrpura */
+    background-color: #f1d6fb !important; /* Púrpura */
     color:            #000000 !important; /* Texto blanco */
     border:           none !important;
     font-weight:      bold;

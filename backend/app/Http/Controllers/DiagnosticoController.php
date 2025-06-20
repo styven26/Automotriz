@@ -17,12 +17,20 @@ class DiagnosticoController extends Controller
      */
     public function index()
     {
+        // 1) Averiguas el id de “Diagnosticado” desde tu seeder
+        $idDiagnosticado = EstadoCita::where('nombre_estado', 'Diagnosticado')
+                        ->value('id_estado'); // ==> 4
+
+        // 2) Filtras órdenes que NO han enviado correo Y cuyo cita.id_estado = Diagnosticado
         $ordenes = OrdenServicio::with([
                 'cita.cliente',
                 'cita.vehiculo',
                 'detallesServicios.servicio',
             ])
             ->where('correo_enviado', false)
+            ->whereHas('cita', function($q) use ($idDiagnosticado) {
+                $q->where('id_estado', $idDiagnosticado);
+            })
             ->get();
 
         return response()->json($ordenes, 200);
@@ -297,6 +305,9 @@ class DiagnosticoController extends Controller
             $cita->fecha_fin  = now()->toDateString();
             $cita->hora_fin   = now()->format('H:i:s');
             $cita->save();
+
+            // Soft delete: rellena deleted_at automáticamente
+            $cita->delete();
 
             // 7) Devuelve JSON con los nuevos valores de la cita
             return response()->json([

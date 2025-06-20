@@ -26,22 +26,60 @@ class CitasController extends Controller
     {
         $cliente = auth()->user();
         if (! $cliente || ! $cliente->tieneRol('cliente')) {
-            return response()->json(['error'=>'Acceso no autorizado'],403);
+            return response()->json(['error' => 'Acceso no autorizado'], 403);
         }
 
-        $citas = Cita::where('cedula_cliente',$cliente->cedula)
-            ->whereHas('estado', fn($q)=> $q->where('nombre_estado','Confirmada'))
+        $citas = Cita::where('cedula_cliente', $cliente->cedula)
+            ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'Confirmada'))
             ->with([
                 'cliente:cedula,nombre,apellido',
                 'mecanico:cedula,nombre,apellido',
                 'vehiculo:id_vehiculo,marca,modelo,numero_placa',
                 'estado:id_estado,nombre_estado',
                 'horario:id_horario,dia_semana,manana_inicio,tarde_fin',
-                'ordenServicio.detallesServicios.servicio'  // en lugar de "subtipos"
+                'ordenServicio.detallesServicios.servicio'
             ])
-            ->get();
+            ->get()
+            ->map(function ($cita) {
+                // Si no hay fecha_fin/hora_fin, uso la fecha/hora de inicio
+                $fechaFin = $cita->fecha_fin;
+                $horaFin  = $cita->hora_fin;
 
-        return response()->json($citas,200);
+                return [
+                    'id_cita'   => $cita->id_cita,
+                    'cliente'   => [
+                        'cedula'   => $cita->cliente->cedula,
+                        'nombre'   => $cita->cliente->nombre,
+                        'apellido' => $cita->cliente->apellido,
+                    ],
+                    'mecanico'  => [
+                        'cedula'   => $cita->mecanico->cedula,
+                        'nombre'   => $cita->mecanico->nombre,
+                        'apellido' => $cita->mecanico->apellido,
+                    ],
+                    'vehiculo'  => $cita->vehiculo,
+                    'fecha'     => $cita->fecha,
+                    'hora'      => $cita->hora,
+                    'fecha_fin' => $fechaFin,
+                    'hora_fin'  => $horaFin,
+                    'estado'    => $cita->estado->nombre_estado,
+                    'horario'   => [
+                        'dia_semana'   => $cita->horario->dia_semana,
+                        'manana_inicio'=> $cita->horario->manana_inicio,
+                        'tarde_fin'    => $cita->horario->tarde_fin,
+                    ],
+                    'subtipos'  => $cita->ordenServicio
+                        ? $cita->ordenServicio->detallesServicios->map(fn($det) => [
+                            'nombre'               => $det->servicio->nombre,
+                            'descripcion_servicio' => $det->servicio->descripcion,
+                            'detalle_descripcion'  => $det->descripcion,
+                            'progreso'             => $det->progreso,
+                        ])->toArray()
+                        : [],
+                ];
+            });
+
+        return response()->json($citas, 200);
     }
 
     /**
@@ -129,6 +167,28 @@ class CitasController extends Controller
         if (in_array(strtolower($dia), ['sábado', 'domingo'])) {
             return response()->json([
                 'error' => 'Solo se pueden programar citas de lunes a viernes.'
+            ], 422);
+        }
+
+        // 1) Calcula el inicio de tu nueva cita
+        $newStart = Carbon::parse("{$validated['fecha']} {$validated['hora']}");
+
+        // 2) Busca si hay alguna cita activa para ese vehículo que NO haya terminado antes de $newStart
+        $solapada = Cita::where('id_vehiculo', $validated['id_vehiculo'])
+            ->where('activo', true)
+            ->where(function($q) use ($newStart) {
+                $q->whereNull('hora_fin') // aún en curso
+                ->orWhereRaw(
+                    "STR_TO_DATE(CONCAT(fecha_fin,' ',hora_fin),'%Y-%m-%d %H:%i') > ?",
+                    [$newStart->format('Y-m-d H:i')]
+                );
+            })
+            ->exists();
+
+        if ($solapada) {
+            return response()->json([
+            'error' => 'El vehículo ya está en taller y no puede reservarse hasta que termine.',
+            'mensaje' => 'Revisa la cita en curso o elige otro día u otro vehículo.'
             ], 422);
         }
     
@@ -235,33 +295,97 @@ class CitasController extends Controller
             ], 422);
         }
     
-        // 9) ENCONTRAR UN MECÁNICO DISPONIBLE
-        //    => "Disponible" significa que NO tiene otra cita en la misma fecha sin 'hora_fin'
-        //       (o sea, en curso). Si hay varios mecánicos, tomas el primero que cumpla la condición.
-        //    => Si NO hay mecánico libre, devuelves error y horarios sugeridos.
-        // Nota: Ajusta la lógica si quieres tener en cuenta la hora de inicio también.
-        $mecanicoLibre = Usuario::whereHas('roles', fn($q)=> $q->where('nombre','mecanico'))
-            ->whereDoesntHave('citasComoMecanico', fn($q)=>
-                $q->where('fecha', $fecha)
-                ->where('activo', true)
-                ->whereNull('hora_fin')
-            )
+        // 9) ENCONTRAR UN MECÁNICO REALMENTE LIBRE
+        $mecanicoLibre = Usuario::whereHas('roles', function($q) {
+                $q->where('nombre', 'mecanico');
+            })
+            ->whereDoesntHave('citasComoMecanico', function($q) use ($newStart) {
+                $q->where('activo', true)
+                ->where(function($q2) use ($newStart) {
+                    // Citas en curso (sin hora_fin)
+                    $q2->whereNull('hora_fin')
+                        // O citas que terminan después del inicio propuesto
+                        ->orWhereRaw(
+                            "STR_TO_DATE(CONCAT(fecha_fin, ' ', hora_fin), '%Y-%m-%d %H:%i') > ?",
+                            [$newStart->format('Y-m-d H:i')]
+                        );
+                });
+            })
             ->first();
-    
-        if (!$mecanicoLibre) {
+
+        if (! $mecanicoLibre) {
+            // 9b) Si NO hay mecánico libre, buscamos cuál está ocupado y cuál es su cita actual
+            $mecanicoOcupado = Usuario::whereHas('roles', function($q) {
+                    $q->where('nombre', 'mecanico');
+                })
+                ->whereHas('citasComoMecanico', function($q) use ($newStart) {
+                    $q->where('activo', true)
+                    ->where(function($q2) use ($newStart) {
+                        $q2->whereNull('hora_fin')
+                            ->orWhereRaw(
+                                "STR_TO_DATE(CONCAT(fecha_fin, ' ', hora_fin), '%Y-%m-%d %H:%i') > ?",
+                                [$newStart->format('Y-m-d H:i')]
+                            );
+                    });
+                })
+                ->with(['citasComoMecanico' => function($q) use ($newStart) {
+                    $q->where('activo', true)
+                    ->where(function($q2) use ($newStart) {
+                        $q2->whereNull('hora_fin')
+                            ->orWhereRaw(
+                                "STR_TO_DATE(CONCAT(fecha_fin, ' ', hora_fin), '%Y-%m-%d %H:%i') > ?",
+                                [$newStart->format('Y-m-d H:i')]
+                            );
+                    })
+                    ->with(['vehiculo', 'ordenServicio.detallesServicios.servicio'])
+                    ->orderBy('fecha')
+                    ->orderBy('hora');
+                }])
+                ->first();
+
+            // Tomamos la primera cita activa de ese mecánico
+            $citaActual = $mecanicoOcupado
+                ? $mecanicoOcupado->citasComoMecanico->first()
+                : null;
+
+            // Preparamos el JSON de la cita actual
+            $dataCitaActual = null;
+            if ($citaActual) {
+                $dataCitaActual = [
+                    'vehiculo' => [
+                        'marca'  => $citaActual->vehiculo->marca,
+                        'modelo' => $citaActual->vehiculo->modelo,
+                        'placa'  => $citaActual->vehiculo->numero_placa,
+                    ],
+                    'servicios_en_proceso' => $citaActual
+                        ->ordenServicio
+                        ->detallesServicios
+                        ->map(fn($det) => $det->servicio->nombre)
+                        ->toArray(),
+                    'fecha_inicio' => $citaActual->fecha,
+                    'hora_inicio'  => $citaActual->hora,
+                ];
+            }
+
             // Sugerir otros horarios usando el método auxiliar
-            $inicioPermitido = Carbon::createFromFormat('H:i:s', $horario->manana_inicio);
-            $finPermitido    = Carbon::createFromFormat('H:i:s', $horario->tarde_fin);
+            $inicioPermitido   = Carbon::createFromFormat('H:i:s', $horario->manana_inicio);
+            $finPermitido      = Carbon::createFromFormat('H:i:s', $horario->tarde_fin);
             $horariosSugeridos = $this->calcularHorariosSugeridos(
                 $validated['fecha'],
                 $validated['hora'],
                 $inicioPermitido,
                 $finPermitido
             );
+
             return response()->json([
-                'error' => 'Mecánico Ocupado',
-                'mensaje' => "No hay mecánicos disponibles para las {$validated['hora']} del día {$validated['fecha']}.",
-                'horarios_sugeridos' => $horariosSugeridos,
+                'error'               => 'Mecánico Ocupado',
+                'mensaje'             => 'No hay ningún mecánico disponible hasta que termine su trabajo actual.',
+                'mecanico_ocupado'    => [
+                    'cedula' => $mecanicoOcupado->cedula,
+                    'nombre' => "{$mecanicoOcupado->nombre} {$mecanicoOcupado->apellido}"
+                ],
+                'cita_actual'         => $dataCitaActual,
+                'horarios_sugeridos'  => $horariosSugeridos,
             ], 422);
         }
     
@@ -316,6 +440,33 @@ class CitasController extends Controller
         ));
     
         return response()->json($cita, 201);
+    }
+
+    /**
+     * Devuelve los IDs de los vehículos que siguen en taller (activo=true y sin hora_fin o que cruce la fecha/hora dada).
+     */
+    public function vehiculosOcupados(Request $request)
+    {
+        $request->validate([
+            'fecha' => 'required|date',
+            'hora'  => 'required|date_format:H:i',
+        ]);
+
+        $timestamp = Carbon::parse("{$request->fecha} {$request->hora}");
+
+        $vehiculos = Cita::where('activo', true)
+            ->where(function($q) use($timestamp) {
+                $q->whereNull('hora_fin')
+                  ->orWhereRaw(
+                    "STR_TO_DATE(CONCAT(fecha_fin,' ',hora_fin),'%Y-%m-%d %H:%i') > ?",
+                    [$timestamp->format('Y-m-d H:i')]
+                  );
+            })
+            ->pluck('id_vehiculo')
+            ->unique()
+            ->values();
+
+        return response()->json($vehiculos);
     }
     
     /**
@@ -513,13 +664,12 @@ class CitasController extends Controller
         $cita->save();
 
         // 6) Notificar al mecánico
+        $clienteUsuario = $cita->cliente; // esto es un App\Models\Usuario
+
         event(new CitaNotificada(
             "La cita para el vehículo {$cita->vehiculo->marca} ha sido cancelada.",
             $cita->cedula_mecanico,
-            [
-                'nombre'   => $cita->cliente->nombre ?? 'Desconocido',
-                'apellido' => $cita->cliente->apellido ?? 'Desconocido',
-            ]
+            $clienteUsuario
         ));
 
         \Log::info('Cita cancelada y evento emitido', [
@@ -538,6 +688,16 @@ class CitasController extends Controller
      */
     public function listarCitas()
     {
+        // 1) Obtener los IDs de los estados que queremos mostrar
+        $idsEstados = EstadoCita::whereIn('nombre_estado', [
+                'Confirmada',
+                'En Proceso',
+                'Cancelada',
+                'Atendida',
+                'Diagnosticado',
+            ])->pluck('id_estado');
+
+        // 2) Incluir soft-deleted (canceladas) y filtrar por esos estados
         $citas = Cita::with([
                 'vehiculo',
                 'cliente:cedula,nombre,apellido',
@@ -546,9 +706,11 @@ class CitasController extends Controller
                 'horario:id_horario,dia_semana,manana_inicio,tarde_fin,capacidad_max',
                 'ordenServicio.detallesServicios.servicio'
             ])
+            ->withTrashed()
+            ->whereIn('id_estado', $idsEstados)
             ->get()
             ->map(function ($cita) {
-                // Extraer “subtipos” desde la orden de servicio
+                // Extraer subtipos desde la orden de servicio
                 $subtipos = [];
                 if ($cita->ordenServicio) {
                     $subtipos = $cita->ordenServicio
@@ -556,39 +718,43 @@ class CitasController extends Controller
                         ->map(fn($det) => [
                             'nombre'               => $det->servicio->nombre,
                             'descripcion_servicio' => $det->servicio->descripcion,
-                            'detalle_descripcion'  => $det->descripcion,  // la descripción que puso el mecánico
+                            'detalle_descripcion'  => $det->descripcion,
                             'progreso'             => $det->progreso,
                         ])
                         ->toArray();
                 }
 
-                // Calcular orden de reserva (número de la cita en ese horario/día)
+                // Calcular orden de reserva en ese día/horario
                 $reservaOrden = Cita::where('id_horario', $cita->id_horario)
                     ->where('fecha', $cita->fecha)
                     ->where('created_at', '<=', $cita->created_at)
                     ->count();
 
+                // Fallback para fecha_fin/hora_fin
+                $fechaFin = $cita->fecha_fin;
+                $horaFin  = $cita->hora_fin;
+
                 return [
-                    'id'               => $cita->id_cita,
-                    'cliente'          => [
+                    'id'            => $cita->id_cita,
+                    'cliente'       => [
                         'cedula'   => $cita->cedula_cliente,
                         'nombre'   => $cita->cliente->nombre,
                         'apellido' => $cita->cliente->apellido,
                     ],
-                    'vehiculo'         => $cita->vehiculo,
-                    'fecha'            => $cita->fecha,
-                    'hora'             => $cita->hora,
-                    'fecha_fin'        => $cita->fecha_fin,
-                    'hora_fin'         => $cita->hora_fin,
-                    'estado'           => $cita->estado->nombre_estado,
-                    'subtipos'         => $subtipos,
-                    'mecanico'         => [
+                    'vehiculo'      => $cita->vehiculo,
+                    'fecha'         => $cita->fecha,
+                    'hora'          => $cita->hora,
+                    'fecha_fin'     => $fechaFin,
+                    'hora_fin'      => $horaFin,
+                    'estado'        => $cita->estado->nombre_estado,
+                    'subtipos'      => $subtipos,
+                    'mecanico'      => [
                         'cedula'   => $cita->cedula_mecanico,
                         'nombre'   => $cita->mecanico->nombre,
                         'apellido' => $cita->mecanico->apellido,
                     ],
-                    'capacidad'        => $cita->horario->capacidad_max ?? 0,
-                    'orden_reserva'    => $reservaOrden,
+                    'capacidad'     => $cita->horario->capacidad_max ?? 0,
+                    'orden_reserva' => $reservaOrden,
                 ];
             });
 

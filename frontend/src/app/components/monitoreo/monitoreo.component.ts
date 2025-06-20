@@ -34,7 +34,7 @@ export class MonitoreoComponent {
 
   // Datos para las gráficas
   categoryData = [
-    { name: 'Diagnóstico', value: 0 },
+    { name: 'Revisión', value: 0 },
     { name: 'Reparación', value: 0 },
     { name: 'Finalización', value: 0 },
     { name: 'Cancelado', value: 0 }
@@ -275,8 +275,8 @@ export class MonitoreoComponent {
   }  
 
   procesarDatos(monitoreos: Monitoreo[]): void {
-    const etapas: Record<'Diagnóstico' | 'Reparación' | 'Finalización', number> = {
-      Diagnóstico: 0,
+    const etapas: Record<'Revisión' | 'Reparación' | 'Finalización', number> = {
+      Revisión: 0,
       Reparación: 0,
       Finalización: 0,
     };

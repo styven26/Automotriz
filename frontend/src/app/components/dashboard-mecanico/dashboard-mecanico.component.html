@@ -117,21 +117,32 @@
         <div class="charts-container">
             <!-- Gráfico de Citas por Día (Barra Vertical Agrupada) -->
             <div class="chart-container">
-                <h4 class="chart-title">Distribución Diaria de Estados de Citas</h4>
-                <ngx-charts-bar-vertical-2d
+                <div class="chart-header">
+                    <h4 class="chart-title">Distribución Mensual de Estados de Citas</h4>
+                    <div class="year-selector">
+                    <label for="year-select">Año:</label>
+                    <select id="year-select"
+                            [(ngModel)]="selectedYear"
+                            (ngModelChange)="updateMonthlyChart()">
+                        <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+                    </select>
+                    </div>
+                </div>
+
+                <ngx-charts-bar-vertical-stacked
                     [view]="[870,600]"
                     [scheme]="colorScheme"
-                    [results]="citasPorDiaData"
+                    [results]="citasPorMesStacked"
                     [xAxis]="true"
                     [yAxis]="true"
                     [legend]="true"
                     [legendTitle]="'Estados de Citas'"
-                    [showGridLines]="true"
                     [showXAxisLabel]="true"
                     [showYAxisLabel]="true"
-                    [xAxisLabel]="'Día'"
-                    [yAxisLabel]="'Nº de Citas'">
-                </ngx-charts-bar-vertical-2d>
+                    [xAxisLabel]="'Meses'"
+                    [yAxisLabel]="'Nº de Citas'"
+                    [animations]="false">
+                </ngx-charts-bar-vertical-stacked>
             </div>
 
             <!-- Gráfico de Distribución de Estados de Citas -->

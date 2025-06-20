@@ -146,33 +146,41 @@ export class TrabajosComponent {
 
   // Firma explícita para que TS sepa que devuelve un Promise<any>
   consultarInventario(trabajo: Orden): Promise<any> {
+    // 1) Calculamos "disponible" = stock – stock_minimo
     const opciones = this.inventario
-      .map(r => ({
-        id: r.id_repuesto,
-        texto: `${r.nombre} (stock: ${r.stock})`,
-        stock: r.stock,
-        precio: r.precio_final
-      }))
-      .filter(r => r.stock > 0);
+      .map(r => {
+        const disponible = r.stock - (r.stock_minimo ?? 0);
+        return {
+          id: r.id_repuesto,
+          texto: `${r.nombre} (disponible: ${disponible})`,
+          disponible,
+          precio: r.precio_final
+        };
+      })
+      // 2) Sólo los que realmente tengan > 0 disponibles
+      .filter(o => o.disponible > 0);
 
+    // 3) Si no hay ninguno, avisamos y salimos
     if (opciones.length === 0) {
-      // Devuelve un Promise<any> aquí
       return Swal.fire(
         'Sin inventario',
-        'No hay repuestos en stock. El cliente deberá buscar el repuesto.',
+        'No hay repuestos disponibles por encima del mínimo. El cliente deberá buscar el repuesto.',
         'info'
       );
     }
 
-    const optsHtml = opciones
-      .map(o => `<option value="${o.id}"
-                        data-precio="${o.precio}"
-                        data-stock="${o.stock}">
-                    ${o.texto}
-                  </option>`)
-      .join('');
+    // 4) HTML de las <option> con data-disponible y data-precio
+    const optsHtml = opciones.map(o => `
+      <option
+        value="${o.id}"
+        data-precio="${o.precio}"
+        data-disponible="${o.disponible}"
+      >
+        ${o.texto}
+      </option>
+    `).join('');
 
-    // ¡AÑADE return aquí!
+    // 5) Mostramos el SweetAlert con select + input cantidad, usando tus estilos inline
     return Swal.fire({
       title: `<h3 style="
           font-family: Roboto, sans-serif;
@@ -182,8 +190,7 @@ export class TrabajosComponent {
         ">
           <strong>Selecciona Repuesto</strong>
       </h3>`,
-      html: `
-        <select
+      html: ` <select
           id="swal-repuesto"
           class="swal2-select"
           style="width:80%; padding:0.75rem 1rem; font-size:1rem; line-height:1.4; border:1px solid #ccc; border-radius:0.375rem; box-sizing:border-box; appearance:none; background-image:url('data:image/svg+xml;charset=UTF-8,%3Csvg width=&quot;10&quot; height=&quot;6&quot; viewBox=&quot;0 0 10 6&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cpath d=&quot;M0 0l5 6 5-6H0z&quot; fill=&quot;%23666&quot;/%3E%3C/svg%3E'); background-repeat:no-repeat; background-position:right 1rem center; background-size:0.65rem auto; margin-bottom:1.5rem;"
@@ -211,17 +218,31 @@ export class TrabajosComponent {
       preConfirm: () => {
         const sel = document.getElementById('swal-repuesto') as HTMLSelectElement;
         const qty = parseInt((document.getElementById('swal-cantidad') as HTMLInputElement).value, 10);
-        if (!sel.value) Swal.showValidationMessage('Debes seleccionar un repuesto');
-        const precio = parseFloat(sel.selectedOptions[0].dataset['precio']!);
-        const stock  = parseInt(sel.selectedOptions[0].dataset['stock']!, 10);
-        if (qty < 1 || qty > stock) {
-          Swal.showValidationMessage(`Cantidad entre 1 y ${stock}`);
+
+        if (!sel.value) {
+          Swal.showValidationMessage('Debes seleccionar un repuesto');
+          return;
         }
-        return { id_repuesto: +sel.value, cantidad: qty, precio };
+
+        const precio     = parseFloat(sel.selectedOptions[0].dataset['precio']!);
+        const disponible = parseInt(sel.selectedOptions[0].dataset['disponible']!, 10);
+
+        if (isNaN(qty) || qty < 1 || qty > disponible) {
+          Swal.showValidationMessage(`Cantidad entre 1 y ${disponible}`);
+          return;
+        }
+
+        return {
+          id_repuesto: +sel.value,
+          cantidad:    qty,
+          precio
+        };
       }
     }).then(res => {
-      if (!res.isConfirmed) return;
-      const { id_repuesto, cantidad, precio } = res.value!;
+      if (!res.isConfirmed || !res.value) {
+        return;
+      }
+      const { id_repuesto, cantidad, precio } = res.value;
       this.detalleRepuestoService.create({
         id_repuesto,
         id_orden: trabajo.id_orden,
@@ -233,7 +254,9 @@ export class TrabajosComponent {
           this.cargarTrabajos();
           this.loadInventario();
         },
-        error: e => Swal.fire('Error', e.error?.error || 'No guardó','error')
+        error: e => {
+          Swal.fire('Error', e.error?.error || 'No guardó','error');
+        }
       });
     });
   }
@@ -524,7 +547,27 @@ export class TrabajosComponent {
           });
       }
     });
-  }    
+  }
+
+  /** Devuelve true si ya pasó (o ha llegado) la hora de inicio */
+  public isCitaIniciada(trabajo: Orden): boolean {
+    const inicio = new Date(`${trabajo.cita.fecha}T${trabajo.cita.hora}`);
+    return new Date() >= inicio;
+  }
+
+  /** Muestra un Swal si aún no es la hora de la cita */
+  public validarHoraCita(trabajo: Orden): boolean {
+    if (!this.isCitaIniciada(trabajo)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Aún no es la hora de la cita',
+        text: `La cita comienza a las ${trabajo.cita.hora} del ${trabajo.cita.fecha}.`,
+        confirmButtonText: 'Entendido'
+      });
+      return false;
+    }
+    return true;
+  }
   
   finalizarTrabajo(trabajo: Orden): void {
     this.ordenService.finalizarAutomatico(trabajo.id_orden)
@@ -533,9 +576,17 @@ export class TrabajosComponent {
           Swal.fire('Éxito','Orden finalizada automáticamente.','success');
           this.cargarTrabajos();
         },
-        error: err => Swal.fire('Error', err.error?.error || 'No se pudo finalizar.','error')
+        error: err => {
+          // Primero intentamos mostrar `mensaje`, si no existe mostramos `error`
+          const msg = err.error?.mensaje ?? err.error?.error ?? 'No se pudo finalizar.';
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: msg
+          });
+        }
       });
-  }   
+  }
 
   actualizarProgresoOrden(idOrden: number, progresos: { id_detalle: number; progreso: number }[]): void {
     this.ordenService.actualizarProgreso(idOrden, progresos).subscribe({

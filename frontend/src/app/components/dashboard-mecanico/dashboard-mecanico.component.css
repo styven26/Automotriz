@@ -10,6 +10,30 @@
   background-color: #f9fafc; 
 }
 
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Cambia la fuente global para header */
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 1rem;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.year-selector label {
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.year-selector select {
+  font-size: 0.9rem;
+  padding: 0.2rem 0.4rem;
+}
+
 .sidebar {
   flex-direction: column; /* Organiza los elementos en columna */
   display: flex;
