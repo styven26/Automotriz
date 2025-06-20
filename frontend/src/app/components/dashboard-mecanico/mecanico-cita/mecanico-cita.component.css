@@ -111,17 +111,19 @@
 .main-content {
   margin-left: 270px; /* tu sidebar */
   position: absolute;
+  width: 253vh;
+  height: auto;
   padding: 0;
 }
 
-.calendar-container {
-  width: 71%;
-  transform: scale(1.3839);
-  transform-origin: top left;
+.calendar-container,
+  :host ::ng-deep .fc {
+    zoom: 1.1766 !important;      /* Compensa el zoom 0.85 global */
+    transform-origin: top left;    /* Asegura que escale desde arriba-izquierda */
 }
 
-:host ::ng-deep .fc-daygrid-day-frame {
-  min-height: 92px;
+.calendar-container {
+  height: 117vh;  /* ajusta “80px” al alto real de tu toolbar */
 }
 
 :host ::ng-deep .fc-col-header-cell {

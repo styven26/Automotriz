@@ -162,21 +162,24 @@
   background-color: #4caf50;
 }
 
+.calendar-container,
+  :host ::ng-deep .fc {
+    zoom: 1.1766 !important;      /* Compensa el zoom 0.85 global */
+    transform-origin: top left;    /* Asegura que escale desde arriba-izquierda */
+}
+
 /* Contenido principal */
 .main-content {
-  margin-left: 300px;
-  position: absolute;
+  margin-left: 300px;               /* deja espacio para la sidebar */
+  padding: 20px;
+  position: relative;
+  width: 248vh;
+  height: auto;
   padding: 0;
 }
 
 .calendar-container {
-  width: 71%;
-  transform: scale(1.3839);
-  transform-origin: top left;
-}
-
-:host ::ng-deep .fc-daygrid-day-frame {
-  min-height: 92px;
+  height: 117vh;  /* ajusta “80px” al alto real de tu toolbar */
 }
 
 :host ::ng-deep .fc-col-header-cell {
@@ -276,7 +279,6 @@ button {
 button:hover {
   background-color: #0056b3;
 }
-
 
 /* Role-switcher */
 .role-switcher {
