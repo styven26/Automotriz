@@ -52,6 +52,7 @@ export class DiagnosticoComponent {
   @ViewChild(MatSort) sort!: MatSort;
 
   // Variables de control
+  sidebarActive: boolean = false; // Controla el estado del menú lateral
   fechaActual = new Date();
   totalCitas = 0;
   totalTrabajos = 0;

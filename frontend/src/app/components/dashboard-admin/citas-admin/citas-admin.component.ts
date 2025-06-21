@@ -45,6 +45,7 @@ export class CitasAdminComponent {
   calendarOptions: any;
 
   // Variables de usuario
+  sidebarActive: boolean = false;
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
   rolActivo: string = 'Sin rol'; 

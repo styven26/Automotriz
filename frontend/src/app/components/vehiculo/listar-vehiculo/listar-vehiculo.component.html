@@ -1,5 +1,9 @@
 <div class="dashboard-container">
-  <div class="sidebar">
+    <!-- 1. Aquí pones el botón toggle -->
+    <button class="menu-toggle" (click)="sidebarActive = !sidebarActive">
+      <i class="fa fa-bars"></i>
+    </button>
+    <div class="sidebar" [class.active]="sidebarActive">
     <!-- Logo e imagen del usuario -->
     <div class="header">
       <img src="icons/usuario.png" alt="">
@@ -133,7 +137,6 @@
       <i class="fas fa-clock"></i>
       <span>{{ tiempoRestante }}</span>
     </div>
-    
   </div>
 
   <!-- Contenido Principal del Dashboard -->

@@ -62,7 +62,7 @@ export class ListarRepuestosComponent {
     
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
-
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
 
   // Variables de usuario

@@ -28,6 +28,7 @@ export class CalendarioComponent {
   tiempoRestante: string = '';
 
   // Variables de usuario
+  sidebarActive: boolean = false;
   rolActivo: string = 'Sin rol';
   roles: string[] = [];
   nombreUsuario: string = '';

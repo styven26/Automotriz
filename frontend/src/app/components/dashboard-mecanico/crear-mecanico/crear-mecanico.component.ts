@@ -37,6 +37,7 @@ export class CrearMecanicoComponent {
 
   constructor( private fb: FormBuilder, private http: HttpClient, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService ) {}
 
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];

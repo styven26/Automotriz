@@ -40,6 +40,7 @@ export class SubtiposServiciosComponent {
   @ViewChild(MatSort) sort!: MatSort;
 
   // Variables de usuario
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
   nombreUsuario: string = '';
   apellidoUsuario: string = '';

@@ -28,6 +28,7 @@ export class DashboardAdminComponent implements OnInit {
     mes: '',
   };
 
+  sidebarActive: boolean = false;
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
 

@@ -26,6 +26,7 @@ import Swal from 'sweetalert2';
 export class TiposServiciosComponent implements OnInit {
   
   // Variables de usuario
+  sidebarActive: boolean = false;
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
   tiempoRestante: string = '';

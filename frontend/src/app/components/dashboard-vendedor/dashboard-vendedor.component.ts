@@ -35,6 +35,7 @@ export interface AlertDialogData {
 })
 export class DashboardVendedorComponent {
 
+  sidebarActive: boolean = false;
   totalRepuestos = 0;
   lowStockRepuestos: Repuesto[] = []; // Ya lo tienes
   lowStockCount = 0;
@@ -154,7 +155,7 @@ export class DashboardVendedorComponent {
       // 3. Asigna a chartOptions
       this.chartOptions = {
         series: [{ name: 'Stock agregado', data: Object.values(map) }],
-        chart:  { type: 'bar', height: 640 },
+        chart:  { type: 'bar', height: 610 },
         xaxis:  { categories: Object.keys(map) },
         dataLabels: { enabled: false },
         grid: { padding: { top: 0, bottom: 0 } },

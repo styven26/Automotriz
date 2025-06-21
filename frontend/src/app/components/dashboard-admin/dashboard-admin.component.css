@@ -440,3 +440,56 @@
     transform: translateY(0);
   }
 }
+
+/* 1) Toggle button: oculto por defecto, aparece en móvil */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    z-index: 1100;
+    cursor: pointer;
+  }
+  
+  /* 2) Sidebar deslizable */
+  .sidebar {
+    left: -100%;
+    width: 75%;
+    max-width: 300px;
+    position: fixed;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* 3) Contenido principal full-width */
+  .main-content {
+    margin: 0;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 1) Pila sidebar y main-content en vez de side-by-side */
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;      /* dejar que crezca según contenido */
+  }
+
+  /* 2) Main-content full-width y sin margen */
+  .main-content {
+    margin: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+}

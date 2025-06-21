@@ -1,4 +1,4 @@
-import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectorRef, ViewChild, ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -24,6 +24,10 @@ import Swal from 'sweetalert2';
 })
 export class DashboardClientesComponent implements OnInit {
 
+  @ViewChild('mainContent', { static: true }) mainContent!: ElementRef;
+  view: [number, number] = [700, 600];
+
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
@@ -50,7 +54,19 @@ export class DashboardClientesComponent implements OnInit {
   showMonitoreoMenu: boolean = false;
   showVehiculoMenu: boolean = false;
 
-  constructor(private authService: AuthService, private vehiculoService: VehiculoService, private notificacionesService: NotificacionesService, private citasService: CitasService, private router: Router) {   console.log('✅ DashboardClientesComponent cargado correctamente');
+  constructor(private authService: AuthService, private cd: ChangeDetectorRef, private vehiculoService: VehiculoService, private notificacionesService: NotificacionesService, private citasService: CitasService, private router: Router) {   console.log('✅ DashboardClientesComponent cargado correctamente');}
+
+  // dashboard-cliente.component.ts
+  @HostListener('window:resize')
+  onResize(): void {
+    const w = this.mainContent.nativeElement.clientWidth * 0.9;
+    const h = Math.round(w * 0.7);
+    this.view = [w, h];
+  }
+
+  ngAfterViewInit(): void {
+    this.onResize();
+    this.cd.detectChanges();            // ← fuerza nueva detección
   }
 
   ngOnInit(): void {

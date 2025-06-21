@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxChartsModule} from '@swimlane/ngx-charts';
 import { Router } from '@angular/router';
@@ -29,6 +29,7 @@ export class MonitoreoComponent {
 
   constructor(private authService: AuthService, private clienteService: ClienteService, private router: Router, private notificacionesService: NotificacionesService, private monitoreoService: MonitoreoService) {}
 
+  view: [number,number] = [700,600];
   private dataSubscription!: Subscription;
   showDropdown: boolean = false; // Controla la visibilidad del menú desplegable
 
@@ -41,6 +42,7 @@ export class MonitoreoComponent {
   ];
 
   // Datos para las gráficas y tablas
+  sidebarActive: boolean = false;
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
   skuSalesData: any[] = []; // Gráfico de barras
@@ -184,11 +186,27 @@ export class MonitoreoComponent {
 
     this.iniciarReloj();
     this.cargarMonitoreos();
+    this.onResize();
 
     // Usa interval para actualizar los datos periódicamente
     this.dataSubscription = interval(3000).subscribe(() => {
       this.cargarMonitoreos();
     });
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    const w = window.innerWidth;
+    if (w < 600) {
+      // móvil: cuadrado pequeño
+      this.view = [w * 0.8, w * 0.8];
+    } else if (w < 960) {
+      // tablet: un poco más grande
+      this.view = [w * 0.7, w * 0.7];
+    } else {
+      // escritorio
+      this.view = [700, 600];
+    }
   }
 
   cambiarRol(event: Event): void {

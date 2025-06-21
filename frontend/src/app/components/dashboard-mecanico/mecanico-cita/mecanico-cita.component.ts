@@ -26,6 +26,7 @@ export class MecanicoCitaComponent {
   tiempoRestante: string = '';
 
   // Control de submenús
+  sidebarActive: boolean = false;
   showMecanicosMenu: boolean = false;
   showClientesMenu: boolean = false;
   showCitasMenu: boolean = false;

@@ -1,5 +1,9 @@
 <div class="dashboard-container">
-  <div class="sidebar">
+    <!-- 1. Aquí pones el botón toggle -->
+    <button class="menu-toggle" (click)="sidebarActive = !sidebarActive">
+        <i class="fa fa-bars"></i>
+    </button>
+    <div class="sidebar" [class.active]="sidebarActive">
     <!-- Logo e imagen del usuario -->
     <div class="header">
       <img src="icons/usuario.png" alt="">
@@ -137,7 +141,7 @@
   </div>
 
   <!-- Contenido Principal del Dashboard -->
-  <div class="main-content">
+  <div class="main-content" #mainContent>
     <!-- Tarjetas de resumen -->
     <div class="summary-container">
       <div class="summary-card">
@@ -167,7 +171,7 @@
       <div class="chart-container">
         <h4 class="chart-title">Distribución de Servicios Solicitados</h4>
         <ngx-charts-pie-chart
-          [view]="[700, 620]"
+          [view]="view"
           [results]="distribucionServicios"
           [legend]="true"
           [legendTitle]="'Servicios'"
@@ -185,7 +189,7 @@
         <h4 class="chart-title">Facturación Mensual por Citas Atendidas</h4>
         <ngx-charts-bar-vertical
             *ngIf="ingresosPorMes.length > 0"
-            [view]="[700, 620]"
+            [view]="view"
             [results]="ingresosPorMes"
             [legend]="true"
             [legendTitle]="'Mes'"

@@ -49,6 +49,7 @@ export class ListarVehiculoComponent {
   constructor( private authService: AuthService, private router: Router, private trabajosService: TrabajosService, private http: HttpClient, private vehiculoService: VehiculoService, public dialog: MatDialog, private snackBar: MatSnackBar ) {}
 
   // Variables de usuario
+  sidebarActive: boolean = false;
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
   nombreUsuario: string = '';

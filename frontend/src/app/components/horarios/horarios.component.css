@@ -13,7 +13,7 @@
 .sidebar {
   flex-direction: column; /* Organiza los elementos en columna */
   display: flex;
-  width: 240px;
+  width: 260px;
   background-color: #e5eae5;
   color: rgb(82, 96, 93);
   padding: 10px;
@@ -113,39 +113,10 @@
   transform: translateX(5px);  /* Efecto de hover en el submenú */
 }
 
-/* Contenido principal */
 .main-content {
-  margin-left: 270px;
+  margin-left: 210px;
   padding: 50px;
   width: calc(100% - 220px);
-}
-
-.input-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem; /* Ensures consistent spacing between elements */
-  margin-bottom: 1.5rem;
-}
-
-.half-width {
-  min-width: 250px; /* Ensures that fields don't shrink too small on small screens */
-  width: 49%; /* Ajuste para que los campos ocupen la mitad del contenedor */
-}
-
-.full-width {
-  width: 100%;
-  gap: 1rem; /* Espacio uniforme entre elementos */
-}
-
-.large-button {
-  font-size: 1rem; /* Aumenta el tamaño del texto */
-  width: 100%; /* Ajusta el ancho del botón */
-  margin: 1rem auto; /* Centra el botón */
-  font-family: 'Roboto', sans-serif;
-  display: block; /* Asegura que el botón sea tratado como un bloque */
-  border-radius: 0; /* Bordes completamente rectos */
-  height: 3rem; /* Ajusta la altura del botón */
 }
 
 /* Cabecera */
@@ -215,6 +186,60 @@
   transform: translateX(10px); /* Animación consistente */
 }
 
+/* Para pantallas de tablets (anchos menores a 1024px) */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .main-content {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr); /* Mostrar solo 2 columnas de widgets */
+  }
+
+  .header h2 {
+    font-size: 22px;
+  }
+
+  .widget h2 {
+    font-size: 28px;
+  }
+}
+
+/* Para pantallas de móviles (anchos menores a 768px) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%; /* Hacer que el sidebar ocupe toda la pantalla */
+    position: static; /* Quitar el sidebar fijo */
+    padding: 10px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr; /* Mostrar solo 1 columna de widgets */
+  }
+
+  .widget {
+    padding: 15px;
+  }
+
+  .header h2 {
+    font-size: 20px;
+  }
+
+  .widget h2 {
+    font-size: 24px;
+  }
+}
+
 .chart-title {
   font-size: 16px; /* Tamaño de letra ligeramente mayor */
   font-weight: 700; /* Más negrita para resaltar */
@@ -264,6 +289,41 @@
   animation: fadeIn 0.5s ease-in-out;
 }
 
+/* Inputs apilados en móvil (<768px) */
+@media (max-width: 768px) {
+  .input-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .half-width {
+    width: 48%;
+    min-width: 120px; /* opcional: para que no queden demasiado pequeñas */
+  }
+}
+
+@media (max-width: 768px) {
+  .half-width {
+    min-width: auto;    /* o min-width: 0; */
+    width: 48%;         /* mantiene dos columnas */
+  }
+}
+
+/* Ajuste intermedio para tablets (769px–1024px): ocupar mitad pero sin forzar min-width demasiado grande */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .half-width {
+    width: 48%;
+    min-width: 200px;
+  }
+}
+
+/* En pantallas muy pequeñas (<480px): reducir gap */
+@media (max-width: 480px) {
+  .input-row {
+    gap: 0.5rem;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -273,4 +333,157 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem; /* Ensures consistent spacing between elements */
+  margin-bottom: 1.5rem;
+}
+
+.full-width {
+  width: 100%;
+  gap: 1rem; /* Espacio uniforme entre elementos */
+}
+
+.half-width {
+  /* fuerza que ocupe 50% menos el gap */
+  flex: 0 0 calc(50% - 0.5rem);
+}
+
+.large-button {
+  font-size: 1rem; /* Aumenta el tamaño del texto */
+  width: 100%; /* Ajusta el ancho del botón */
+  margin: 1rem auto; /* Centra el botón */
+  font-family: 'Roboto', sans-serif;
+  display: block; /* Asegura que el botón sea tratado como un bloque */
+  border-radius: 0; /* Bordes completamente rectos */
+  height: 3rem; /* Ajusta la altura del botón */
+}
+
+/* -------------------------------- */
+/* Responsive adicional faltante    */
+/* -------------------------------- */
+
+/* 1. Pantallas muy anchas (>1600px) */
+@media (min-width: 1600px) {
+  .dashboard-container {
+    padding: 2rem 6rem;
+  }
+  .grid-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* 2. Escritorio grande (1201px–1599px) */
+@media (min-width: 1201px) and (max-width: 1599px) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 3. Escritorio medio (993px–1200px) */
+@media (min-width: 993px) and (max-width: 1200px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .main-content {
+    padding: 2rem;
+  }
+}
+
+/* 4. Tablets horizontales (769px–992px) */
+@media (min-width: 769px) and (max-width: 992px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sidebar {
+    width: 200px;
+  }
+  .main-content {
+    margin-left: 200px;
+    padding: 1.5rem;
+  }
+}
+
+/* 5. Tablets verticales y móviles grandes (577px–768px) */
+@media (min-width: 577px) and (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    left: -100%;
+    width: 70%;
+    max-width: 280px;
+    top: 0;
+    bottom: 0;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+  .menu-toggle {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  .grid-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* 6. Móviles medianos (481px–576px) */
+@media (min-width: 481px) and (max-width: 576px) {
+  .header h2 { font-size: 1.3rem; }
+  .widget h2 { font-size: 1.6rem; }
+  .input-row { flex-direction: column; gap: 0.75rem; }
+  .half-width { width: 100%; }
+}
+
+/* 7. Móviles pequeños (<480px) */
+@media (max-width: 480px) {
+  /* Toggle button */
+  .menu-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    z-index: 1100;
+    display: block;
+    cursor: pointer;
+  }
+  /* Sidebar oculto por defecto */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+  /* Contenido full-width */
+  .main-content {
+    margin: 0;
+    padding: 0.75rem;
+  }
+  /* Ajustes tipográficos */
+  .header h2 { font-size: 1.2rem; }
+  .header p  { font-size: 0.9rem; }
+  .widget h2 { font-size: 1.4rem; }
+  .large-button {
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 8. Ajuste global de box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
 }

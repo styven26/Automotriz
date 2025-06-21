@@ -27,6 +27,7 @@ export class HorariosComponent {
 
   constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private horarioService: HorarioService) {}
 
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
   showMecanicosMenu: boolean = false;
   showHorariosMenu: boolean = false;

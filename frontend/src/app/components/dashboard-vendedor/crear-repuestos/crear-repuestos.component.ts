@@ -28,7 +28,7 @@ import Swal from 'sweetalert2';
 export class CrearRepuestosComponent implements OnInit {
     
     repuestoForm!: FormGroup;
-  
+    sidebarActive: boolean = false;
     rolActivo: string = 'Sin rol'; 
     roles: string[] = [];
   

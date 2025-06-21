@@ -47,6 +47,7 @@ export class ListarClientesComponent {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
   isSubmitting: boolean = false;
   isModalOpen: boolean = false;

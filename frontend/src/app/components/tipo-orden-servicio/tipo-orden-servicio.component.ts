@@ -28,6 +28,7 @@ export class TipoOrdenServicioComponent {
     nombreExistente: boolean = false;
 
     // Variables de usuario
+    sidebarActive: boolean = false;
     nombreUsuario: string = '';
     apellidoUsuario: string = '';
     tiempoRestante: string = '';

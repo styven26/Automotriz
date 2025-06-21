@@ -57,6 +57,7 @@ export class CitasComponent implements OnInit {
   previewImage: string | null = null; // Propiedad para la URL de la imagen seleccionada
 
   // Variables de usuario
+  sidebarActive: boolean = false;
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
   tiempoRestante: string = '';

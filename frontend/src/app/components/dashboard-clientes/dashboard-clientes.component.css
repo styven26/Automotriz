@@ -270,3 +270,191 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* 1) Toggle button: oculto por defecto, aparece en móvil */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    z-index: 1100;
+    cursor: pointer;
+  }
+  
+  /* 2) Sidebar deslizable */
+  .sidebar {
+    left: -100%;
+    width: 75%;
+    max-width: 300px;
+    position: fixed;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* 3) Contenido principal full-width */
+  .main-content {
+    margin: 0;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 1) Pila sidebar y main-content en vez de side-by-side */
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;      /* dejar que crezca según contenido */
+  }
+
+  /* 2) Main-content full-width y sin margen */
+  .main-content {
+    margin: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+}
+/* ============================= */
+/*  RESPONSIVE PARA RESÚMENES    */
+/* ============================= */
+/* Pantallas ≤ 1024px: 2 tarjetas por fila */
+@media (max-width: 1024px) {
+  .summary-container {
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-around;
+  }
+  .summary-card {
+    flex: 1 1 calc(50% - 1rem);
+    max-width: calc(50% - 1rem);
+    margin-bottom: 1rem;
+  }
+}
+
+/* Pantallas ≤ 768px: 1 tarjeta por fila */
+@media (max-width: 768px) {
+  .summary-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .summary-card {
+    flex: 1 1 100%;
+    max-width: 400px;
+  }
+}
+
+/* ============================= */
+/*  RESPONSIVE PARA GRÁFICOS     */
+/* ============================= */
+/* Pantallas ≤ 1024px: 1 gráfico arriba de otro si caben justo */
+@media (max-width: 1024px) {
+  .charts-row {
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .chart-container {
+    flex: 1 1 calc(50% - 2rem);
+    max-width: calc(50% - 2rem);
+  }
+}
+
+/* Pantallas ≤ 768px: apilar gráficos */
+@media (max-width: 768px) {
+  .charts-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .chart-container {
+    flex: 1 1 100%;
+    max-width: 500px;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Muy pequeños (≤480px): ajustar alturas de ngx-charts */
+@media (max-width: 480px) {
+  .chart-container ngx-charts-pie-chart,
+  .chart-container ngx-charts-bar-vertical {
+    height: 250px !important;
+  }
+  .chart-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+}
+/* dashboard-clientes.component.css */
+
+.charts-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  /* + esto */
+  flex-wrap: wrap;
+}
+
+.chart-container {
+  flex: 1 1 calc(50% - 25px);
+  min-width: 300px;  /* para que no quede demasiado estrecho */
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
+/* ======== AJUSTES PARA MÓVIL ======== */
+@media (max-width: 768px) {
+  /* 1) Deja que el contenedor crezca y se desplace normalmente */
+  .dashboard-container {
+    position: relative;    /* ya no fijo */
+    height: auto;          /* altura según contenido */
+    flex-direction: column;
+  }
+
+  .main-content {
+    margin: 0;
+    width: 100%;
+    padding: 1rem;
+    overflow-y: auto;      /* scroll interno si hace falta */
+  }
+
+  /*  Tarjetas full-width */
+  .summary-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .summary-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  /* 3) Apila los .chart-container y hazlos full-width */
+  .charts-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .chart-container {
+    flex: 1 1 100%;
+    max-width: none;
+    min-width: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  /* 4) Asegura altura razonable de los ngx-charts */
+  .chart-container ngx-charts-pie-chart,
+  .chart-container ngx-charts-bar-vertical {
+    height: 250px !important;
+  }
+}

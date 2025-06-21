@@ -31,6 +31,7 @@ import Swal from 'sweetalert2';
 })
 export class TrabajosComponent {
 
+  sidebarActive: boolean = false; // Controla el estado del menú lateral
   tiempoRestante: string = '';
   trabajos: Orden[] = [];
   inventario: Repuesto[] = [];

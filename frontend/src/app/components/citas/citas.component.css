@@ -300,3 +300,97 @@ input[type="file"] {
     from { opacity: 0; }
     to { opacity: 1; }
   }
+
+  
+/* 1) Toggle button: oculto por defecto, aparece en móvil */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    z-index: 1100;
+    cursor: pointer;
+  }
+  
+  /* 2) Sidebar deslizable */
+  .sidebar {
+    left: -100%;
+    width: 75%;
+    max-width: 300px;
+    position: fixed;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* 3) Contenido principal full-width */
+  .main-content {
+    margin: 0;
+    padding: 1rem;
+  }
+}
+
+/* ======== RESPONSIVE PARA EL STEP 1: REGISTRO VEHÍCULO ======== */
+@media (max-width: 768px) {
+  /* 1) Contenedor principal apilado */
+  .dashboard-container {
+    position: relative !important;
+    flex-direction: column;
+    height: auto;
+  }
+  .main-content {
+    margin: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  /* 2) Stepper full-width */
+  mat-stepper {
+    width: 100% !important;
+  }
+
+  /* 3) El row del formulario pasa a columna */
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* 4) Secciones izquierda/derecha ocupan 100% */
+  .left-section,
+  .right-section {
+    flex: 1 1 100%;
+    padding: 0;
+  }
+  .right-section {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  /* 5) Cada fila de dos campos pasa a una sola columna */
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  .half-width {
+    flex: 1 1 100% !important;
+    min-width: auto;
+  }
+
+  /* 6) Preview de imagen más pequeña */
+  .preview-image {
+    max-height: 150px;
+  }
+}

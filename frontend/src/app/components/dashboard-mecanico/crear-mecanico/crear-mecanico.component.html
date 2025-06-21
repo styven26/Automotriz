@@ -1,6 +1,10 @@
 <div class="dashboard-container">
+  <!-- 1. Aquí pones el botón toggle -->
+  <button class="menu-toggle" (click)="sidebarActive = !sidebarActive">
+    <i class="fa fa-bars"></i>
+  </button>
   <!-- Sidebar/Menu Lateral -->
-  <div class="sidebar">
+  <div class="sidebar" [class.active]="sidebarActive">
     <div class="header">
       <img src="icons/usuario.png" alt="">
       <h3>{{ nombreUsuario }} {{ apellidoUsuario }}</h3>
@@ -331,7 +335,7 @@
           </mat-form-field>
         </div>
 
-        <div>
+        <div class="input-row">
           <!-- Confirmar Contraseña -->
           <mat-form-field appearance="outline" class="half-width">
             <mat-label>Confirmar Contraseña</mat-label>

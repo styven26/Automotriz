@@ -9,7 +9,20 @@
     padding: 0%;
     background-color: #f9fafc; 
   }
-  
+
+  @media (max-width: 768px) {
+    .dashboard-container {
+      position: relative;
+      height: auto;
+      overflow-y: auto;
+    }
+    .main-content {
+      margin: 0;
+      width: 100%;
+      padding: 1rem;
+    }
+  }
+
   /* Sidebar */
   .sidebar {
     flex-direction: column; /* Organiza los elementos en columna */
@@ -342,3 +355,172 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
+
+  /* 1) Toggle button: oculto por defecto, aparece en móvil */
+  .menu-toggle {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: block;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      z-index: 1100;
+      cursor: pointer;
+    }
+    
+    /* 2) Sidebar deslizable */
+    .sidebar {
+      left: -100%;
+      width: 75%;
+      max-width: 300px;
+      position: fixed;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar.active {
+      left: 0;
+    }
+
+    /* 3) Contenido principal full-width */
+    .main-content {
+      margin: 0;
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .menu-toggle .fa-bars {
+      color: #020202;
+    }
+  }
+
+  @media (max-width: 768px) {
+    /* 1) Pila sidebar y main-content en vez de side-by-side */
+    .dashboard-container {
+      flex-direction: column;
+      height: auto;      /* dejar que crezca según contenido */
+    }
+
+    /* 2) Main-content full-width y sin margen */
+    .main-content {
+      margin: 0;
+      width: 100%;
+      padding: 1rem;
+    }
+  }
+  
+/* ============================= */
+/*     RESPONSIVE GENERAL        */
+/* ============================= */
+
+/* ≥1025px: 3 tarjetas, 2 gráficas lado a lado */
+@media (max-width: 1200px) {
+  .summary-container {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .summary-card {
+    flex: 1 1 calc(33.333% - 1rem);
+  }
+  .charts-row {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .chart-container {
+    flex: 1 1 calc(50% - 1rem);
+  }
+}
+
+/* ≤1024px: 2 tarjetas por fila, gráficos apilados en dos filas */
+@media (max-width: 1024px) {
+  .summary-card {
+    flex: 1 1 calc(50% - 1rem);
+    max-width: calc(50% - 1rem);
+  }
+  .chart-container {
+    flex: 1 1 calc(50% - 1rem);
+    max-width: calc(50% - 1rem);
+  }
+}
+
+/* ≤768px: todo a una sola columna */
+@media (max-width: 768px) {
+  /* Dashboard y sidebar apilados */
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+  }
+  .main-content {
+    margin: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  /*  Tarjetas full-width */
+  .summary-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .summary-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  /* Gráficos apilados */
+  .charts-row {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .chart-container {
+    flex: 1 1 100%;
+    max-width: 100%;
+    /* For ngx-charts, ajustar el view desde el TS con resize, 
+       pero CSS garantiza el contenedor */
+  }
+
+  /* Input Buscar full-width */
+  .auth-container mat-form-field {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+
+  /* Tabla con scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-container table {
+    width: auto;
+    min-width: 600px; /* Ajusta si tienes más o menos columnas */
+  }
+  th, td {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}
+
+/* ≤480px: detalles finos */
+@media (max-width: 480px) {
+  .chart-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .summary-title {
+    font-size: 16px;
+  }
+  .summary-value {
+    font-size: 28px;
+  }
+  .custom-table th,
+  .custom-table td {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+}

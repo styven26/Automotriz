@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -41,6 +41,9 @@ import Swal from 'sweetalert2';
     styleUrls: ['./dashboard-mecanico.component.css']
 })
 export class DashboardMecanicoComponent {
+  // ancho x alto del chart
+  view: [number, number] = [window.innerWidth * 0.9, 400];
+
   // define colorScheme como un Color válido:
   colorScheme: Color = {
     name: 'estadosCitas',
@@ -80,6 +83,7 @@ export class DashboardMecanicoComponent {
   citasChartData: { name: string; value: number }[] = [];
 
   // Filtros
+  sidebarActive: boolean = false;
   filtroCitas: string = ''; // Filtro para citas
   filtroTrabajos: string = ''; // Filtro para trabajos
 
@@ -150,20 +154,22 @@ export class DashboardMecanicoComponent {
     this.citasService.listarCitasMecanico().subscribe(citas => {
       this.allCitas = citas;
 
-      // 1) Extrae años únicos de tus datos:
+      // extraigo años únicos y ordeno
       const years = Array.from(
         new Set(citas.map(c => +c.fecha.slice(0,4)))
-      ).sort((a,b) => a - b);
+      ).sort((a, b) => a - b);
       this.availableYears = years;
 
-      // 2) Setea el año seleccionado por defecto:
-      this.selectedYear = new Date().getFullYear();
-      if (!years.includes(this.selectedYear)) {
-        // si no hay datos del año en curso, toma el primero disponible
-        this.selectedYear = years[0];
+      const currentYear = new Date().getFullYear();
+      if (years.length > 0) {
+        // elijo el año actual si existe, si no tomo el primero disponible
+        this.selectedYear = years.includes(currentYear) ? currentYear : years[0];
+      } else {
+        // ¡ojo! si no hay ningún año en los datos, uso siempre el año actual
+        this.selectedYear = currentYear;
       }
 
-      // 3) Genera el chart mensual
+      // ahora sí puedo llamar sin miedo a invalid date
       this.updateMonthlyChart();
     });
 
@@ -223,7 +229,19 @@ export class DashboardMecanicoComponent {
       this.totalTrabajos = ordenes.length;      
       this.agruparCitas();
       this.actualizarDistribucionEstados();
+      this.calculateView();
     });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.calculateView();
+  }
+
+  private calculateView() {
+    const width = Math.floor(window.innerWidth * 0.8);  // 90% del viewport
+    const height = Math.floor(width * 0.5);             // ratio 3:2 ó lo que quieras
+    this.view = [width, height];
   }
 
   updateMonthlyChart(): void {

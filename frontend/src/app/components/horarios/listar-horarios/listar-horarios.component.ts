@@ -58,6 +58,7 @@ export class ListarHorariosComponent {
     public dialog: MatDialog
   ) {}
 
+  sidebarActive: boolean = false;
   tiempoRestante: string = '';
   showMecanicosMenu: boolean = false;
   showHorariosMenu: boolean = false;

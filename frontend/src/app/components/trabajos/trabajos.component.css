@@ -7,7 +7,6 @@
     bottom: 0;
     display: flex;
     padding: 0%;
-    background-color: #f9fafc; 
   }
   
   .sidebar {
@@ -612,5 +611,176 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* 1) Toggle button: oculto por defecto, aparece en móvil */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    z-index: 1100;
+    cursor: pointer;
+  }
+  
+  /* 2) Sidebar deslizable */
+  .sidebar {
+    left: -100%;
+    width: 75%;
+    max-width: 300px;
+    position: fixed;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* 3) Contenido principal full-width */
+  .main-content {
+    margin: 0;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 1) Pila sidebar y main-content en vez de side-by-side */
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;      /* dejar que crezca según contenido */
+  }
+
+  /* 2) Main-content full-width y sin margen */
+  .main-content {
+    margin: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE PARA TARJETAS      */
+/* ============================= */
+
+/* Tablets (≤1024px): 2 cards por fila */
+@media (max-width: 1024px) {
+  .trabajos-container {
+    gap: 40px; /* ajusta el espacio entre cards */
+    padding: 12px;
+  }
+  .card-wrapper {
+    width: calc(50% - 40px); /* dos columnas */
+  }
+  /* Status cards: dos en fila */
+  .status-cards {
+    justify-content: space-around;
+  }
+  .status-card {
+    width: calc(50% - 20px);
+  }
+}
+
+/* Móviles (≤768px): 1 card por fila, centra todo */
+@media (max-width: 768px) {
+  .trabajos-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 1rem;
+  }
+  .card-wrapper {
+    width: 100%; /* una columna */
+    max-width: 400px; /* opcional */
+  }
+  .status-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .status-card {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* Muy pequeños (≤480px): reduce paddings y tamaños */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 0.5rem;
+  }
+  .card-black {
+    padding: 12px;
+  }
+  .card-black h3 {
+    font-size: 1rem;
+  }
+  .card-black p {
+    font-size: 0.8rem;
+  }
+  .button-row {
+    gap: 8px;
+  }
+  .paginator {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .paginator button {
+    width: 100%;
+  }
+  .status-card {
+    padding: 8px;
+    height: auto;
+  }
+  .status-icon {
+    font-size: 32px;
+  }
+  .status-info h4 {
+    font-size: 1rem;
+  }
+  .status-info p {
+    font-size: 0.75rem;
+  }
+}
+
+/* Asegúrate de que el main-content deje espacio al final */
+.main-content {
+  padding-bottom: 2rem; /* evita que el contenido de abajo quede oculto */
+}
+
+/* Contenedor de la guía de estados */
+.status-guide-container {
+  padding: 1.5rem;       /* espacio interior */
+  margin-top: 2rem;      /* separa del contenido de arriba */
+}
+
+/* Flex dinámico: permite varias filas y centra */
+.status-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* centro horizontal */
+  gap: 1.5rem;              /* espacio entre cards */
+}
+
+/* Cada tarjeta ocupa un ancho razonable */
+.status-card {
+  flex: 1 1 calc(33% - 1.5rem); /* tres en una fila */
+  max-width: 300px;
+  min-width: 200px;
+}
+
+/* Ajustes para móvil: apilar */
+@media (max-width: 768px) {
+  .status-card {
+    flex: 1 1 100%;
+    max-width: none;
   }
 }
