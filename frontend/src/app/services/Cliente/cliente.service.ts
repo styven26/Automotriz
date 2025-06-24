@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -30,21 +30,21 @@ export class ClienteService {
   // Descargar historial de servicios
   descargarHistorialServicios(filtros: any): void {
     const headers = this.getHeaders();
-  
-    const params = new URLSearchParams();
-    if (filtros.anio) params.append('anio', filtros.anio);
-    if (filtros.mes) params.append('mes', filtros.mes);
-  
-    const url = `${this.baseUrl}/historial-servicios?${params.toString()}`;
-    
-    this.http.get(url, { headers, responseType: 'blob' }).subscribe({
-      next: (response: Blob) => this.descargarArchivo(response, 'reporte-historial-servicios.pdf'),
-      error: (error: any) => {
-        console.error('Error al descargar el reporte:', error);
-      },
+    let params = new HttpParams();
+    if (filtros.anio) { params = params.set('anio', filtros.anio); }
+    if (filtros.mes)  { params = params.set('mes',  filtros.mes);  }
+
+    this.http.get(`${this.baseUrl}/historial-servicios`, {
+      headers,
+      params,
+      responseType: 'blob'
+    }).subscribe({
+      next: (blob: Blob) =>
+        this.descargarArchivo(blob, 'historial-servicios.pdf'),
+      error: err => console.error('Error al descargar el reporte:', err)
     });
   }
-
+  
   // Descargar servicios más solicitados
   descargarServiciosMasSolicitados(): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/servicios-mas-solicitados`, {

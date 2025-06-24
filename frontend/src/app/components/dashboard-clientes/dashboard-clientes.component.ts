@@ -25,7 +25,7 @@ import Swal from 'sweetalert2';
 export class DashboardClientesComponent implements OnInit {
 
   @ViewChild('mainContent', { static: true }) mainContent!: ElementRef;
-  view: [number, number] = [700, 600];
+  view: [number,number] = [0,0];
 
   sidebarActive: boolean = false;
   tiempoRestante: string = '';
@@ -59,9 +59,19 @@ export class DashboardClientesComponent implements OnInit {
   // dashboard-cliente.component.ts
   @HostListener('window:resize')
   onResize(): void {
-    const w = this.mainContent.nativeElement.clientWidth * 0.9;
-    const h = Math.round(w * 0.7);
-    this.view = [w, h];
+    const totalW = this.mainContent.nativeElement.clientWidth;
+
+    let chartW: number;
+    // Si estamos en móvil (<768px) usamos todo el ancho menos un padding
+    if (totalW < 768) {
+      chartW = totalW - 32; // 16px de padding a cada lado, por ejemplo
+    } else {
+      // desktop: mitad menos gap
+      chartW = (totalW * 0.4) - 20;
+    }
+
+    const chartH = Math.round(chartW * 0.9); // ratio altura/ancho = 0.6
+    this.view = [chartW, chartH];
   }
 
   ngAfterViewInit(): void {

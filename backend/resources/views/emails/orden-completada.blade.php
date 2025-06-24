@@ -7,16 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body style="font-family:'Poppins',sans-serif; background-color:#f4f4f9; margin:0; padding:0;">
-  <div style="max-width:600px; margin:auto; background:#fff; border-radius:10px;
-              overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+  <div style="max-width:600px; margin:auto; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
 
     <!-- Encabezado -->
     <div style="background-color:#34495e; color:#fff; padding:20px; text-align:center;">
       <img 
         src="https://st.depositphotos.com/1006018/3132/v/450/depositphotos_31322065-stock-illustration-automotive-mechanic-car-repair-retro.jpg" 
         alt="Mecánica Automotriz Don Chavo"
-        style="max-width:200px; width:100%; margin-bottom:15px; border-radius:8px;
-               box-shadow:0 4px 10px rgba(0,0,0,0.1);"
+        style="max-width:200px; width:100%; margin-bottom:15px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);"
       >
       <h1 style="margin:0; font-size:24px; font-weight:600;">
         Mecánica Automotriz Don Chavo
@@ -27,8 +25,7 @@
     <div style="padding:20px;">
       <p style="font-size:18px; margin:0 0 10px;">Reciba un cordial saludo,</p>
       <p style="font-size:16px; margin:0 0 20px;">
-        {{ $cliente->nombre }} {{ $cliente->apellido }}, su vehículo está listo para ser retirado.
-        A continuación, los detalles de su servicio:
+        {{ $cliente->nombre }} {{ $cliente->apellido }}, su vehículo ({{ $vehiculo->marca }} {{ $vehiculo->modelo }}) está listo para ser retirado.
       </p>
 
       <!-- Servicios Realizados -->
@@ -39,9 +36,9 @@
         <thead>
           <tr style="background-color:#f4f4f9; text-align:left;">
             <th style="padding:8px; border-bottom:2px solid #ddd; font-weight:600;">Servicio</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio sin IVA</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">IVA (%)</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio Total</th>
+            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Cantidad</th>
+            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio U.</th>
+            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
@@ -51,13 +48,13 @@
                 {{ $d->servicio->nombre }}
               </td>
               <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
-                ${{ number_format($d->servicio->precio_base, 2) }}
+                {{ $d->cantidad }}
               </td>
               <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
-                {{ $d->servicio->iva }}%
+                ${{ number_format($d->precio_unitario, 2) }}
               </td>
               <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
-                ${{ number_format($d->servicio->precio, 2) }}
+                ${{ number_format($d->subtotal, 2) }}
               </td>
             </tr>
           @endforeach
@@ -83,9 +80,7 @@
           <tr style="background-color:#f4f4f9; text-align:left;">
             <th style="padding:8px; border-bottom:2px solid #ddd; font-weight:600;">Repuesto</th>
             <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Cantidad</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio sin IVA</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">IVA (%)</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio Unitario</th>
+            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio U.</th>
             <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Subtotal</th>
           </tr>
         </thead>
@@ -99,12 +94,6 @@
                 {{ $r->cantidad }}
               </td>
               <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
-                ${{ number_format($r->repuesto->precio_base, 2) }}
-              </td>
-              <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
-                {{ $r->repuesto->iva }}%
-              </td>
-              <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
                 ${{ number_format($r->precio, 2) }}
               </td>
               <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
@@ -115,7 +104,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="5" style="padding:8px; font-weight:600; border-top:2px solid #ddd;">
+            <td colspan="3" style="padding:8px; font-weight:600; border-top:2px solid #ddd;">
               Total Repuestos:
             </td>
             <td style="padding:8px; font-weight:600; text-align:right; border-top:2px solid #ddd;">
@@ -127,7 +116,7 @@
 
       <!-- Gran Total -->
       <div style="text-align:right; font-size:18px; font-weight:600; margin-top:10px;">
-        Total a Pagar: ${{ number_format($total, 2) }}
+        Total a Pagar: ${{ number_format($granTotal, 2) }}
       </div>
 
       <p style="font-size:16px; color:#333; margin:20px 0 0;">
@@ -141,6 +130,7 @@
       <p>*Correo generado automáticamente. Por favor, no responda.</p>
       <p><strong>Mecánica Automotriz Don Chavo</strong></p>
     </div>
+
   </div>
 </body>
 </html>

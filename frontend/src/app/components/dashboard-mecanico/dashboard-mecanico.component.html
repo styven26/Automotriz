@@ -80,6 +80,16 @@
                         </a>
                     </li>
                 </ul>
+                <ul *ngIf="showTiposnMenu" class="submenu">
+                        <li class="submenu-item">
+                            <a (click)="descargarReporte()">
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                    <span style="font-size: 14px; color: #050505;">Reporte Trabajos Atendidos </span>
+                                </div>
+                            </a>
+                        </li>
+                </ul>
             </li>
     
             <!-- Opción "Cerrar Sesión" -->
@@ -140,6 +150,7 @@
                     [xAxis]="true"
                     [yAxis]="true"
                     [legend]="true"
+                    [legendPosition]="LegendPosition.Right"
                     [legendTitle]="'Estados de Citas'"
                     [showXAxisLabel]="true"
                     [showYAxisLabel]="true"
@@ -147,24 +158,7 @@
                     [yAxisLabel]="'Nº de Citas'"
                     [animations]="false">
                 </ngx-charts-bar-vertical-stacked>
-            </div>
-
-            <!-- Gráfico de Distribución de Estados de Citas -->
-            <div class="chart-container">
-                <h4 class="chart-title">Distribución de Estados de Citas</h4>
-                <ngx-charts-pie-chart
-                    [view]="view"
-                    [scheme]="colorScheme"
-                    [results]="citasChartData"
-                    [legend]="true"
-                    [legendTitle]="'Estados de Citas'"
-                    [labels]="true"
-                    [explodeSlices]="false"
-                    [doughnut]="false"
-                    [gradient]="false"
-                    [animations]="false">
-                </ngx-charts-pie-chart>
-            </div>
+            </div>            
         </div>
     </div>
 </div>

@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { RepuestoService, Repuesto } from '../../services/Repuesto/repuesto.service';
+import { DetalleServicioService } from '../../services/DetalleServicio/detalleservicio.service';
 import { DetalleRepuestoService } from '../../services/DetalleRepuesto/detallerepuesto.service';
 import { OrdenService, Orden } from '../../services/Orden/orden.service';
 import { SubtipoService } from '../../services/Subtiposervicios/subtipo.service';
@@ -55,7 +56,7 @@ export class TrabajosComponent {
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
 
-  constructor(private authService: AuthService, private router: Router,  private serviciosService:SubtipoService, private repuestoService: RepuestoService, private detalleRepuestoService: DetalleRepuestoService, private diagnosticoService: DiagnosticoService, private ordenService: OrdenService) {}
+  constructor(private authService: AuthService, private router: Router,  private detalleServicioService: DetalleServicioService, private serviciosService:SubtipoService, private repuestoService: RepuestoService, private detalleRepuestoService: DetalleRepuestoService, private diagnosticoService: DiagnosticoService, private ordenService: OrdenService) {}
 
   // Funciones de navegación del menú
   ngOnInit(): void {  
@@ -71,6 +72,197 @@ export class TrabajosComponent {
     this.cargarTrabajos();
     this.iniciarReloj();
     this.loadInventario();
+  }
+
+  abrirModalCantidad(
+    detalle: { id_detalle: number; cantidad: number },
+    nombreServicio?: string
+  ) {
+    const cantidadActual = detalle.cantidad ?? 1;
+    const label = nombreServicio
+      ? `¿Cuántas unidades de "${nombreServicio}"?`
+      : '¿Qué cantidad?';
+
+    const html = `
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 0 20px;
+        max-height: 25vh;
+        overflow-y: auto;
+      ">
+        <label style="
+          font-family: 'Poppins', sans-serif;
+          font-size: 16px;
+          text-align: center;
+        ">
+          ${label}
+        </label>
+        <input
+          id="swal-input-cantidad"
+          type="number"
+          class="swal2-input"
+          style="
+            width: 80%;
+            padding: 0.75rem 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            line-height: 1.4;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            box-sizing: border-box;
+          "
+          min="1"
+          value="${cantidadActual}"
+          placeholder="Cantidad"
+        />
+      </div>
+    `;
+
+    Swal.fire({
+      title: `<h3 style="
+        font-family: Roboto, sans-serif;
+        font-size: 30px;
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 15px;
+      "><strong>${label}</strong></h3>`,
+      html,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: `<span style="
+        font-family: Roboto, sans-serif;
+        border-radius: 50px;
+        padding: 8px 24px;
+      ">Guardar</span>`,
+      cancelButtonText: `<span style="
+        font-family: Roboto, sans-serif;
+        border-radius: 50px;
+        padding: 8px 24px;
+      ">Cancelar</span>`,
+      customClass: {
+        confirmButton: 'rounded-button',
+        cancelButton: 'rounded-button'
+      },
+      preConfirm: () => {
+        const input = document.getElementById('swal-input-cantidad') as HTMLInputElement;
+        const val = parseInt(input.value, 10);
+        if (isNaN(val) || val < 1) {
+          Swal.showValidationMessage('Introduce un número válido (>=1)');
+        }
+        return { cantidad: val };
+      }
+    }).then(result => {
+      if (result.isConfirmed && result.value?.cantidad != null) {
+        this.detalleServicioService
+          .updateCantidad(detalle.id_detalle, result.value.cantidad)
+          .subscribe({
+            next: () => {
+              Swal.fire('¡Listo!', 'Cantidad actualizada', 'success');
+              this.cargarTrabajos();
+            },
+            error: () => Swal.fire('Error', 'No se pudo actualizar', 'error')
+          });
+      }
+    });
+  }
+
+  /** en trabajos.component.ts */
+  abrirModalCantidadRepuesto(
+    dr: { id_detalle_repuesto: number; cantidad: number },
+    nombreRepuesto?: string
+  ) {
+    const cantidadActual = dr.cantidad ?? 1;
+    const label = nombreRepuesto
+      ? `¿Cuántas unidades de "${nombreRepuesto}"?`
+      : '¿Qué cantidad?';
+
+    const html = `
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 0 20px;
+        max-height: 25vh;
+        overflow-y: auto;
+      ">
+        <label style="
+          font-family: 'Poppins', sans-serif;
+          font-size: 16px;
+          text-align: center;
+        ">
+          ${label}
+        </label>
+        <input
+          id="swal-input-cantidad-repuesto"
+          type="number"
+          class="swal2-input"
+          style="
+            width: 80%;
+            padding: 0.75rem 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            line-height: 1.4;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            box-sizing: border-box;
+          "
+          min="1"
+          value="${cantidadActual}"
+          placeholder="Cantidad"
+        />
+      </div>
+    `;
+
+    Swal.fire({
+      title: `<h3 style="
+        font-family: Roboto, sans-serif;
+        font-size: 30px;
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 15px;
+      "><strong>${label}</strong></h3>`,
+      html,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: `<span style="
+        font-family: Roboto, sans-serif;
+        border-radius: 50px;
+        padding: 8px 24px;
+      ">Guardar</span>`,
+      cancelButtonText: `<span style="
+        font-family: Roboto, sans-serif;
+        border-radius: 50px;
+        padding: 8px 24px;
+      ">Cancelar</span>`,
+      customClass: {
+        confirmButton: 'rounded-button',
+        cancelButton:  'rounded-button'
+      },
+      preConfirm: () => {
+        const input = document.getElementById('swal-input-cantidad-repuesto') as HTMLInputElement;
+        const val = parseInt(input.value, 10);
+        if (isNaN(val) || val < 1) {
+          Swal.showValidationMessage('Introduce un número válido (>=1)');
+        }
+        return { cantidad: val };
+      }
+    }).then(result => {
+      if (result.isConfirmed && result.value?.cantidad != null) {
+        this.detalleRepuestoService
+          .update(dr.id_detalle_repuesto, { cantidad: result.value.cantidad })
+          .subscribe({
+            next: () => {
+              Swal.fire('¡Listo!', 'Cantidad de repuesto actualizada', 'success');
+              this.cargarTrabajos();
+            },
+            error: () => Swal.fire('Error', 'No se pudo actualizar', 'error')
+          });
+      }
+    });
   }
 
   cambiarRol(event: Event): void {

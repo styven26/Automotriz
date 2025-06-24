@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Usuario;
 use App\Models\Cita;
+use App\Models\EstadoCita;
 use App\Models\Vehiculo;
 use App\Models\OrdenServicio;
 use Illuminate\Support\Facades\Auth;
@@ -14,35 +15,84 @@ use Illuminate\Support\Facades\Auth;
 class ReportController extends Controller
 {
     public function descargarReporte(Request $request)
-    {
-        /// Obtener el mecánico autenticado
-        $mecanico = Auth::user();
-        
-        if (!$mecanico || !$mecanico->tieneRol('mecanico')) {
-            return response()->json(['error' => 'No autorizado.'], 403);
-        }
+{
+    /* 1) Mecánico autenticado */
+    $mecanico = Auth::user();
+    if (! $mecanico || ! $mecanico->tieneRol('mecanico')) {
+        return response()->json(['error' => 'No autorizado.'], 403);
+    }
 
-        // Filtrar los trabajos completados asignados al mecánico autenticado
-        $trabajos = Trabajo::with(['cita.cliente', 'vehiculo'])
-            ->where('id_mecanico', $mecanico->id)
-            ->where('estado', 'completado') // Filtrar solo trabajos completados
-            ->get()
-            ->map(function ($trabajo) {
-                // Agregar nombre completo del cliente
-                $trabajo->cliente_nombre_completo = $trabajo->cita->cliente 
-                    ? $trabajo->cita->cliente->nombre . ' ' . $trabajo->cita->cliente->apellido 
-                    : 'Sin cliente';
-                return $trabajo;
+    /* 2) Id del estado “Atendida” */
+    $atendidaId = EstadoCita::where('nombre_estado', 'Atendida')->value('id_estado');
+
+    /* 3) Órdenes atendidas con servicios y repuestos */
+    $trabajos = OrdenServicio::with([
+            // columnas reales de vehiculo
+            'vehiculo:id_vehiculo,marca,modelo,numero_placa',
+
+            // columnas reales de cita (sin fecha_inicio / fecha_fin)
+            'cita:id_cita,cedula_cliente,cedula_mecanico,fecha,fecha_fin,hora,hora_fin,id_estado',
+
+            'cita.cliente:cedula,nombre,apellido',
+            'cita.estado:id_estado,nombre_estado',
+
+            'detallesServicios.servicio:id_servicio,nombre',
+            'detallesRepuestos.repuesto:id_repuesto,nombre',
+        ])
+        ->whereHas('cita', function ($q) use ($mecanico, $atendidaId) {
+            $q->where('cedula_mecanico', $mecanico->cedula)
+              ->where('id_estado',       $atendidaId);
+        })
+        ->orderByDesc('fecha_fin')   // fecha_fin pertenece a orden_servicio
+        ->get()
+        ->map(function ($orden) {
+            /* Alias y formatos para la vista */
+            $orden->cita_numero   = $orden->id_cita;
+            $orden->cliente_nombre= optional($orden->cita->cliente)->nombre
+                                   .' '.optional($orden->cita->cliente)->apellido;
+            $orden->vehiculo_full = $orden->vehiculo
+                                   ? "{$orden->vehiculo->marca} {$orden->vehiculo->modelo}"
+                                   : 'Sin vehículo';
+            $orden->estado_nombre = optional($orden->cita->estado)->nombre_estado ?? '—';
+
+            // Fechas (de la orden, donde sí existen)
+            $orden->fecha_inicio_f = $orden->fecha_inicio
+                                   ? \Carbon\Carbon::parse($orden->fecha_inicio)->format('d/m/Y')
+                                   : '—';
+            $orden->fecha_fin_f    = $orden->fecha_fin
+                                   ? \Carbon\Carbon::parse($orden->fecha_fin)->format('d/m/Y')
+                                   : 'Pendiente';
+
+            /* Listas */
+            $orden->servicios = $orden->detallesServicios->map(fn($ds)=>[
+                'nombre'=>$ds->servicio->nombre,'cant'=>$ds->cantidad,
+                'precio'=>number_format($ds->precio_unitario,2),
+                'subtotal'=>number_format($ds->subtotal,2),
+            ]);
+
+            $orden->repuestos = $orden->detallesRepuestos->map(fn($dr)=>[
+                'nombre'=>$dr->repuesto->nombre,'cant'=>$dr->cantidad,
+                'precio'=>number_format($dr->precio,2),
+                'subtotal'=>number_format($dr->subtotal,2),
+            ]);
+
+            return $orden;
         });
 
-        if ($trabajos->isEmpty()) {
-            return response()->json(['error' => 'No hay trabajos completados para generar el reporte.'], 404);
-        }
-
-        // Generar el PDF con los trabajos filtrados
-        $pdf = Pdf::loadView('reportes.trabajos', compact('trabajos'));
-        return $pdf->download('reporte-trabajos.pdf');
+    if ($trabajos->isEmpty()) {
+        return response()->json(['error' => 'No hay órdenes atendidas para generar el reporte.'], 404);
     }
+
+    /* 4) PDF */
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'reportes.trabajos',           // vista que ya tienes
+            compact('trabajos','mecanico')
+        )
+        ->setPaper('A4','portrait')
+        ->setOption('isRemoteEnabled',true);
+
+    return $pdf->download("reporte-trabajos-{$mecanico->cedula}.pdf");
+}
 
     // Reporte de clientes
     public function descargarReporteClientes(Request $request)
@@ -355,77 +405,98 @@ class ReportController extends Controller
      */
     public function descargarHistorialServicios(Request $request)
     {
-        // 1) Obtener cliente autenticado
+        // 1) Cliente autenticado
         $cliente = Auth::guard('cliente')->user();
         if (! $cliente) {
             return response()->json(['error' => 'No autorizado.'], 403);
         }
 
-        // 2) Obtener filtros de año y mes
+        // 2) Filtros año/mes
         $anio = $request->input('anio');
         $mes  = $request->input('mes');
-
-        // 2.1) Validar año
         if ($anio && (! is_numeric($anio) || strlen($anio) !== 4)) {
             return response()->json(['error' => 'Año inválido.'], 400);
         }
-        // 2.2) Validar mes
         if ($mes && (! is_numeric($mes) || $mes < 1 || $mes > 12)) {
             return response()->json(['error' => 'Mes inválido.'], 400);
         }
 
-        // 3) Preparar nombres legibles de meses
+        // 3) Etiquetas de mes
         $meses = [
-            1 => 'Enero',    2 => 'Febrero',  3 => 'Marzo',     4 => 'Abril',
-            5 => 'Mayo',     6 => 'Junio',    7 => 'Julio',     8 => 'Agosto',
-            9 => 'Septiembre',10 => 'Octubre',11 => 'Noviembre',12 => 'Diciembre',
+            1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',
+            5=>'Mayo',6=>'Junio',7=>'Julio',8=>'Agosto',
+            9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre',
         ];
-        $mesSeleccionado  = $mes  ? $meses[intval($mes)] : 'Todos los meses';
-        $anioSeleccionado = $anio ? $anio            : 'Todos los años';
+        $mesSeleccionado  = $mes  ? $meses[intval($mes)]  : 'Todos los meses';
+        $anioSeleccionado = $anio ? $anio               : 'Todos los años';
 
-        // 4) Recuperar órdenes atendidas para este cliente, aplicando filtros
+        // 4) Obtener órdenes “Atendidas” del cliente con relaciones
         $ordenes = OrdenServicio::whereHas('cita', function($q) use($cliente, $anio, $mes) {
-                // la cita debe pertenecer al cliente y estar “Atendida”
                 $q->where('cedula_cliente', $cliente->cedula)
-                ->whereHas('estado', fn($q2) => $q2->where('nombre_estado','Atendida'));
+                  ->whereHas('estado', fn($q2) => $q2->where('nombre_estado','Atendida'));
                 if ($anio) $q->whereYear('fecha', $anio);
                 if ($mes)  $q->whereMonth('fecha', $mes);
             })
             ->with([
-                'cita:id_cita,fecha,fecha_fin',
+                'cita:id_cita,fecha,hora,fecha_fin,hora_fin',
                 'vehiculo:id_vehiculo,marca,modelo',
-                'detallesServicios.servicio:id_servicio,nombre,precio'
+                'detallesServicios.servicio:id_servicio,nombre',
+                'detallesRepuestos.repuesto:id_repuesto,nombre',
             ])
             ->get();
 
-        // 5) Mapear cada detalle de servicio para el PDF
-        $servicios = $ordenes->flatMap(function($orden) {
-            return $orden->detallesServicios->map(function($det) use($orden) {
-                $serv = $det->servicio;
-                $fecha = $orden->cita->fecha_fin
-                    ? \Carbon\Carbon::parse($orden->cita->fecha_fin)->format('d/m/Y')
-                    : (\Carbon\Carbon::parse($orden->cita->fecha)->format('d/m/Y') ?? 'N/A');
-                return [
-                    'fecha'         => $fecha,
-                    'vehiculo'      => "{$orden->vehiculo->marca} {$orden->vehiculo->modelo}",
-                    'tipo_servicio' => $serv->nombre,
-                    'precio'        => number_format($serv->precio, 2, '.', ','),
-                ];
-            });
-        });
+        // 5) Transformar cada orden
+        $datos = $ordenes->map(function($orden) {
+            $c = $orden->cita;
+            $inicio = Carbon::parse("{$c->fecha} {$c->hora}")
+                          ->format('d/m/Y H:i');
+            $fin = $c->fecha_fin && $c->hora_fin
+                   ? Carbon::parse("{$c->fecha_fin} {$c->hora_fin}")
+                         ->format('d/m/Y H:i')
+                   : '—';
 
-        // 6) Sumar los costos totales
-        $totalCostos = $servicios->sum(fn($row) => floatval(str_replace(',','',$row['precio'])));
+            // Detalle de Servicios
+            $servicios = $orden->detallesServicios->map(fn($ds) => [
+                'nombre'          => $ds->servicio->nombre,
+                'cantidad'        => $ds->cantidad,
+                'precio_unitario' => number_format($ds->precio_unitario, 2, '.', ','),
+                'subtotal'        => number_format($ds->subtotal,        2, '.', ','),
+            ])->toArray();
+            $totServ = collect($servicios)
+                       ->sum(fn($s)=> (float) str_replace(',','',$s['subtotal']));
 
-        // 7) Generar el PDF
-        $pdf = Pdf::loadView('reportes.historial_servicios', [
-            'servicios'        => $servicios,
+            // Detalle de Repuestos
+            $repuestos = $orden->detallesRepuestos->map(fn($dr) => [
+                'nombre'          => $dr->repuesto->nombre,
+                'cantidad'        => $dr->cantidad,
+                'precio_unitario' => number_format($dr->precio, 2, '.', ','),
+                'subtotal'        => number_format($dr->subtotal, 2, '.', ','),
+            ])->toArray();
+            $totRep = collect($repuestos)
+                      ->sum(fn($r)=> (float) str_replace(',','',$r['subtotal']));
+
+            return [
+                'cita_id'          => $orden->id_cita,
+                'inicio'           => $inicio,
+                'fin'              => $fin,
+                'vehiculo'         => "{$orden->vehiculo->marca} {$orden->vehiculo->modelo}",
+                'servicios'        => $servicios,
+                'repuestos'        => $repuestos,
+                'total_servicios'  => number_format($totServ, 2, '.', ','),
+                'total_repuestos'  => number_format($totRep, 2, '.', ','),
+                'total_general'    => number_format($totServ + $totRep, 2, '.', ','),
+            ];
+        })->toArray();
+
+        // 6) Generar PDF
+        $pdf = PDF::loadView('reportes.historial_servicios', [
+            'cliente'          => $cliente,
+            'ordenes'          => $datos,
             'anioSeleccionado' => $anioSeleccionado,
             'mesSeleccionado'  => $mesSeleccionado,
-            'totalCostos'      => number_format($totalCostos, 2, '.', ','),
         ]);
 
-        // 8) Devolver descarga
+        // 7) Descargar
         return $pdf->download("historial-servicios_{$cliente->cedula}.pdf");
     }
 }

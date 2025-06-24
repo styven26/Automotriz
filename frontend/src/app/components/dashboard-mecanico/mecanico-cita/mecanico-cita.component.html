@@ -80,6 +80,16 @@
                         </a>
                     </li>
                 </ul>
+                <ul *ngIf="showTiposnMenu" class="submenu">
+                        <li class="submenu-item">
+                            <a (click)="descargarReporte()">
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                    <span style="font-size: 14px; color: #050505;">Reporte Trabajos Atendidos </span>
+                                </div>
+                            </a>
+                        </li>
+                </ul>
             </li>
 
             <!-- Opción "Cerrar Sesión" -->

@@ -80,6 +80,16 @@
                             </a>
                         </li>
                     </ul>
+                    <ul *ngIf="showTiposnMenu" class="submenu">
+                        <li class="submenu-item">
+                            <a (click)="descargarReporte()">
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fa-solid fa-plus-circle" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                                    <span style="font-size: 14px; color: #050505;">Reporte Trabajos Atendidos </span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
         
                 <!-- Opción "Cerrar Sesión" -->
@@ -152,46 +162,66 @@
                                 <strong>Servicios Solicitados</strong>
                             </p>
                             <div class="listar">
-                                <div *ngFor="let detalle of trabajo.detalles_servicios" style="margin-bottom:20px;">
-                                    <p>
+                                <div *ngFor="let detalle of trabajo.detalles_servicios" class="detalle-servicio">
+                                    <div class="detalle-texto">
+                                        <p>
                                         <strong>{{ detalle.servicio.nombre }}</strong><br>
+                                        <strong>Cantidad:</strong> {{ detalle.cantidad }}<br>
                                         <strong>Progreso:</strong> {{ detalle.progreso }}%<br>
                                         <strong>Descripción:</strong> {{ detalle.descripcion || 'Sin descripción' }}
-                                    </p>
-                                </div>  
+                                        </p>
+                                    </div>
+
+                                    <div class="detalle-accion">
+                                            <button
+                                                mat-icon-button
+                                                (click)="abrirModalCantidad(detalle, detalle.servicio.nombre)"
+                                                aria-label="Editar cantidad"
+                                            >
+                                                <mat-icon>edit</mat-icon>
+                                            </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>  
+                        </div>
 
                         <!-- Nueva sección: REPUESTOS -->
-                        <div class="section repuestos" *ngIf="isCitaIniciada(trabajo)"><br>
+                        <div class="section repuestos" *ngIf="isCitaIniciada(trabajo)">
                             <p>
                                 <strong>Repuestos</strong>
-                                <button 
-                                mat-button 
-                                color="primary"
-                                (click)="validarHoraCita(trabajo) && consultarInventario(trabajo)"
-                                >
+                                <button mat-button color="primary"
+                                (click)="validarHoraCita(trabajo) && consultarInventario(trabajo)">
                                 Consultar Repuestos
                                 </button>
                             </p>
 
                             <div class="list" *ngIf="trabajo.detalles_repuestos?.length; else sinRepuestos">
                                 <div *ngFor="let dr of trabajo.detalles_repuestos" class="item" style="margin-bottom:16px;">
-                                    <p>
-                                        <strong>{{ dr.repuesto.nombre }}</strong><br>
-                                        Cantidad: {{ dr.cantidad }}<br>
-                                        Subtotal: {{ dr.subtotal | currency }}<br>
-                                        <span *ngIf="dr.repuesto.stock < dr.cantidad"
-                                            style="color:#c0392b;font-weight:bold;">
-                                        ⚠️ Sin stock suficiente en inventario. El cliente deberá buscar este repuesto.
-                                        </span>
-                                    </p>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; margin-right: 20px;">
+                                        <div>
+                                            <p>
+                                                <strong>{{ dr.repuesto.nombre }}</strong><br>
+                                                Cantidad: {{ dr.cantidad }}<br>
+                                                Subtotal: {{ dr.subtotal | currency }}<br>
+                                                <span *ngIf="dr.repuesto.stock < dr.cantidad"
+                                                    style="color:#c0392b;font-weight:bold;">
+                                                ⚠️ Sin stock suficiente en inventario.
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <!-- Botón para editar cantidad de repuesto -->
+                                        <button mat-icon-button
+                                                aria-label="Editar cantidad de repuesto"
+                                                (click)="abrirModalCantidadRepuesto(dr, dr.repuesto.nombre)">
+                                            <mat-icon>edit</mat-icon>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <ng-template #sinRepuestos>
-                        <p style="font-style: italic;">No se han usado repuestos en esta orden.</p>
+                            <p style="font-style: italic;">No se han usado repuestos en esta orden.</p>
                         </ng-template>
 
                     </igx-card-content>

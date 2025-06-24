@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\DetalleRepuesto;
+use App\Models\OrdenServicio;
 
 class Repuesto extends Model
 {
@@ -25,13 +27,28 @@ class Repuesto extends Model
         'created_at',
     ];
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
+        // 1) Cada vez que cambie precio_base o iva, recalcula precio_final:
+        static::saving(function(Repuesto $rep) {
+            $rep->precio_final = round($rep->precio_base * (1 + $rep->iva / 100), 2);
+        });
 
-        // Siempre recalcular precio_final antes de guardar
-        static::saving(function($rep) {
-            $rep->precio_final = round($rep->precio_base * (1 + $rep->iva/100), 2);
+        // 2) Tras actualizar un repuesto, propaga a sus detalles:
+        static::updated(function(Repuesto $rep) {
+            // Actualiza cada DetalleRepuesto ligado
+            $rep->detallesRepuestos()->get()->each(function(DetalleRepuesto $det) use ($rep) {
+                $det->precio   = $rep->precio_final;
+                $det->subtotal = round($det->cantidad * $rep->precio_final, 2);
+                $det->saveQuietly();
+            });
+
+            // Recalcula total_repuestos en cada orden afectada
+            $ordenIds = $rep->detallesRepuestos()->pluck('id_orden')->unique();
+            OrdenServicio::whereIn('id_orden', $ordenIds)->get()->each(function(OrdenServicio $orden) {
+                $orden->total_repuestos = $orden->detallesRepuestos()->sum('subtotal');
+                $orden->saveQuietly();
+            });
         });
     }
 

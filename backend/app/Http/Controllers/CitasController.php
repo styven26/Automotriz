@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -15,6 +16,9 @@ use App\Models\OrdenServicio;
 use App\Models\DetalleServicio;
 use App\Models\Servicio;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CitaConfirmada;
+use App\Mail\RecordatorioCita;
 use App\Events\CitaNotificada;
 
 class CitasController extends Controller
@@ -429,15 +433,18 @@ class CitasController extends Controller
         $total = \App\Models\Servicio::whereIn('id_servicio', $validated['servicios'])
             ->sum('precio');
         $orden->update(['total_servicios' => $total]);
-    
-        // 12) Notificar al mecánico (por ejemplo, mediante un evento)
-        $clienteModelo = auth()->user();  // instancia de App\Models\Usuario
 
-        event(new CitaNotificada(
-            "La cita para el vehículo {$cita->vehiculo->marca} ha sido creada.",
-            $cita->cedula_mecanico,
-            $clienteModelo
-        ));
+        // 11b) Enviar correo de confirmación
+        Mail::to(auth()->user()->correo)
+            ->send(new CitaConfirmada($cita));
+
+        // 11c) Programar recordatorio 10 minutos antes
+        $inicio = Carbon::parse("{$cita->fecha} {$cita->hora}");
+        $when   = $inicio->subMinutes(10);
+        if ($when->isFuture()) {
+            Mail::to(auth()->user()->correo)
+                ->later($when, new RecordatorioCita($cita));
+        }
     
         return response()->json($cita, 201);
     }
@@ -663,15 +670,6 @@ class CitasController extends Controller
         $cita->deleted_at = now();
         $cita->save();
 
-        // 6) Notificar al mecánico
-        $clienteUsuario = $cita->cliente; // esto es un App\Models\Usuario
-
-        event(new CitaNotificada(
-            "La cita para el vehículo {$cita->vehiculo->marca} ha sido cancelada.",
-            $cita->cedula_mecanico,
-            $clienteUsuario
-        ));
-
         \Log::info('Cita cancelada y evento emitido', [
             'cita_id'       => $cita->id_cita,
             'mecanico_cedula' => $cita->cedula_mecanico,
@@ -876,42 +874,28 @@ class CitasController extends Controller
     /**
      *  Facturación total del cliente.
      */
-    public function obtenerFacturacionTotal(Request $request)
+    public function obtenerFacturacionTotal()
     {
         $cliente = auth()->user();
-
         if (! $cliente || ! $cliente->tieneRol('cliente')) {
             return response()->json(['error' => 'Acceso no autorizado'], 403);
         }
 
-        // 1) Obtengo el id de "Atendida" desde la tabla estados_citas
         $atendidaId = EstadoCita::where('nombre_estado', 'Atendida')->value('id_estado');
 
-        // 2) Traigo todas las órdenes cuyas citas son de ese cliente y estén "atendidas"
-        $ordenes = OrdenServicio::whereHas('cita', function($q) use ($cliente, $atendidaId) {
+        // ① CAST explícito a float para que no sea string
+        $facturacionTotal = (float) OrdenServicio::query()
+            ->selectRaw('COALESCE(SUM(total_servicios + total_repuestos), 0) AS total')
+            ->whereHas('cita', function ($q) use ($cliente, $atendidaId) {
                 $q->where('cedula_cliente', $cliente->cedula)
                 ->where('id_estado', $atendidaId);
             })
-            ->with([
-                'detallesServicios.servicio:id_servicio,precio',
-                'detallesRepuestos:id_detalle_repuesto,subtotal'
-            ])
-            ->get();
-
-        // 3) Sumamos
-        $facturacionTotal = 0.0;
-        foreach ($ordenes as $orden) {
-            foreach ($orden->detallesServicios as $detalle) {
-                $facturacionTotal += (float) $detalle->servicio->precio;
-            }
-            foreach ($orden->detallesRepuestos as $detalle) {
-                $facturacionTotal += (float) $detalle->subtotal;
-            }
-        }
+            ->value('total');
 
         return response()->json([
+            // ② devuélvelo sin number_format—Angular lo formatea
             'facturacionTotal' => round($facturacionTotal, 2)
-        ], 200);
+        ]);
     }
 
     /**
@@ -949,53 +933,30 @@ class CitasController extends Controller
     public function ingresosPorMes()
     {
         $cliente = auth()->user();
-
         if (! $cliente || ! $cliente->tieneRol('cliente')) {
             return response()->json(['error' => 'Acceso no autorizado'], 403);
         }
 
-        // 1) Obtengo el id_estado correspondiente a "Atendida"
-        $atendidaId = EstadoCita::where('nombre_estado', 'Atendida')
-            ->value('id_estado');
+        $atendidaId = EstadoCita::where('nombre_estado', 'Atendida')->value('id_estado');
 
-        // 2) Traer todas las órdenes cuyas citas sean de este cliente y estén atendidas
-        $ordenes = OrdenServicio::whereHas('cita', function ($q) use ($cliente, $atendidaId) {
-                $q->where('cedula_cliente', $cliente->cedula)
-                  ->where('id_estado', $atendidaId);
-            })
-            ->with('cita','detallesServicios.servicio')
+        $filtrado = DB::table('orden_servicio AS os')
+            ->join('citas AS c', 'c.id_cita', '=', 'os.id_cita')
+            ->selectRaw("
+                DATE_FORMAT(c.fecha, '%m/%Y') AS mes,
+                COALESCE(SUM(os.total_servicios), 0) AS total_mes
+            ")
+            ->where('c.cedula_cliente', $cliente->cedula)
+            ->where('c.id_estado',      $atendidaId)
+            ->groupBy('mes')
+            ->orderByRaw("STR_TO_DATE(mes, '%m/%Y')")
             ->get();
 
-        if ($ordenes->isEmpty()) {
-            \Log::info("No se encontraron órdenes atendidas para el cliente {$cliente->cedula}");
-            return response()->json([], 200);
-        }
+        $resultado = $filtrado->map(fn ($row) => [
+            'name'  => $row->mes,
+            'value' => (float) $row->total_mes, 
+        ]);
 
-        // 3) Aplanar detalles para extraer mes e ingreso
-        $items = $ordenes->flatMap(function ($orden) {
-            $mesKey = Carbon::parse($orden->cita->fecha)->format('m/Y');
-            return $orden->detallesServicios->map(function ($detalle) use ($mesKey) {
-                return [
-                    'mes'     => $mesKey,
-                    'ingreso' => (float) $detalle->servicio->precio,
-                ];
-            });
-        });
-
-        // 4) Agrupar por mes y sumar ingresos
-        $result = $items
-            ->groupBy('mes')
-            ->map(function ($group, $mes) {
-                return [
-                    'name'  => $mes,                   // etiqueta para ngx-charts
-                    'value' => $group->sum('ingreso'), // valor a graficar
-                ];
-            })
-            ->values(); // reindex numérico
-
-        \Log::info('Ingresos por mes procesados:', $result->toArray());
-
-        return response()->json($result, 200);
+        return response()->json($resultado, 200);
     }
 
     /**

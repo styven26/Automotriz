@@ -76,14 +76,21 @@ class DetalleRepuestoController extends Controller
             'precio'   => ['sometimes','numeric','min:0'],
         ]);
 
-        // Si cambias cantidad o precio, recomputa subtotal
+        // 1) Recalcular subtotal
         if (isset($data['cantidad']) || isset($data['precio'])) {
             $cantidad = $data['cantidad'] ?? $det->cantidad;
             $precio   = $data['precio']   ?? $det->precio;
             $data['subtotal'] = round($cantidad * $precio, 2);
         }
 
+        // 2) Actualizar el detalle
         $det->update($data);
+
+        // 3) Recalcular el total de repuestos en la orden padre
+        $orden = OrdenServicio::findOrFail($det->id_orden);
+        $nuevoTotal = $orden->detallesRepuestos()->sum('subtotal');
+        $orden->update(['total_repuestos' => $nuevoTotal]);
+
         return response()->json($det);
     }
 

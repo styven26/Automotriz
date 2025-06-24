@@ -9,6 +9,9 @@ use App\Models\EstadoCita;
 use App\Models\OrdenServicio;
 use App\Models\DetalleServicio;
 use App\Models\Servicio;
+use App\Mail\CitaConfirmada;
+use App\Mail\RecordatorioCita;
+use Carbon\Carbon;
 
 class DiagnosticoController extends Controller
 {
@@ -223,6 +226,18 @@ class DiagnosticoController extends Controller
         // ← Si aún está en diagnóstico, procesamos la aceptación
         $cita->id_estado = 2; // confirmado
         $cita->save();
+
+        // enviar confirmación
+        Mail::to($cita->cliente->correo)
+            ->send(new CitaConfirmada($cita));
+
+        // programar recordatorio 10 minutos antes
+        $inicio = Carbon::parse("{$cita->fecha} {$cita->hora}");
+        $when   = $inicio->subMinutes(10);
+        if ($when->isFuture()) {
+            Mail::to($cita->cliente->correo)
+                ->later($when, new RecordatorioCita($cita));
+        }
 
         return view('diagnosticos.confirmacion', [
             'titulo'  => 'Servicios Aceptados',

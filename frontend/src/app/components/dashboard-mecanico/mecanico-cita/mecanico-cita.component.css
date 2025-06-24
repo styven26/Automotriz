@@ -109,9 +109,9 @@
 
 /* Contenido Principal del Dashboard */
 .main-content {
-  margin-left: 270px; /* tu sidebar */
+  margin-left: 261px; /* tu sidebar */
   position: absolute;
-  width: 253vh;
+  width: 251vh;
   height: auto;
   padding: 0;
 }

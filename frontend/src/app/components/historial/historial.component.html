@@ -93,7 +93,7 @@
                 <a routerLink="/history">
                   <div style="display: flex; align-items: center;">
                     <span class="material-icons">history_toggle_off</span>
-                    <span>Historial de Servicios</span>
+                    <span>Historial</span>
                   </div>
                 </a>
               </li>
@@ -144,8 +144,8 @@
     <div class="main-content">
         <div class="auth-container">
           <div class="header">
-            <h2>Historial de Citas</h2>
-            <p>Listado de servicios realizados</p>
+            <h2>Registro Histórico de Órdenes de Servicio</h2>
+            <p>Órdenes de Servicios</p>
              <!-- Filtros de Historial de Servicios -->
             <div class="filtros-container">
               <div class="filtros-row">
@@ -165,41 +165,92 @@
           <mat-form-field appearance="outline">
             <mat-label>Buscar</mat-label>
             <mat-icon matPrefix>search</mat-icon>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Buscar por fecha, servicio o costo" #filter>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Buscar por cualquier campo">
           </mat-form-field>
-      
-          <!-- Tabla para mostrar los datos -->
-            <div class="table-container">
-              <table mat-table [dataSource]="dataSource" matSort>
-                <!-- Fecha -->
-                <ng-container matColumnDef="fecha">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-                  <td mat-cell *matCellDef="let historial">{{ historial.fecha | date: 'd \'de\' MMMM \'de\' yyyy' }}</td>
-                </ng-container>
-              
-                <!-- Tipo de Servicio -->
-                <ng-container matColumnDef="tipo_servicio">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Servicios</th>
-                  <td mat-cell *matCellDef="let historial">{{ historial.tipo_servicio }}</td>
-                </ng-container>
-              
-                <!-- Costo -->
-                <ng-container matColumnDef="costo">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Costo</th>
-                  <td mat-cell *matCellDef="let historial">{{ historial.costo | currency }}</td>
-                </ng-container>
-              
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-                <tr class="mat-row" *matNoDataRow>
-                  <td class="mat-cell" colspan="3">No hay datos que coincidan con "{{ filterValue }}"</td>
-                </tr>
+          <div class="table-container">
+            <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-              </table>
-              
-                <mat-paginator [pageSizeOptions]="[5, 10, 15, 20, 25]" showFirstLastButtons></mat-paginator>
-            </div>
+              <!-- Cita ID -->
+              <ng-container matColumnDef="cita_id">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Cita</th>
+                <td mat-cell        *matCellDef="let o">{{ o.cita_id }}</td>
+              </ng-container>
+
+              <!-- Inicio -->
+              <ng-container matColumnDef="inicio">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Inicio</th>
+                <td mat-cell        *matCellDef="let o">{{ o.inicio }}</td>
+              </ng-container>
+
+              <!-- Fin -->
+              <ng-container matColumnDef="fin">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Fin</th>
+                <td mat-cell        *matCellDef="let o">{{ o.fin }}</td>
+              </ng-container>
+
+              <!-- Vehículo -->
+              <ng-container matColumnDef="vehiculo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Vehículo</th>
+                <td mat-cell        *matCellDef="let o">{{ o.vehiculo }}</td>
+              </ng-container>
+
+              <!-- Servicios -->
+              <ng-container matColumnDef="servicios">
+                <th mat-header-cell *matHeaderCellDef>Servicios</th>
+                <td mat-cell *matCellDef="let o">
+                  <ul class="no-bullets">
+                    <li *ngFor="let s of o.servicios">
+                      {{ s.nombre }} 
+                      (x{{ s.cantidad }}) — 
+                      U. ${{ s.precio_unitario }} = 
+                      ${{ s.subtotal }}
+                    </li>
+                  </ul>
+                </td>
+              </ng-container>
+
+              <!-- Repuestos -->
+              <ng-container matColumnDef="repuestos">
+                <th mat-header-cell *matHeaderCellDef>Repuestos</th>
+                <td mat-cell        *matCellDef="let o">
+                  <ul class="no-bullets">
+                    <li *ngFor="let r of o.repuestos">
+                      {{ r.nombre }} (x{{ r.cantidad }}) =
+                      ${{ r.subtotal }}
+                    </li>
+                  </ul>
+                </td>
+              </ng-container>
+
+              <!-- Totales -->
+              <ng-container matColumnDef="total_servicios">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Tot. Servicios</th>
+                <td mat-cell *matCellDef="let o">{{ o.total_servicios | currency }}</td>
+              </ng-container>
+              <ng-container matColumnDef="total_repuestos">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Tot. Repuestos</th>
+                <td mat-cell        *matCellDef="let o">{{ o.total_repuestos | currency }}</td>
+              </ng-container>
+              <ng-container matColumnDef="total_general">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Total General</th>
+                <td mat-cell        *matCellDef="let o">{{ o.total_general | currency }}</td>
+              </ng-container>
+
+              <!-- Filas -->
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row        *matRowDef="let row; columns: displayedColumns;"></tr>
+
+              <!-- No data -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                  No hay datos que coincidan con "{{ filterValue }}"
+                </td>
+              </tr>
+            </table>
+
+            <mat-paginator [pageSizeOptions]="[5,10,15,20]" showFirstLastButtons></mat-paginator>
+          </div>
         </div>
     </div>    
 </div>

@@ -9,16 +9,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NotificacionesService } from '../../services/Notificaciones/notificaciones.service';
 import { CitaMecanicoService } from '../../services/CitaMecanico/cita-mecanico.service';
 import { OrdenService, Orden } from '../../services/Orden/orden.service';
 import { IgxCardModule, IgxButtonModule, IgxRippleModule, IgxIconModule } from 'igniteui-angular';
-import { forkJoin } from 'rxjs';
+import { forkJoin, timer } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { MatCardModule } from '@angular/material/card';
-import { ScaleType, Color } from '@swimlane/ngx-charts';
-import Swal from 'sweetalert2';
+import { ScaleType, Color, LegendPosition } from '@swimlane/ngx-charts';
 
 @Component({
     selector: 'app-dashboard-mecanico',
@@ -42,7 +41,9 @@ import Swal from 'sweetalert2';
 })
 export class DashboardMecanicoComponent {
   // ancho x alto del chart
-  view: [number, number] = [window.innerWidth * 0.9, 400];
+  view: [number,number] = [0,0];
+
+  readonly LegendPosition = LegendPosition;
 
   // define colorScheme como un Color válido:
   colorScheme: Color = {
@@ -100,7 +101,7 @@ export class DashboardMecanicoComponent {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
 
-  constructor(private authService: AuthService, private ordenSvc: OrdenService, private citasService: CitaMecanicoService, private router: Router, private notificacionesService: NotificacionesService, private http: HttpClient) {
+  constructor(private authService: AuthService, private ordenSvc: OrdenService, private citasService: CitaMecanicoService, private router: Router, private http: HttpClient) {
     registerLocaleData(localeEs, 'es');
   }
 
@@ -113,6 +114,59 @@ export class DashboardMecanicoComponent {
   citasPorMesStacked: { name: string; series: { name: string; value: number }[] }[] = [];
 
   private allCitas: any[] = [];
+
+  // Funciones de navegación del menú
+  ngOnInit(): void {
+    // cargar usuario y roles
+    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
+    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
+    const u = JSON.parse(localStorage.getItem('user') || '{}');
+    this.nombreUsuario = u.nombre || '';
+    this.apellidoUsuario = u.apellido || '';
+
+    // iniciar reloj
+    this.iniciarReloj();
+
+    // cargar solo años y datos iniciales para el gráfico mensual
+    this.citasService.listarCitasMecanico().subscribe(citas => {
+      this.allCitas = citas;
+      this.citas    = citas;                 // ← asigna aquí para el pie-chart
+      this.totalCitas = citas.length;        // ← si lo quieres en tu KPI
+
+      // años para el stacked
+      const years = Array.from(
+        new Set(citas.map(c => +c.fecha.slice(0,4)))
+      ).sort((a,b) => a-b);
+      this.availableYears = years;
+      const current = new Date().getFullYear();
+      this.selectedYear = years.includes(current) ? current : (years[0]||current);
+
+      this.updateMonthlyChart();            // stacked mensual
+      this.actualizarDistribucionEstados(); // pie-chart de estados
+    });
+
+    // polling cada 30s para refrescar todo
+    timer(0, 10000).pipe(
+      switchMap(() => forkJoin({
+        citas:   this.citasService.listarCitasMecanico(),
+        ordenes: this.ordenSvc.listar()
+      }))
+    ).subscribe(({ citas, ordenes }) => {
+      this.citas    = citas;
+      this.ordenes  = ordenes;
+      this.allCitas = citas;
+      this.totalCitas   = citas.length;
+      this.totalTrabajos = ordenes.length;
+      this.actualizarDistribucionEstados();
+      this.updateMonthlyChart();
+      this.calculateView();
+    }, err => console.error(err));
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.calculateView();
+  }
 
   private agruparCitas(): void {
     const year = this.fechaActual.getFullYear();
@@ -141,107 +195,14 @@ export class DashboardMecanicoComponent {
     }));
   }
 
-  // Funciones de navegación del menú
-  ngOnInit(): void {
-    this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
-    this.rolActivo = localStorage.getItem('rol_activo') ?? '';
-
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-  
-    this.nombreUsuario = user.nombre || '';
-    this.apellidoUsuario = user.apellido || '';
-
-    this.citasService.listarCitasMecanico().subscribe(citas => {
-      this.allCitas = citas;
-
-      // extraigo años únicos y ordeno
-      const years = Array.from(
-        new Set(citas.map(c => +c.fecha.slice(0,4)))
-      ).sort((a, b) => a - b);
-      this.availableYears = years;
-
-      const currentYear = new Date().getFullYear();
-      if (years.length > 0) {
-        // elijo el año actual si existe, si no tomo el primero disponible
-        this.selectedYear = years.includes(currentYear) ? currentYear : years[0];
-      } else {
-        // ¡ojo! si no hay ningún año en los datos, uso siempre el año actual
-        this.selectedYear = currentYear;
-      }
-
-      // ahora sí puedo llamar sin miedo a invalid date
-      this.updateMonthlyChart();
-    });
-
-    this.notificacionesService.subscribeToNotifications(
-      `notificaciones-mecanico-${user.mecanicoId}`,
-      (message: string, cliente: { nombre: string; apellido: string } | undefined) => {
-        const clienteNombre = cliente 
-          ? `${cliente.nombre} ${cliente.apellido}` 
-          : 'No disponible';
-    
-        Swal.fire({
-          title: '<h2 style="font-family: Poppins, sans-serif; color: #1e8449; margin-bottom: 20px;">¡Nueva Notificación!</h2>',
-          html: `
-            <div style="font-family: 'Poppins', sans-serif; text-align: left; padding: 10px; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-              <p style="font-size: 18px; color: #34495e; margin-bottom: 10px;">
-                <strong style="color: #27ae60;">Mensaje:</strong> ${message}
-              </p>
-              <p style="font-size: 18px; color: #34495e; margin-bottom: 10px;">
-                <strong style="color: #3498db;">Cliente:</strong> ${clienteNombre}
-              </p>
-            </div>
-          `,
-          icon: 'info',
-          confirmButtonText: `
-            <span style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: bold; color: #ffffff;">
-              Aceptar
-            </span>
-          `,
-          confirmButtonColor: '#2ecc71',
-        });
-      }
-    );       
-    
-    this.citasService.listarCitasMecanico().subscribe(citas => {
-      this.citasChartData = this.ESTADOS.map(estado => ({
-        name: estado,
-        value: citas.filter(c => {
-          const valor = typeof c.estado === 'string'
-            ? c.estado
-            : c.estado?.nombre_estado;
-          return valor === estado;
-        }).length
-      })).filter(d => d.value > 0);
-    });
-    
-    this.iniciarReloj();
-  
-    // Cargar datos simultáneamente
-    forkJoin({
-      citas:   this.citasService.listarCitasMecanico(),
-      ordenes: this.ordenSvc.listar()
-    })
-    .subscribe(({ citas, ordenes }) => {
-      this.citas   = citas;
-      this.ordenes = ordenes;     
-      this.totalCitas   = citas.length;
-      this.totalTrabajos = ordenes.length;      
-      this.agruparCitas();
-      this.actualizarDistribucionEstados();
-      this.calculateView();
-    });
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.calculateView();
+  descargarReporte(): void {
+    this.ordenSvc.descargarReporte();
   }
 
   private calculateView() {
-    const width = Math.floor(window.innerWidth * 0.8);  // 90% del viewport
-    const height = Math.floor(width * 0.5);             // ratio 3:2 ó lo que quieras
-    this.view = [width, height];
+    const width  = Math.floor((window.innerWidth - 250) * 1.38);  // 250 = ancho del sidebar
+    const height = 600;                                          // <-- altura fija
+    this.view = [ width, height ];
   }
 
   updateMonthlyChart(): void {

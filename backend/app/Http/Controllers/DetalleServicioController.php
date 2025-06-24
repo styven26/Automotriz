@@ -26,6 +26,7 @@ class DetalleServicioController extends Controller
             'id_servicio' => 'required|exists:servicios,id_servicio',
             'descripcion' => 'nullable|string',
             'progreso' => 'nullable|integer|min:0|max:100',
+            'cantidad'    => 'required|integer|min:1',
         ]);
 
         $detalle = DetalleServicio::create($validated);
@@ -49,6 +50,7 @@ class DetalleServicioController extends Controller
             'id_servicio' => 'sometimes|exists:servicios,id_servicio',
             'descripcion' => 'nullable|string',
             'progreso' => 'nullable|integer|min:0|max:100',
+            'cantidad'    => 'required|integer|min:1',
         ]);
 
         $detalle->update($validated);

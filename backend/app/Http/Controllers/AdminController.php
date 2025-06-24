@@ -24,12 +24,11 @@ class AdminController extends Controller
         $totalMecanicos = Usuario::whereHas('roles', fn($q)=> $q->where('nombre','mecánico'))->count();
         $totalClientes  = Usuario::whereHas('roles', fn($q)=> $q->where('nombre','cliente'))->count();
 
-        // 3) Dinero total de citas atendidas (ejemplo con detalle_servicio y servicios)
-        $dineroTotal = Cita::whereHas('estado', fn($q)=> $q->where('nombre_estado','atendida'))
-            ->join('orden_servicio',   'citas.id_cita',         '=', 'orden_servicio.id_cita')
-            ->join('detalle_servicio', 'orden_servicio.id_orden','=', 'detalle_servicio.id_orden')
-            ->join('servicios',        'detalle_servicio.id_servicio','=', 'servicios.id_servicio')
-            ->sum('servicios.precio');
+        // 3) Dinero total generado por servicios en citas atendidas
+        $dineroTotal = Cita::whereHas('estado', fn ($q) =>
+                $q->where('nombre_estado', 'Atendida'))
+            ->join('orden_servicio', 'orden_servicio.id_cita', '=', 'citas.id_cita')
+            ->sum('orden_servicio.total_servicios');
 
         return response()->json([
             'totalCitas'    => $totalCitasConfirmadas,

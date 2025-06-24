@@ -23,12 +23,19 @@ export class NotificacionesService {
     });
   }
 
-  subscribeToNotifications(channelName: string, callback: (message: string, cliente: { nombre: string; apellido: string } | undefined) => void): void {
-    this.echo.channel(channelName).listen('.cita-notificada', (data: any) => {
-      console.log('Evento recibido:', data); // Verifica el contenido de `data`
-      callback(data.message, data.cliente);
-    });
-  }  
+  subscribeToNotifications(
+    channelName: string,
+    callback: (message: string, cliente: { nombre: string; apellido: string } | undefined) => void
+  ): void {
+    console.log('📡 Echo → suscribiendo a canal:', channelName);
+    this.echo
+      .channel(channelName)
+      .listen('.cita-notificada', (payload: any) => {
+        console.log('📬 Evento recibido en frontend:', payload);
+        // payload.mensaje y payload.cliente vienen del broadcastWith()
+        callback(payload.mensaje, payload.cliente);
+      });
+  }
 
   subscribeToTrabajoActualizado(
     clienteCedula: string,

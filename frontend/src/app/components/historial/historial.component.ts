@@ -21,7 +21,6 @@ import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { ClienteService } from '../../services/Cliente/cliente.service';
 import { FormsModule } from '@angular/forms';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-historial',
@@ -41,6 +40,7 @@ export class HistorialComponent {
   sidebarActive: boolean = false;
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
+  ordenes: any[] = [];
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
   tiempoRestante: string = '';
@@ -51,8 +51,19 @@ export class HistorialComponent {
 
   filterValue: string = '';
   
-  displayedColumns: string[] = ['fecha', 'tipo_servicio', 'costo'];
+  displayedColumns = [
+    'cita_id',
+    'inicio',
+    'fin',
+    'vehiculo',
+    'servicios',
+    'repuestos',
+    'total_servicios',
+    'total_repuestos',
+    'total_general'
+  ];
   dataSource = new MatTableDataSource<any>();
+  expandedElement: any| null = null;
 
   // Control de submenús
   showMecanicosMenu: boolean = false;
@@ -61,7 +72,6 @@ export class HistorialComponent {
   showConfiguracionMenu: boolean = false;
   showHistorialMenu: boolean = false;
   showMonitoreoMenu: boolean = false;
-
   
   ngOnInit(): void {
     this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
@@ -113,17 +123,11 @@ export class HistorialComponent {
   }
 
   obtenerHistorial(): void {
-    this.historialService.obtenerHistorial().subscribe(
-      (data) => {
-        // Actualiza los datos y asigna la paginación y el orden
-        this.dataSource.data = data;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      },
-      (error) => {
-        console.error('Error al obtener el historial:', error);
-      }
-    );
+    this.historialService.obtenerHistorial().subscribe(resp => {
+      this.dataSource.data      = resp.ordenes;
+      this.dataSource.paginator  = this.paginator;
+      this.dataSource.sort       = this.sort;
+    });
   }  
 
   toggleDropdown(): void {

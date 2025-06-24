@@ -30,6 +30,10 @@ return new class extends Migration
         
             $table->text('descripcion')->nullable();
             $table->integer('progreso')->default(0);
+
+            $table->integer('cantidad')->default(1);
+            $table->decimal('precio_unitario', 10, 2);
+            $table->decimal('subtotal', 10, 2);
         });
         
     }

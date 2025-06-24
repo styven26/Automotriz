@@ -20,7 +20,7 @@
 }
 
 .chart-title {
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 600;
 }
 
@@ -543,18 +543,14 @@
 /* -------------------------------- */
 
 .chart-container {
-  width: 100% !important;
-  max-width: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
+  position: relative;
+  overflow: visible !important;
 }
 
-/* Hace que el componente de ngx-charts llene su contenedor */
 .chart-container ngx-charts-bar-vertical-stacked,
 .chart-container ngx-charts-pie-chart {
+  /* nada de height ni width forzados */
   display: block;
-  width: 100% !important;
-  height: 400px !important;  /* altura por defecto */
 }
 
 /* Tablets: baja un poco la altura */

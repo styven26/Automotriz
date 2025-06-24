@@ -81,7 +81,7 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     // Listar citas asignadas al mecánico
     Route::get('/citas',                     [CitasController::class, 'listarCitasMecanico']);
     Route::post('/citas/{cita}/diagnostico', [DiagnosticoController::class, 'store']);
-    Route::apiResource('detalle-repuestos', DetalleRepuestoController::class);
+    Route::apiResource('detalle-repuestos',  DetalleRepuestoController::class);
 
     // Diagnósticos
     Route::get('/diagnosticos',                                                  [DiagnosticoController::class, 'index']);
@@ -96,6 +96,13 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     Route::patch ('/ordenes/{id}/progreso',          [OrdenServicioController::class,'actualizarProgreso']);
     Route::patch ('/ordenes/{id}/descripciones',     [OrdenServicioController::class,'actualizarDescripcion']);
     Route::post  ('/ordenes/{id}/finalizar-auto',    [OrdenServicioController::class,'finalizarOrdenAutomatico']);
+
+    // Detalle de servicio
+    Route::get    ('/detalle-servicio',           [DetalleServicioController::class, 'index']);
+    Route::post   ('/detalle-servicio',           [DetalleServicioController::class, 'store']);
+    Route::get    ('/detalle-servicio/{id}',      [DetalleServicioController::class, 'show']);
+    Route::put    ('/detalle-servicio/{id}',      [DetalleServicioController::class, 'update']);
+    Route::delete ('/detalle-servicio/{id}',      [DetalleServicioController::class, 'destroy']);
 
     // Reportes
     Route::get('/reporte-trabajos',                  [ReportController::class, 'descargarReporte']);

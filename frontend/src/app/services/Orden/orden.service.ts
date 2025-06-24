@@ -8,6 +8,7 @@ export interface DetalleServicio {
   id_servicio: number;
   descripcion?: string;
   progreso: number;
+  cantidad: number;
   servicio: {
     id_servicio: number;
     nombre: string;

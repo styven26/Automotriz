@@ -7,6 +7,7 @@ import { CitaMecanicoService } from '../../../services/CitaMecanico/cita-mecanic
 import { FullCalendarModule } from '@fullcalendar/angular'; // Import FullCalendarModule
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { OrdenService, Orden } from '../../../services/Orden/orden.service';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import Swal from 'sweetalert2';
@@ -20,7 +21,7 @@ import Swal from 'sweetalert2';
 })
 export class MecanicoCitaComponent {
 
-  constructor(private authService: AuthService, private router: Router, private http: HttpClient, private citasService: CitaMecanicoService) {}
+  constructor(private authService: AuthService, private router: Router, private ordenService: OrdenService, private http: HttpClient, private citasService: CitaMecanicoService) {}
 
   calendarOptions: any;
   tiempoRestante: string = '';
@@ -70,6 +71,10 @@ export class MecanicoCitaComponent {
   
     this.cargarCitasMecanico();
     this.iniciarReloj();
+  }
+
+  descargarReporte(): void {
+    this.ordenService.descargarReporte();
   }
 
   cambiarRol(event: Event): void {

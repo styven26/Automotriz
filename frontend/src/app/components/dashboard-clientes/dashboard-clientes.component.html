@@ -93,7 +93,7 @@
               <a (click)="navigateHistorial()">
                 <div style="display: flex; align-items: center;">
                   <span class="material-icons">history_toggle_off</span>
-                  <span>Historial de Citas</span>
+                  <span>Historial</span>
                 </div>
               </a>
             </li>
@@ -186,7 +186,7 @@
 
       <!-- Gráfico: Ingresos Acumulados por Mes -->
       <div class="chart-container" *ngIf="ingresosPorMes">
-        <h4 class="chart-title">Facturación Mensual por Citas Atendidas</h4>
+        <h4 class="chart-title">Facturación Mensual por Servicios de Citas Atendidas</h4>
         <ngx-charts-bar-vertical
             *ngIf="ingresosPorMes.length > 0"
             [view]="view"

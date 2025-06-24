@@ -88,7 +88,7 @@
 
   /* Contenedor scrollable */
   .section .list {
-    max-height: 120px;       /* ajusta según necesites */
+    max-height: 200px;       /* ajusta según necesites */
     overflow-y: auto;
     padding-right: 8px;      /* espacio para scrollbar */
     border: 1px solid #e0e0e0;
@@ -109,7 +109,7 @@
   }
 
   .listar {
-    max-height: 95px;       /* ajusta según necesites */
+    max-height: 200px;       /* ajusta según necesites */
     overflow-y: auto;
     padding-right: 8px;      /* espacio para scrollbar */
     border: 1px solid #e0e0e0;
@@ -447,6 +447,14 @@
     background: #cdd6d3;
   }
   
+  .detalle-servicio {
+    display: flex;
+    align-items: center;       /* Centra verticalmente el texto y el botón */
+    justify-content: space-between;
+    margin-bottom: 20px;
+    margin-right: 20px;
+  }
+
   /* ======================================== */
   /*  Contenedor de detalles de cada trabajo  */
   /* ======================================== */

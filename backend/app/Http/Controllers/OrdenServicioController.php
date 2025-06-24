@@ -289,10 +289,16 @@ class OrdenServicioController extends Controller
         $detalles   = $ordenServicio->detallesServicios;
         $repuestos  = $ordenServicio->detallesRepuestos;
 
-        // 2) Recalcular totales a partir de la colección
-        $totalServicios = $detalles->sum(fn($d) => $d->servicio->precio);
+        // 2) Recalcular totales a partir de la colección:
+        // servicios: sum(detalle.precio_unitario * detalle.cantidad)
+        $totalServicios = $detalles->sum(function($d) {
+            return $d->precio_unitario * $d->cantidad;
+        });
+
+        // repuestos: sum(detalle.subtotal)
         $totalRepuestos = $repuestos->sum('subtotal');
-        $total          = $totalServicios + $totalRepuestos;
+
+        $granTotal = $totalServicios + $totalRepuestos;
 
         // 3) Datos para la vista
         $data = [
@@ -302,7 +308,7 @@ class OrdenServicioController extends Controller
             'repuestos'       => $repuestos,
             'totalServicios'  => $totalServicios,
             'totalRepuestos'  => $totalRepuestos,
-            'total'           => $total,
+            'granTotal'       => $granTotal,
         ];
 
         try {
@@ -312,7 +318,7 @@ class OrdenServicioController extends Controller
             });
             Log::info("Email de orden completada enviado a {$cliente->correo}");
         } catch (\Throwable $e) {
-            Log::error("Error enviando correo: ".$e->getMessage());
+            Log::error("Error enviando correo: " . $e->getMessage());
         }
     }
 }

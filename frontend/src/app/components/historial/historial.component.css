@@ -418,3 +418,13 @@ button {
       height: 250px !important;
     }
   }
+
+  .no-bullets {
+    list-style: none;    /* quita los bullets */
+    margin: 0;           /* quita márgenes por defecto */
+    padding: 0;          /* quita sangrías por defecto */
+  }
+
+  .no-bullets li {
+    margin-left: 0;      /* asegúrate de que no queden indentados */
+  }
