@@ -74,6 +74,7 @@ export class DashboardAdminComponent implements OnInit {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   chartOptions: any = {
     series: [],
@@ -368,6 +369,8 @@ export class DashboardAdminComponent implements OnInit {
       this.showHorariosMenu = !this.showHorariosMenu;
     } else if (menu === 'tipos') {
         this.showTiposnMenu = !this.showTiposnMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'subtipos') {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
@@ -378,7 +381,7 @@ export class DashboardAdminComponent implements OnInit {
       this.showClientesMenu= !this.showClientesMenu;
     } else if (menu === 'orden') {
       this.showOrdenMenu= !this.showOrdenMenu;
-    }
+    } 
   }
 
   // Resetea todos los menús (ciérralos)
@@ -391,5 +394,6 @@ export class DashboardAdminComponent implements OnInit {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 }
