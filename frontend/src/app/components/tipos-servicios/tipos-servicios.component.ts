@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { TiposService } from '../../services/Tiposervicios/tipos.service'; // define interfaz si quieres
+import { AdministradorService } from '../../services/Administrador/administrador.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -45,6 +46,10 @@ export class TiposServiciosComponent implements OnInit {
   showSubtiposnMenu: boolean = false;
   showHorariosMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
+
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
@@ -54,6 +59,7 @@ export class TiposServiciosComponent implements OnInit {
     private router: Router,
     private http: HttpClient,
     private fb: FormBuilder,
+    private admin: AdministradorService,
     private tiposService: TiposService,
     private subtipoService: SubtipoService
   ) {
@@ -75,6 +81,14 @@ export class TiposServiciosComponent implements OnInit {
       ],
       precio: [{ value: 0, disabled: true }],
     });             
+  }
+
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
   }
 
   ngOnInit(): void {
@@ -276,6 +290,8 @@ export class TiposServiciosComponent implements OnInit {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
       this.showCitasMenu = !this.showCitasMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'configuracion') {
       this.showConfiguracionMenu = !this.showConfiguracionMenu;
     } else if (menu === 'clientes') {
@@ -295,6 +311,7 @@ export class TiposServiciosComponent implements OnInit {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 
   // Rutas del Panel - Listar Mecanico

@@ -114,6 +114,22 @@ export class DashboardVendedorComponent {
     this.setupBarChart();
   }
 
+  descargarPDFInventario(): void {
+    this.repService.descargarReporteInventario().subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      const fecha = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      link.download = `inventario-${fecha}.pdf`;
+
+      link.click();
+      window.URL.revokeObjectURL(url);
+    }, err => {
+      console.error('Error al descargar el PDF:', err);
+    });
+  }
+
   // Métricas de inventario
   cargarMetricas(): void {
     this.repService.getAll().subscribe(list => {

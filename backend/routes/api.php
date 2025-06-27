@@ -165,6 +165,8 @@ Route::prefix('vendedor')->middleware('auth:vendedor')->group(function () {
 
     // Repuestos
     Route::apiResource('repuestos', RepuestoController::class);
+    // Reportes de repuestos
+    Route::get('reporte-inventario', [RepuestoController::class, 'descargarInventarioActual']);
 });
 
 // Rutas públicas

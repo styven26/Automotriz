@@ -56,34 +56,17 @@
         <thead>
           <tr style="background-color:#f4f4f9; text-align:left;">
             <th style="padding:8px; border-bottom:2px solid #ddd; font-weight:600;">Servicio</th>
-            <th style="padding:8px; border-bottom:2px solid #ddd; text-align:right; font-weight:600;">Precio</th>
           </tr>
         </thead>
         <tbody>
-          @php $totalServicios = 0; @endphp
           @foreach ($servicios as $detalle)
-            @php 
-              $precio = $detalle->servicio->precio;
-              $totalServicios += $precio;
-            @endphp
             <tr>
               <td style="padding:8px; border-bottom:1px solid #ddd;">
                 {{ $detalle->servicio->nombre }}
               </td>
-              <td style="padding:8px; border-bottom:1px solid #ddd; text-align:right;">
-                ${{ number_format($precio, 2) }}
-              </td>
             </tr>
           @endforeach
         </tbody>
-        <tfoot>
-          <tr>
-            <td style="padding:8px; font-weight:600; border-top:2px solid #ddd;">Total:</td>
-            <td style="padding:8px; font-weight:600; text-align:right; border-top:2px solid #ddd;">
-              ${{ number_format($totalServicios, 2) }}
-            </td>
-          </tr>
-        </tfoot>
       </table>
 
       <p style="font-size:16px; color:#333; margin:20px 0 0;">

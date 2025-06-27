@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
+import { AdministradorService } from '../../../services/Administrador/administrador.service';
 import {MatTableDataSource} from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';  
 import Swal from 'sweetalert2'; 
@@ -55,6 +56,7 @@ export class ListarHorariosComponent {
     private snackBar: MatSnackBar, 
     private router: Router, 
     private authService: AuthService, 
+    private admin: AdministradorService,
     public dialog: MatDialog
   ) {}
 
@@ -68,11 +70,14 @@ export class ListarHorariosComponent {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
   
   // Rutas del Panel - Listar Mecanico
   navigateListarMecanico() {
@@ -133,6 +138,8 @@ export class ListarHorariosComponent {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
       this.showCitasMenu = !this.showCitasMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'configuracion') {
       this.showConfiguracionMenu = !this.showConfiguracionMenu;
     } else if (menu === 'clientes') {
@@ -151,7 +158,16 @@ export class ListarHorariosComponent {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
+
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+  }  
 
   ngOnInit(): void {
     this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');

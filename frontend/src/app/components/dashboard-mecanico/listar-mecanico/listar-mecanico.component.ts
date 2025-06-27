@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ActualizarMecanicoComponent } from '../actualizar-mecanico/actualizar-mecanico.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AdministradorService } from '../../../services/Administrador/administrador.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -41,7 +42,7 @@ import Swal from 'sweetalert2';
 })
 export class ListarMecanicoComponent {
 
-  constructor( private fb: FormBuilder, private http: HttpClient, private snackBar: MatSnackBar, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService, public dialog: MatDialog) {}
+  constructor( private fb: FormBuilder, private http: HttpClient, private admin:AdministradorService, private snackBar: MatSnackBar, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService, public dialog: MatDialog) {}
 
   displayedColumns: string[] = ['nombre', 'apellido', 'cedula', 'correo', 'telefono', 'direccion_domicilio', 'especialidad', 'acciones'];
   dataSource!: MatTableDataSource<any>;
@@ -61,6 +62,11 @@ export class ListarMecanicoComponent {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
+
+  // Añade estas variables al componente
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
@@ -106,6 +112,14 @@ export class ListarMecanicoComponent {
     this.router.navigate(['/tipo-orden-servicio']);
   }
 
+   descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+  
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+  }  
+
   // Salir del Dashboard
   logout(): void { 
     this.authService.logout(); // Llama al método de logout en AuthService
@@ -123,6 +137,8 @@ export class ListarMecanicoComponent {
       this.showHorariosMenu = !this.showHorariosMenu;
     } else if (menu === 'tipos') {
         this.showTiposnMenu = !this.showTiposnMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'subtipos') {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
@@ -133,7 +149,7 @@ export class ListarMecanicoComponent {
       this.showClientesMenu= !this.showClientesMenu;
     } else if (menu === 'orden') {
       this.showOrdenMenu= !this.showOrdenMenu;
-    }
+    } 
   }
 
   resetMenus(): void {
@@ -145,6 +161,7 @@ export class ListarMecanicoComponent {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 
   // Listar Mecanicos

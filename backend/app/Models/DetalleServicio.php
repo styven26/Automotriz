@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Servicio;
+use App\Models\OrdenServicio;
 
 class DetalleServicio extends Model
 {
@@ -17,20 +19,27 @@ class DetalleServicio extends Model
         'descripcion',
         'progreso',
         'cantidad',
-        'precio_unitario',
-        'subtotal',
     ];
 
-    public static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
-        static::saving(function($det) {
-            // Siempre toma el precio actualizado
-            $det->precio_unitario = $det->servicio->precio;
-            $det->subtotal        = round($det->precio_unitario * $det->cantidad, 2);
+        // Antes de insertar
+        static::creating(function($det) {
+            $precio = Servicio::where('id_servicio', $det->id_servicio)
+                              ->value('precio');
+            $det->precio_unitario = $precio;
+            $det->subtotal        = round($precio * $det->cantidad, 2);
         });
 
+        // Antes de actualizar cantidad o servicio
+        static::updating(function($det) {
+            $precio = Servicio::where('id_servicio', $det->id_servicio)
+                              ->value('precio');
+            $det->precio_unitario = $precio;
+            $det->subtotal        = round($precio * $det->cantidad, 2);
+        });
+
+        // Después de guardar (crear o actualizar)
         static::saved(function($det) {
             $orden = $det->orden;
             $orden->total_servicios = $orden->detallesServicios()->sum('subtotal');

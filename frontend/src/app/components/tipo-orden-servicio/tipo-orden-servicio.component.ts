@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { AdministradorService } from '../../services/Administrador/administrador.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
@@ -42,6 +43,9 @@ export class TipoOrdenServicioComponent {
     showSubtiposnMenu: boolean = false;
     showHorariosMenu: boolean = false;
     showOrdenMenu: boolean = false;
+    showReportes: boolean = false;
+    filtrosCitas: any = { anio: '', mes: '' };
+    filtrosIngresos: any = { anio: '', mes: '' };
 
     rolActivo: string = 'Sin rol'; 
     roles: string[] = [];
@@ -50,6 +54,7 @@ export class TipoOrdenServicioComponent {
       private authService: AuthService,
       private router: Router,
       private http: HttpClient,
+      private admin: AdministradorService,
       private fb: FormBuilder,
       private tiposService: TiposService
     ) {
@@ -160,6 +165,14 @@ export class TipoOrdenServicioComponent {
           break;
       }
     }
+
+    descargarCitasPDF(): void {
+      this.admin.descargarReporteCitas(this.filtrosCitas);
+    }
+
+    descargarFinancieroPDF(): void {
+      this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+    }
   
     iniciarReloj(): void {
       const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;
@@ -216,6 +229,8 @@ export class TipoOrdenServicioComponent {
         this.showSubtiposnMenu = !this.showSubtiposnMenu;
       } else if (menu === 'citas') {
         this.showCitasMenu = !this.showCitasMenu;
+      } else if (menu === 'reportes') {
+        this.showReportes = !this.showReportes;
       } else if (menu === 'configuracion') {
         this.showConfiguracionMenu = !this.showConfiguracionMenu;
       } else if (menu === 'clientes') {
@@ -235,6 +250,7 @@ export class TipoOrdenServicioComponent {
       this.showTiposnMenu = false;
       this.showSubtiposnMenu = false;
       this.showOrdenMenu = false;
+      this.showReportes = false;
     }
   
     // Rutas del Panel - Listar Mecanico

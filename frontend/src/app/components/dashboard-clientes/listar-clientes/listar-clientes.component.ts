@@ -51,6 +51,9 @@ export class ListarClientesComponent {
   tiempoRestante: string = '';
   isSubmitting: boolean = false;
   isModalOpen: boolean = false;
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
+
   showMecanicosMenu: boolean = false;
   showHorariosMenu: boolean = false;
   showCitasMenu: boolean = false;
@@ -59,6 +62,7 @@ export class ListarClientesComponent {
   showSubtiposnMenu: boolean = false;
   showClientesMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
@@ -104,6 +108,14 @@ export class ListarClientesComponent {
     this.router.navigate(['/tipo-orden-servicio']);
   }
 
+  descargarCitasPDF(): void {
+    this.adminService.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.adminService.descargarReporteFinanciero(this.filtrosIngresos);
+  }  
+
   // Salir del Dashboard
   logout(): void { 
     this.authService.logout(); // Llama al método de logout en AuthService
@@ -121,6 +133,8 @@ export class ListarClientesComponent {
       this.showHorariosMenu = !this.showHorariosMenu;
     } else if (menu === 'tipos') {
         this.showTiposnMenu = !this.showTiposnMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'subtipos') {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
@@ -143,6 +157,7 @@ export class ListarClientesComponent {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 
   // Listar Mecanicos

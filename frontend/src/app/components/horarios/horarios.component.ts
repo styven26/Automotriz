@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon'; 
 import { HorarioService } from '../../services/Horario/horario.service';
 import { AuthService } from '../../services/auth.service';
+import { AdministradorService } from '../../services/Administrador/administrador.service';
 import { MatSelectModule } from '@angular/material/select'; // Importar MatSelectModule
 import Swal from 'sweetalert2';
 
@@ -25,7 +26,7 @@ export class HorariosComponent {
   horarioForm!: FormGroup;
   diasSemana: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
-  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService, private horarioService: HorarioService) {}
+  constructor(private fb: FormBuilder, private router: Router, private admin:AdministradorService, private authService: AuthService, private horarioService: HorarioService) {}
 
   sidebarActive: boolean = false;
   tiempoRestante: string = '';
@@ -37,11 +38,14 @@ export class HorariosComponent {
   showClientesMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
 
   // Rutas del Panel - Listar Mecanico
   navigateListarMecanico() {
@@ -78,6 +82,14 @@ export class HorariosComponent {
     this.router.navigate(['/tipo-orden-servicio']);
   }
 
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+  }  
+
   logout(): void { 
     this.authService.logout(); // Llama al método de logout en AuthService
 
@@ -98,6 +110,8 @@ export class HorariosComponent {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
       this.showCitasMenu = !this.showCitasMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'configuracion') {
       this.showConfiguracionMenu = !this.showConfiguracionMenu;
     } else if (menu === 'clientes') {
@@ -116,6 +130,7 @@ export class HorariosComponent {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 
   ngOnInit(): void {

@@ -162,39 +162,38 @@ export class DiagnosticoComponent {
   }
 
   cargarDiagnosticos() {
-  this.diagnosticoService.listarDiagnosticos().subscribe({
-    next: (resp) => {
-      resp.forEach((diag: any) => {
-        // 1) FORZAMOS a que _siempre_ sea un array de números:
-        let arr = diag.servicios_recomendados;
-        if (typeof arr === 'string') {
-          try {
-            arr = JSON.parse(arr);
-          } catch {
+    this.diagnosticoService.listarDiagnosticos().subscribe({
+      next: (resp) => {
+        resp.forEach((diag: any) => {
+          // 1) FORZAMOS a que _siempre_ sea un array de números:
+          let arr = diag.servicios_recomendados;
+          if (typeof arr === 'string') {
+            try {
+              arr = JSON.parse(arr);
+            } catch {
+              arr = [];
+            }
+          }
+          if (!Array.isArray(arr)) {
             arr = [];
           }
-        }
-        if (!Array.isArray(arr)) {
-          arr = [];
-        }
-        // 2) deduplicamos y convertimos a entero:
-        arr = Array.from(new Set(arr.map((x: any) => +x)));
-        diag.servicios_recomendados = arr;
+          // 2) deduplicamos y convertimos a entero:
+          arr = Array.from(new Set(arr.map((x: any) => +x)));
+          diag.servicios_recomendados = arr;
 
-        // 3) ahora montamos los nombres
-        diag.servicios_recomendados_nombres = diag.servicios_recomendados
-          .map((id: number) => this.serviciosMap[id] || 'Desconocido');
-      });
+          // 3) ahora montamos los nombres
+          diag.servicios_recomendados_nombres = diag.servicios_recomendados
+            .map((id: number) => this.serviciosMap[id] || 'Desconocido');
+        });
 
-      console.log('🔍 Diagnósticos tras normalizar:', resp);
-      this.dataSource = new MatTableDataSource(resp);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    },
-    error: (err) => console.error('Error al listar diagnósticos', err)
-  });
-}
-
+        console.log('🔍 Diagnósticos tras normalizar:', resp);
+        this.dataSource = new MatTableDataSource(resp);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      },
+      error: (err) => console.error('Error al listar diagnósticos', err)
+    });
+  }
 
   filterValue: string = '';
 

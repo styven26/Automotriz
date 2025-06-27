@@ -12,6 +12,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon'; 
 import { AuthService } from '../../../services/auth.service';
+import { AdministradorService } from '../../../services/Administrador/administrador.service';
 import { MecanicoService } from '../../../services/Mecanico/mecanico.service';
 import Swal from 'sweetalert2';
 
@@ -35,7 +36,7 @@ import Swal from 'sweetalert2';
 })
 export class CrearMecanicoComponent {
 
-  constructor( private fb: FormBuilder, private http: HttpClient, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService ) {}
+  constructor( private fb: FormBuilder, private http: HttpClient, private admin: AdministradorService, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService ) {}
 
   sidebarActive: boolean = false;
   tiempoRestante: string = '';
@@ -43,6 +44,8 @@ export class CrearMecanicoComponent {
   roles: string[] = [];
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
 
   hidePassword: boolean = true;
   hideConfirmPassword: boolean = true;
@@ -56,6 +59,7 @@ export class CrearMecanicoComponent {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   // Rutas del Panel - Listar Mecanico
   navigateListarMecanico() {
@@ -154,6 +158,14 @@ export class CrearMecanicoComponent {
 
     this.iniciarReloj();
   }
+
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+  }  
 
   cambiarRol(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -385,6 +397,8 @@ export class CrearMecanicoComponent {
       this.showHorariosMenu = !this.showHorariosMenu;
     } else if (menu === 'tipos') {
         this.showTiposnMenu = !this.showTiposnMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'subtipos') {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
@@ -395,7 +409,7 @@ export class CrearMecanicoComponent {
       this.showClientesMenu= !this.showClientesMenu;
     } else if (menu === 'orden') {
       this.showOrdenMenu= !this.showOrdenMenu;
-    }
+    } 
   }
 
   resetMenus(): void {
@@ -407,6 +421,7 @@ export class CrearMecanicoComponent {
     this.showTiposnMenu = false;
     this.showOrdenMenu = false;
     this.showSubtiposnMenu = false;
+    this.showReportes = false;
   }
 
   // Método auxiliar para mostrar los mensajes de error del teléfono

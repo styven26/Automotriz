@@ -88,7 +88,7 @@
 
   /* Contenedor scrollable */
   .section .list {
-    max-height: 200px;       /* ajusta según necesites */
+    max-height: 170px;       /* ajusta según necesites */
     overflow-y: auto;
     padding-right: 8px;      /* espacio para scrollbar */
     border: 1px solid #e0e0e0;
@@ -109,7 +109,7 @@
   }
 
   .listar {
-    max-height: 200px;       /* ajusta según necesites */
+    max-height: 170px;       /* ajusta según necesites */
     overflow-y: auto;
     padding-right: 8px;      /* espacio para scrollbar */
     border: 1px solid #e0e0e0;

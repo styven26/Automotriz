@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../services/auth.service';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import { AdministradorService } from '../../../services/Administrador/administrador.service';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
@@ -39,7 +40,7 @@ import Swal from 'sweetalert2';
 })
 export class CitasAdminComponent {
 
-  constructor(private authService: AuthService, private router: Router, private citadmin: CitaadminService ) {}
+  constructor(private authService: AuthService, private admin: AdministradorService, private router: Router, private citadmin: CitaadminService ) {}
 
   tiempoRestante: string = '';
   calendarOptions: any;
@@ -48,6 +49,8 @@ export class CitasAdminComponent {
   sidebarActive: boolean = false;
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
 
@@ -60,6 +63,7 @@ export class CitasAdminComponent {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   ngOnInit(): void {
     this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');
@@ -108,6 +112,14 @@ export class CitasAdminComponent {
         console.error('Error al cambiar de rol:', error);
       },
     });
+  }
+
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
   }
   
   private redirectUser(rolActivo: string): void {
@@ -322,6 +334,8 @@ export class CitasAdminComponent {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
       this.showCitasMenu = !this.showCitasMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'configuracion') {
       this.showConfiguracionMenu = !this.showConfiguracionMenu;
     } else if (menu === 'clientes') {
@@ -341,5 +355,6 @@ export class CitasAdminComponent {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 }

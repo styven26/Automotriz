@@ -61,4 +61,12 @@ export class RepuestoService {
       headers: this.getAuthHeaders()
     });
   }
+
+  descargarReporteInventario(): Observable<Blob> {
+    const headers = this.getAuthHeaders().set('Accept', 'application/pdf');
+    return this.http.get('http://localhost:8000/api/vendedor/reporte-inventario', {
+      headers,
+      responseType: 'blob'
+    });
+  }
 }

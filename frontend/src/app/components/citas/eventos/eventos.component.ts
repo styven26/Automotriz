@@ -192,7 +192,7 @@ export class EventosComponent {
 
   onConfirmClick(): void {
     Swal.fire({
-      title: '¿Deseas actualizar los datos?',
+      title: '¿Deseas editar los datos?',
       text: 'Ya no será posible retroceder después de confirmar.',
       icon: 'warning',
       showCancelButton: true,

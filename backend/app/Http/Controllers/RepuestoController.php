@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Repuesto;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class RepuestoController extends Controller
 {
@@ -76,5 +79,42 @@ class RepuestoController extends Controller
         $rep = Repuesto::findOrFail($id);
         $rep->delete();
         return response()->json(['message'=>'Repuesto eliminado.']);
+    }
+
+    /**
+     * Generar un PDF con la lista de repuestos.
+     */
+    public function descargarInventarioActual(Request $request)
+    {
+        try {
+            // Autenticación
+            $vendedor = Auth::user();
+
+            if (!$vendedor || !$vendedor->hasRole('vendedor')) {
+                \Log::warning("Acceso no autorizado al reporte de inventario.");
+                return response()->json(['error' => 'No autorizado.'], 403);
+            }
+
+            // Obtener todos los repuestos activos
+            $repuestos = Repuesto::orderBy('nombre')->get();
+
+            if ($repuestos->isEmpty()) {
+                \Log::info("No hay repuestos registrados en inventario.");
+                return response()->json(['error' => 'No hay repuestos en inventario.'], 404);
+            }
+
+            // Generar PDF con vista personalizada
+            $pdf = Pdf::loadView('reportes.inventario', compact('repuestos'));
+
+            \Log::info("Reporte de inventario generado correctamente por vendedor {$vendedor->cedula}.");
+
+            return $pdf->download('reportes-inventario-actual.pdf');
+
+        } catch (\Exception $e) {
+            \Log::error('Error al generar el reporte de inventario: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Error interno al generar el reporte.'], 500);
+        }
     }
 }

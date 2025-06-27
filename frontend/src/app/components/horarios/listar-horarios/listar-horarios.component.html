@@ -183,6 +183,36 @@
             </ul>
           </li>
 
+          <!-- Menú "Reportes" con submenú -->
+          <li>
+            <a (click)="toggleMenu('reportes')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-file-lines" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Reportes </span>
+              </div>
+            </a>
+            <ul *ngIf="showReportes" class="submenu">
+              <li class="submenu-item">
+                <a (click)="descargarCitasPDF()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-calendar-check" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Reporte de Citas Atendidas </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+            <ul *ngIf="showReportes" class="submenu">
+              <li class="submenu-item">
+                <a (click)="descargarFinancieroPDF()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-dollar-sign" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Reporte de Ingresos</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
           <!-- Opción "Cerrar Sesión" -->
           <li>
             <a (click)="logout()">

@@ -10,6 +10,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { AdministradorService } from '../../../services/Administrador/administrador.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -44,6 +45,8 @@ export class ListarTiposComponent {
   tiempoRestante: string = '';
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
 
   // Control de submenús
   showMecanicosMenu: boolean = false;
@@ -54,6 +57,7 @@ export class ListarTiposComponent {
   showSubtiposnMenu: boolean = false;
   showHorariosMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
 
   rolActivo: string = 'Sin rol'; 
   roles: string[] = [];
@@ -63,6 +67,7 @@ export class ListarTiposComponent {
     private router: Router,
     private tiposService: TiposService,
     private snackBar: MatSnackBar,
+    private admin: AdministradorService,
     public dialog: MatDialog
   ) {}
 
@@ -241,6 +246,14 @@ export class ListarTiposComponent {
     });
   } 
 
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+  }
+
   // Función para alternar los menús
   toggleMenu(menu: string): void {
     this.resetMenus(); // Cierra otros menús
@@ -254,6 +267,8 @@ export class ListarTiposComponent {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
       this.showCitasMenu = !this.showCitasMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'configuracion') {
       this.showConfiguracionMenu = !this.showConfiguracionMenu;
     } else if (menu === 'clientes') {
@@ -273,6 +288,7 @@ export class ListarTiposComponent {
     this.showSubtiposnMenu = false;
     this.showClientesMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 
   // Rutas del Panel - Listar Mecanico

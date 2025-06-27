@@ -16,6 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AdministradorService } from '../../services/Administrador/administrador.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
@@ -57,12 +58,17 @@ export class SubtiposServiciosComponent {
   showTiposnMenu: boolean = false;
   showSubtiposnMenu: boolean = false;
   showOrdenMenu: boolean = false;
+  showReportes: boolean = false;
+
+  filtrosCitas: any = { anio: '', mes: '' };
+  filtrosIngresos: any = { anio: '', mes: '' };
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private subtipoService: SubtipoService,
     private snackBar: MatSnackBar,
+    private admin: AdministradorService,
     public dialog: MatDialog
   ) {}
 
@@ -235,6 +241,14 @@ export class SubtiposServiciosComponent {
     });
   }  
 
+  descargarCitasPDF(): void {
+    this.admin.descargarReporteCitas(this.filtrosCitas);
+  }
+
+  descargarFinancieroPDF(): void {
+    this.admin.descargarReporteFinanciero(this.filtrosIngresos);
+  }
+
   // Función de cierre de sesión
   logout(): void { 
     this.authService.logout(); // Llama al método de logout en AuthService
@@ -257,6 +271,8 @@ export class SubtiposServiciosComponent {
       this.showSubtiposnMenu = !this.showSubtiposnMenu;
     } else if (menu === 'citas') {
       this.showCitasMenu = !this.showCitasMenu;
+    } else if (menu === 'reportes') {
+      this.showReportes = !this.showReportes;
     } else if (menu === 'configuracion') {
       this.showConfiguracionMenu = !this.showConfiguracionMenu;
     } else if (menu === 'clientes') {
@@ -265,7 +281,6 @@ export class SubtiposServiciosComponent {
       this.showOrdenMenu= !this.showOrdenMenu;
     }
   }
-
 
   // Resetea todos los menús (ciérralos)
   resetMenus(): void {
@@ -277,6 +292,7 @@ export class SubtiposServiciosComponent {
     this.showTiposnMenu = false;
     this.showSubtiposnMenu = false;
     this.showOrdenMenu = false;
+    this.showReportes = false;
   }
 
   // Funciones de navegación del menú
