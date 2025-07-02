@@ -33,7 +33,7 @@
     <div class="header">
         <img src="https://st.depositphotos.com/1006018/3132/v/450/depositphotos_31322065-stock-illustration-automotive-mechanic-car-repair-retro.jpg" alt="Logo Mecánica Automotriz Don Chavo">
         <h1>Mecánica Automotriz Don Chavo</h1><br>
-        <h2>Reporte de Trabajos Atendidos</h2>
+        <h2>Reporte de Trabajos Completados por Cita Atendida</h2>
         <div class="line"></div>
     </div>
 
@@ -43,7 +43,7 @@
                 <th>Nº Cita</th>
                 <th>Cliente</th>
                 <th>Vehículo</th>
-                <th>Estado</th>
+                <th>Estado de Cita</th>
                 <th>F. Inicio</th>
                 <th>F. Fin</th>
             </tr>
