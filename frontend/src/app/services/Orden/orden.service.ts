@@ -69,6 +69,22 @@ export class OrdenService {
     });
   }
 
+  /** Enviar foto + datos al cliente */
+  enviarFotoGmailPorOrden(
+    idOrden: number,
+    payload: FormData
+  ): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    // aquí sólo ponemos la cabecera de autenticación
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post<any>(
+      `${this.base}/${idOrden}/enviar-foto-gmail`,
+      payload,
+      { headers }   // ¡sin Content-Type!
+    );
+  }
+
   /** 1) Todas las órdenes del mecánico */
   listar(): Observable<Orden[]> {
     return this.http.get<Orden[]>(`${this.base}`, {

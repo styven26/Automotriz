@@ -301,6 +301,11 @@ export class EventosComponent {
           const errorTitulo = err.error?.error || 'Datos Inválidos';
           const errorMensaje = err.error?.mensaje || '';
           const horaActual = err.error?.hora_actual;
+
+          // **NUEVO**: extraer mecánico y cita
+          const mecanico = err.error?.mecanico_ocupado;
+          const cita     = err.error?.cita_actual;
+        
           const horaIngresada = err.error?.hora_ingresada;
           const sugerencia = err.error?.sugerencia;
   
@@ -324,6 +329,40 @@ export class EventosComponent {
                 <span style="color: #000000;">${horaIngresada}</span>
               </p>
             `;
+          }
+
+          // Mecánico ocupado
+          if (mecanico) {
+            mensajeError += `
+              <div style="text-align:center; margin:1.5em 0;">
+                <p style="
+                  margin: 0 0 0.8em;    /* espacio abajo del título */
+                ">
+                <strong>Mecánico Ocupado</strong>
+                </p>
+                <p style="
+                  margin: 0.8em 0 0;     /* espacio arriba del nombre */
+                ">
+                  ${mecanico.nombre}
+                </p>
+              </div>`;
+          }
+
+          // Cita actual
+          if (cita) {
+            mensajeError += `
+              <div style="text-align:center; margin:1.5em 0;">
+                <p style="
+                  margin: 0 0 0.8em;   /* espacio abajo del título */
+                ">
+                  <strong>Cita Actual</strong>
+                </p>
+                <p style="
+                  margin: 0.8em 0 0;    /* espacio arriba del contenido */
+                ">
+                  ${cita.vehiculo.marca} ${cita.vehiculo.modelo} — Placa ${cita.vehiculo.placa}
+                </p>
+              </div>`;
           }
   
           // Si el backend devolvió sugerencia
@@ -351,7 +390,7 @@ export class EventosComponent {
           // ...
           if (sugerencias.length > 0) {
             mensajeError += `
-              <p><strong>Horarios Sugeridos:</strong></p>
+              <p><strong>Horarios Sugeridos</strong></p>
               <!-- Estilo inline para remover viñetas y espaciados -->
               <ul style="list-style-type: none; margin: 0; padding: 0;">
             `;

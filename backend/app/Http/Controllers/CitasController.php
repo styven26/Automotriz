@@ -320,39 +320,40 @@ class CitasController extends Controller
         if (! $mecanicoLibre) {
             // 9b) Si NO hay mecánico libre, buscamos cuál está ocupado y cuál es su cita actual
             $mecanicoOcupado = Usuario::whereHas('roles', function($q) {
-                    $q->where('nombre', 'mecanico');
+                $q->where('nombre', 'mecanico');
+            })
+            ->whereHas('citasComoMecanico', function($q) use ($newStart) {
+                $q->where('activo', true)
+                // SOLO citas iniciadas en o antes de $newStart
+                ->where('fecha', '<=', $newStart->toDateString())
+                ->where(function($q2) use ($newStart) {
+                    $q2->whereNull('hora_fin')
+                        ->orWhereRaw(
+                            "STR_TO_DATE(CONCAT(fecha_fin,' ',hora_fin),'%Y-%m-%d %H:%i') > ?",
+                            [$newStart->format('Y-m-d H:i')]
+                        );
+                });
+            })
+            ->with(['citasComoMecanico' => function($q) use ($newStart) {
+                $q->where('activo', true)
+                ->where('fecha', '<=', $newStart->toDateString())
+                ->where(function($q2) use ($newStart) {
+                    $q2->whereNull('hora_fin')
+                        ->orWhereRaw(
+                            "STR_TO_DATE(CONCAT(fecha_fin,' ',hora_fin),'%Y-%m-%d %H:%i') > ?",
+                            [$newStart->format('Y-m-d H:i')]
+                        );
                 })
-                ->whereHas('citasComoMecanico', function($q) use ($newStart) {
-                    $q->where('activo', true)
-                    ->where(function($q2) use ($newStart) {
-                        $q2->whereNull('hora_fin')
-                            ->orWhereRaw(
-                                "STR_TO_DATE(CONCAT(fecha_fin, ' ', hora_fin), '%Y-%m-%d %H:%i') > ?",
-                                [$newStart->format('Y-m-d H:i')]
-                            );
-                    });
-                })
-                ->with(['citasComoMecanico' => function($q) use ($newStart) {
-                    $q->where('activo', true)
-                    ->where(function($q2) use ($newStart) {
-                        $q2->whereNull('hora_fin')
-                            ->orWhereRaw(
-                                "STR_TO_DATE(CONCAT(fecha_fin, ' ', hora_fin), '%Y-%m-%d %H:%i') > ?",
-                                [$newStart->format('Y-m-d H:i')]
-                            );
-                    })
-                    ->with(['vehiculo', 'ordenServicio.detallesServicios.servicio'])
-                    ->orderBy('fecha')
-                    ->orderBy('hora');
-                }])
-                ->first();
+                ->with(['vehiculo', 'ordenServicio.detallesServicios.servicio'])
+                ->orderBy('fecha')
+                ->orderBy('hora');
+            }])
+            ->first();
 
-            // Tomamos la primera cita activa de ese mecánico
             $citaActual = $mecanicoOcupado
-                ? $mecanicoOcupado->citasComoMecanico->first()
-                : null;
+            ? $mecanicoOcupado->citasComoMecanico->first()
+            : null;
 
-            // Preparamos el JSON de la cita actual
             $dataCitaActual = null;
             if ($citaActual) {
                 $dataCitaActual = [

@@ -256,25 +256,21 @@ export class CalendarioComponent {
 
   // Cargar todas las citas (de todos los clientes) y asignar extendedProps incluyendo el id_cliente y el estado
   cargarCitas(): void {
-    this.citasService.listarCitas().subscribe(
-      (response) => {
-        this.calendarOptions.events = response.map((cita: any) => ({
+    this.citasService.listarCitas().subscribe({
+      next: (response: any[]) => {
+        this.calendarOptions.events = response.map(cita => ({
           id: cita.id,
           title: `Vehículo: ${cita.vehiculo?.marca || 'Vehículo no definido'}`,
           start: `${cita.fecha}T${cita.hora}`,
           end: `${cita.fecha_fin}T${cita.hora_fin}`,
-          className: 
-            cita.estado === 'En Proceso'
-              ? 'fc-event-purple'
-              :cita.estado === 'Diagnosticado'
-                ? 'fc-event-orange'
-                : cita.estado === 'Atendida'
-                  ? 'fc-event-blue'
-                  : cita.estado === 'Confirmada'
-                    ? 'fc-event-green'
-                    : 'fc-event-red',
+          className:
+            cita.estado === 'En Proceso'   ? 'fc-event-purple' :
+            cita.estado === 'Diagnosticado'? 'fc-event-orange' :
+            cita.estado === 'Atendida'     ? 'fc-event-blue'   :
+            cita.estado === 'Confirmada'   ? 'fc-event-green'  :
+                                            'fc-event-red',
           extendedProps: {
-            id_cliente: cita.cliente.cedula, 
+            id_cliente: cita.cliente.cedula,
             nombre_cliente: cita.cliente.nombre,
             apellido_cliente: cita.cliente.apellido,
             vehiculo: cita.vehiculo || null,
@@ -288,15 +284,22 @@ export class CalendarioComponent {
             mecanicoNombre: cita.mecanico?.nombre || 'No asignado',
             mecanicoApellido: cita.mecanico?.apellido || '',
             capacidad: cita.capacidad,
-            orden_reserva: cita.orden_reserva, // <--- nuevo campo
+            orden_reserva: cita.orden_reserva,
           },
         }));
       },
-      (error) => {
-        console.error('Error al cargar citas:', error);
+      error: err => {
+        if (err.status === 401) {
+          // Si el token expiró o es inválido, forzamos logout y redireccionamos
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        } else {
+          console.error('Error al cargar citas:', err);
+          Swal.fire('Error', 'No se pudieron cargar las citas.', 'error');
+        }
       }
-    );
-  }    
+    });
+  }
 
   abrirModalCita(info: any): void {
     const [year, month, day] = info.dateStr.split('-').map(Number);

@@ -111,25 +111,21 @@ export class MecanicoCitaComponent {
   }
 
   cargarCitasMecanico(): void {
-    this.citasService.listarCitasMecanico().subscribe(
-      (response) => {
-        this.calendarOptions.events = response.map((cita: any) => ({
+    this.citasService.listarCitasMecanico().subscribe({
+      next: (response: any[]) => {
+        this.calendarOptions.events = response.map(cita => ({
           id: cita.id,
           title: `Vehículo: ${cita.vehiculo?.marca || 'Vehículo no definido'}`,
           start: `${cita.fecha}T${cita.hora}`,
-          end: cita.fecha_fin 
-                 ? `${cita.fecha_fin}T${cita.hora_fin}` 
-                 : (cita.hora_fin ? `${cita.fecha}T${cita.hora_fin}` : null),
-          className: 
-                cita.estado === 'En Proceso'
-                   ? 'fc-event-purple'
-                   :cita.estado === 'Diagnosticado'
-                   ? 'fc-event-orange'
-                   : cita.estado === 'Atendida'
-                     ? 'fc-event-blue'
-                     : cita.estado === 'Confirmada'
-                       ? 'fc-event-green'
-                       : 'fc-event-red',
+          end: cita.fecha_fin
+                ? `${cita.fecha_fin}T${cita.hora_fin}`
+                : (cita.hora_fin ? `${cita.fecha}T${cita.hora_fin}` : null),
+          className:
+            cita.estado === 'En Proceso'    ? 'fc-event-purple'  :
+            cita.estado === 'Diagnosticado' ? 'fc-event-orange'  :
+            cita.estado === 'Atendida'      ? 'fc-event-blue'    :
+            cita.estado === 'Confirmada'    ? 'fc-event-green'   :
+                                            'fc-event-red',
           extendedProps: {
             vehiculo: cita.vehiculo || null,
             clienteNombre: cita.cliente?.nombre || 'Sin nombre',
@@ -137,17 +133,24 @@ export class MecanicoCitaComponent {
             subtipos: cita.subtipos || [],
             estado: cita.estado,
             fecha: cita.fecha,
-            fecha_fin: cita.fecha_fin, // Se incluye para poder combinar con hora_fin
+            fecha_fin: cita.fecha_fin,
             hora_fin: cita.hora_fin,
             capacidad: cita.capacidad,
             orden_reserva: cita.orden_reserva
-          },
-        }));        
+          }
+        }));
       },
-      (error) => {
-        console.error('Error al cargar citas del mecánico:', error);
+      error: err => {
+        if (err.status === 401) {
+          // Token inválido o expirado: forzamos logout y redirigimos al login
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        } else {
+          console.error('Error al cargar citas del mecánico:', err);
+          Swal.fire('Error', 'No se pudieron cargar las citas del mecánico.', 'error');
+        }
       }
-    );
+    });
   }                                
 
   mostrarDetallesCita(event: any): void {

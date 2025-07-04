@@ -229,6 +229,27 @@
                     <!-- Sección de acciones (botones) -->
                     <mat-card-actions class="button-row">
 
+                        <!-- Nuevo botón enviar foto -->
+                        <button
+                            mat-icon-button
+                            class="custom-button accent-button"
+                            color="warn"
+                            aria-label="Enviar foto repuesto"
+                            *ngIf="isCitaIniciada(trabajo)"
+                            (click)="triggerFileSelector(trabajo)"
+                        >
+                            <mat-icon>photo_camera</mat-icon>
+                        </button>
+
+                        <!-- input oculto -->
+                        <input
+                            #fileInput
+                            type="file"
+                            accept="image/*"
+                            (change)="onFileSelected($event)"
+                            hidden
+                        >
+
                         <!-- Diagnóstico: sólo si ya empezó y está en Diagnosticado -->
                         <button
                             mat-icon-button

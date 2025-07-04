@@ -90,12 +90,13 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     Route::post('diagnosticos/{idOrden}/enviarCorreoSinServicios',               [DiagnosticoController::class, 'enviarCorreoSinServicios']);
 
     // Orden de servicio 
-    Route::get   ('/ordenes',                        [OrdenServicioController::class,'index']);
-    Route::get   ('/ordenes/confirmadas',            [OrdenServicioController::class,'listarOrdenesConfirmadas']);
-    Route::get   ('/ordenes/{id}',                   [OrdenServicioController::class,'show']);
-    Route::patch ('/ordenes/{id}/progreso',          [OrdenServicioController::class,'actualizarProgreso']);
-    Route::patch ('/ordenes/{id}/descripciones',     [OrdenServicioController::class,'actualizarDescripcion']);
-    Route::post  ('/ordenes/{id}/finalizar-auto',    [OrdenServicioController::class,'finalizarOrdenAutomatico']);
+    Route::get   ('/ordenes',                               [OrdenServicioController::class,'index']);
+    Route::get   ('/ordenes/confirmadas',                   [OrdenServicioController::class,'listarOrdenesConfirmadas']);
+    Route::get   ('/ordenes/{id}',                          [OrdenServicioController::class,'show']);
+    Route::patch ('/ordenes/{id}/progreso',                 [OrdenServicioController::class,'actualizarProgreso']);
+    Route::patch ('/ordenes/{id}/descripciones',            [OrdenServicioController::class,'actualizarDescripcion']);
+    Route::post  ('/ordenes/{id}/finalizar-auto',           [OrdenServicioController::class,'finalizarOrdenAutomatico']);
+    Route::post  ('/ordenes/{idOrden}/enviar-foto-gmail',   [OrdenServicioController::class, 'notificarFotoGmailPorOrden']);
 
     // Detalle de servicio
     Route::get    ('/detalle-servicio',           [DetalleServicioController::class, 'index']);

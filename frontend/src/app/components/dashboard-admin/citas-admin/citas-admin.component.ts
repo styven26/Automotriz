@@ -140,45 +140,49 @@ export class CitasAdminComponent {
   }
 
   cargarCitasGlobal(): void {
-    this.citadmin.listarCitasGlobal().subscribe(
-      (citas: any[]) => {
+    this.citadmin.listarCitasGlobal().subscribe({
+      next: (citas: any[]) => {
         this.calendarOptions.events = citas.map(cita => {
-          // Sacamos la orden y sus detalles
           const orden = cita.ordenServicio;
           const detalles: any[] = orden?.detalles_servicios ?? [];
 
           return {
-            id: cita.id_cita, // o cita.id según tu JSON
+            id: cita.id_cita,
             title: `Mecánico: ${cita.mecanico?.nombre || 'No asignado'} | Vehículo: ${cita.vehiculo?.marca || 'No definido'}`,
             start: `${cita.fecha}T${cita.hora}`,
             end: `${cita.fecha}T${cita.hora_fin}`,
-           className: 
-           cita.estado === 'En Proceso'
-              ? 'fc-event-purple'
-              :cita.estado === 'Diagnosticado'
-                ? 'fc-event-orange'
-                : cita.estado === 'Atendida'
-                  ? 'fc-event-blue'
-                  : cita.estado === 'Confirmada'
-                    ? 'fc-event-green'
-                    : 'fc-event-red',
+            className:
+              cita.estado === 'En Proceso'    ? 'fc-event-purple' :
+              cita.estado === 'Diagnosticado' ? 'fc-event-orange' :
+              cita.estado === 'Atendida'      ? 'fc-event-blue'   :
+              cita.estado === 'Confirmada'    ? 'fc-event-green'  :
+                                                'fc-event-red',
             extendedProps: {
               vehiculo: cita.vehiculo,
               clienteNombre: cita.cliente?.nombre,
               clienteApellido: cita.cliente?.apellido,
               mecanicoNombre: cita.mecanico?.nombre,
-              servicios: detalles,    // aquí van los detalles de servicio
+              servicios: detalles,
               estado: cita.estado,
               ordenId: orden?.id_orden,
             }
           };
         });
       },
-      err => console.error('Error al cargar citas globales:', err)
-    );
+      error: err => {
+        if (err.status === 401) {
+          // Token inválido o expirado: forzamos logout y redirigimos al login
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        } else {
+          console.error('Error al cargar citas globales:', err);
+          Swal.fire('Error', 'No se pudieron cargar las citas globales.', 'error');
+        }
+      }
+    });
   }
 
- mostrarDetallesCita(event: any): void {
+  mostrarDetallesCita(event: any): void {
     const cita = event.event;
     const props = cita.extendedProps;
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrdenServicio;
 use App\Models\DetalleServicio;
+use App\Mail\FotoRepuestoMail;
 use App\Models\DetalleRepuesto;
 use App\Models\EstadoCita;
 use App\Models\Cita;
@@ -320,5 +321,36 @@ class OrdenServicioController extends Controller
         } catch (\Throwable $e) {
             Log::error("Error enviando correo: " . $e->getMessage());
         }
+    }
+
+    // Notificar por correo al cliente que un repuesto
+    public function notificarFotoGmailPorOrden(Request $request, $idOrden)
+    {
+        // 1) validación
+        $data = $request->validate([
+            'nombre'   => 'required|string|max:50',
+            'cantidad' => 'required|integer|min:1',
+            'foto'     => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        // 2) encuentra orden y correo de cliente
+        $orden   = OrdenServicio::findOrFail($idOrden);
+        $cliente = $orden->cita->cliente->correo;
+
+        // 3) mueve el archivo y guarda ruta relativa
+        $archivo       = $request->file('foto');
+        $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
+        $archivo->move(public_path('repuestos'), $nombreArchivo);
+        $rutaFoto = 'repuestos/' . $nombreArchivo;
+
+        // 4) envía el Mailable
+        Mail::to($cliente)
+            ->send(new FotoRepuestoMail(
+                $data['nombre'],
+                $data['cantidad'],
+                $rutaFoto
+            ));
+
+        return response()->json(['message' => 'Correo enviado.'], 200);
     }
 }
