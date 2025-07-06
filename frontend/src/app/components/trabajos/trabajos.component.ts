@@ -86,135 +86,135 @@ export class TrabajosComponent {
   }
 
   // trabajos.component.ts
-onFileSelected(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (!input.files?.length) return;
-  let file: File = input.files[0];
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    let file: File = input.files[0];
 
-  // Cargamos el Data-URL para la vista previa
-  const reader = new FileReader();
-  reader.onload = () => {
-    let modalFile = file; // variable que actualizará el fichero si cambias la foto
+    // Cargamos el Data-URL para la vista previa
+    const reader = new FileReader();
+    reader.onload = () => {
+      let modalFile = file; // variable que actualizará el fichero si cambias la foto
 
-    Swal.fire({
-      title: `<h3 style="
-          font-family: Roboto, sans-serif;
-          font-size: 30px;
-          font-weight: 900;
-          text-align: center;
-          margin-bottom: 15px;
-        ">
-          <strong>Previsualizar y datos del repuesto</strong>
-      </h3>`,
-      html: `<img
-          id="swal-img-preview"
-          src="${reader.result}"
-          style="max-width:100%; margin-bottom:15px; border-radius:8px;"
-        />
-        <input
-          type="file"
-          id="swal-file"
-          accept="image/*"
-          style="
-            display: block;
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            line-height: 1.4;
-            border: 1px solid #ccc;
-            border-radius: 0.375rem;
+      Swal.fire({
+        title: `<h3 style="
+            font-family: Roboto, sans-serif;
+            font-size: 30px;
+            font-weight: 900;
+            text-align: center;
             margin-bottom: 15px;
-            box-sizing: border-box;
-          "
-        />
-        <input
-          id="swal-nombre"
-          placeholder="Nombre"
-          style="
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            line-height: 1.4;
-            border: 1px solid #ccc;
-            border-radius: 0.375rem;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-          "
-        />
-        <input
-          id="swal-cantidad"
-          type="number"
-          min="1"
-          placeholder="Cantidad"
-          style="
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            line-height: 1.4;
-            border: 1px solid #ccc;
-            border-radius: 0.375rem;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-          "
-        />
-      `,
-      focusConfirm: false,
-      showCancelButton: true,
-      didOpen: () => {
-        // cuando cambias la foto en el modal, actualizamos la preview y modalFile
-        const fileInputModal = document.getElementById('swal-file') as HTMLInputElement;
-        const imgPreview     = document.getElementById('swal-img-preview') as HTMLImageElement;
+          ">
+            <strong>Previsualizar y datos del repuesto</strong>
+        </h3>`,
+        html: `<img
+            id="swal-img-preview"
+            src="${reader.result}"
+            style="max-width:100%; margin-bottom:15px; border-radius:8px;"
+          />
+          <input
+            type="file"
+            id="swal-file"
+            accept="image/*"
+            style="
+              display: block;
+              width: 100%;
+              padding: 0.75rem 1rem;
+              font-family: 'Poppins', sans-serif;
+              font-size: 1rem;
+              line-height: 1.4;
+              border: 1px solid #ccc;
+              border-radius: 0.375rem;
+              margin-bottom: 15px;
+              box-sizing: border-box;
+            "
+          />
+          <input
+            id="swal-nombre"
+            placeholder="Nombre"
+            style="
+              width: 100%;
+              padding: 0.75rem 1rem;
+              font-family: 'Poppins', sans-serif;
+              font-size: 1rem;
+              line-height: 1.4;
+              border: 1px solid #ccc;
+              border-radius: 0.375rem;
+              margin-bottom: 15px;
+              box-sizing: border-box;
+            "
+          />
+          <input
+            id="swal-cantidad"
+            type="number"
+            min="1"
+            placeholder="Cantidad"
+            style="
+              width: 100%;
+              padding: 0.75rem 1rem;
+              font-family: 'Poppins', sans-serif;
+              font-size: 1rem;
+              line-height: 1.4;
+              border: 1px solid #ccc;
+              border-radius: 0.375rem;
+              margin-bottom: 15px;
+              box-sizing: border-box;
+            "
+          />
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        didOpen: () => {
+          // cuando cambias la foto en el modal, actualizamos la preview y modalFile
+          const fileInputModal = document.getElementById('swal-file') as HTMLInputElement;
+          const imgPreview     = document.getElementById('swal-img-preview') as HTMLImageElement;
 
-        fileInputModal.addEventListener('change', e => {
-          const fi = e.target as HTMLInputElement;
-          if (!fi.files?.length) return;
-          modalFile = fi.files[0];
-          const r2 = new FileReader();
-          r2.onload = () => imgPreview.src = r2.result as string;
-          r2.readAsDataURL(modalFile);
-        });
-      },
-      preConfirm: () => {
-        const nombreEl   = (document.getElementById('swal-nombre')   as HTMLInputElement).value.trim();
-        const cantidadEl = (document.getElementById('swal-cantidad') as HTMLInputElement).value;
-        if (!nombreEl)   return Swal.showValidationMessage('Ingresa un nombre');
-        const cantidad = parseInt(cantidadEl, 10);
-        if (isNaN(cantidad) || cantidad < 1) 
-          return Swal.showValidationMessage('Cantidad ≥ 1');
-        return { nombre: nombreEl, cantidad, file: modalFile };
-      }
-    }).then(result => {
-      if (!result.isConfirmed || !result.value) return;
-      const { nombre, cantidad, file } = result.value;
+          fileInputModal.addEventListener('change', e => {
+            const fi = e.target as HTMLInputElement;
+            if (!fi.files?.length) return;
+            modalFile = fi.files[0];
+            const r2 = new FileReader();
+            r2.onload = () => imgPreview.src = r2.result as string;
+            r2.readAsDataURL(modalFile);
+          });
+        },
+        preConfirm: () => {
+          const nombreEl   = (document.getElementById('swal-nombre')   as HTMLInputElement).value.trim();
+          const cantidadEl = (document.getElementById('swal-cantidad') as HTMLInputElement).value;
+          if (!nombreEl)   return Swal.showValidationMessage('Ingresa un nombre');
+          const cantidad = parseInt(cantidadEl, 10);
+          if (isNaN(cantidad) || cantidad < 1) 
+            return Swal.showValidationMessage('Cantidad ≥ 1');
+          return { nombre: nombreEl, cantidad, file: modalFile };
+        }
+      }).then(result => {
+        if (!result.isConfirmed || !result.value) return;
+        const { nombre, cantidad, file } = result.value;
 
-      const formData = new FormData();
-      formData.append('foto', file);
-      formData.append('nombre', nombre);
-      formData.append('cantidad', `${cantidad}`);
+        const formData = new FormData();
+        formData.append('foto', file);
+        formData.append('nombre', nombre);
+        formData.append('cantidad', `${cantidad}`);
 
-      this.ordenService
-        .enviarFotoGmailPorOrden(this.selectedTrabajo.id_orden, formData)
-        .subscribe({
-          next: ()   => Swal.fire('¡Listo!','Correo enviado al cliente','success'),
-          error: err => {
-            console.error(err);
-            const msg = err.error?.errors
-              ? Object.values(err.error.errors).flat().join(', ')
-              : err.error?.message || err.message;
-            Swal.fire('Error', `No se pudo enviar la foto: ${msg}`, 'error');
-          }
-        });
-    });
-  };
+        this.ordenService
+          .enviarFotoGmailPorOrden(this.selectedTrabajo.id_orden, formData)
+          .subscribe({
+            next: ()   => Swal.fire('¡Listo!','Correo enviado al cliente','success'),
+            error: err => {
+              console.error(err);
+              const msg = err.error?.errors
+                ? Object.values(err.error.errors).flat().join(', ')
+                : err.error?.message || err.message;
+              Swal.fire('Error', `No se pudo enviar la foto: ${msg}`, 'error');
+            }
+          });
+      });
+    };
 
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
 
-  // limpiamos el input original para poder volver a subir la misma foto si quieres
-  input.value = '';
-}
+    // limpiamos el input original para poder volver a subir la misma foto si quieres
+    input.value = '';
+  }
 
   abrirModalCantidad(
     detalle: { id_detalle: number; cantidad: number },

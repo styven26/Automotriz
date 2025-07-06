@@ -205,7 +205,8 @@
                                                 Subtotal: {{ dr.subtotal | currency }}<br>
                                                 <span *ngIf="dr.repuesto.stock < dr.cantidad"
                                                     style="color:#c0392b;font-weight:bold;">
-                                                ⚠️ Sin stock suficiente en inventario.
+                                                ⚠️ Stock insuficiente. El cliente debe adquirir este repuesto por su cuenta.
+                                                El mecánico enviará los detalles de la compra y la foto del repuesto vía WhatsApp.
                                                 </span>
                                             </p>
                                         </div>
@@ -229,17 +230,18 @@
                     <!-- Sección de acciones (botones) -->
                     <mat-card-actions class="button-row">
 
-                        <!-- Nuevo botón enviar foto -->
-                        <button
-                            mat-icon-button
-                            class="custom-button accent-button"
-                            color="warn"
-                            aria-label="Enviar foto repuesto"
-                            *ngIf="isCitaIniciada(trabajo)"
-                            (click)="triggerFileSelector(trabajo)"
-                        >
-                            <mat-icon>photo_camera</mat-icon>
-                        </button>
+                        <!-- Nuevo botón enviar foto
+                            <button
+                                mat-icon-button
+                                class="custom-button accent-button"
+                                color="warn"
+                                aria-label="Enviar foto repuesto"
+                                *ngIf="isCitaIniciada(trabajo)"
+                                (click)="triggerFileSelector(trabajo)"
+                            >
+                                <mat-icon>photo_camera</mat-icon>
+                            </button>
+                        -->
 
                         <!-- input oculto -->
                         <input
