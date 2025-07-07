@@ -1,0 +1,126 @@
+<!-- actualizar-clientes.component.html -->
+<div class="modal-container">
+  <!-- Header -->
+  <div class="modal-header">
+    <h2 id="dialog-title">Editar Cliente</h2>
+    <button mat-icon-button (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Formulario -->
+  <form [formGroup]="clienteForm" (ngSubmit)="guardarCambios()">
+    <div class="modal-body">
+      <!-- Nombre -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+        <mat-error *ngIf="f['nombre'].hasError('required')">
+          El nombre es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="f['nombre'].hasError('minlength')">
+          Al menos 3 caracteres.
+        </mat-error>
+        <mat-error *ngIf="f['nombre'].hasError('pattern')">
+          Solo letras y espacios.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Apellido -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="apellido" placeholder="Ingrese el apellido">
+        <mat-error *ngIf="f['apellido'].hasError('required')">
+          El apellido es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="f['apellido'].hasError('minlength')">
+          Al menos 3 caracteres.
+        </mat-error>
+        <mat-error *ngIf="f['apellido'].hasError('pattern')">
+          Solo letras y espacios.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Cédula -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Cédula</mat-label>
+        <input matInput formControlName="cedula" maxlength="10" placeholder="10 dígitos">
+        <mat-error *ngIf="f['cedula'].hasError('required')">
+          La cédula es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="f['cedula'].hasError('pattern')">
+          Debe tener 10 dígitos.
+        </mat-error>
+        <mat-error *ngIf="f['cedula'].hasError('invalidCedula')">
+          Cédula no válida.
+        </mat-error>
+        <mat-error *ngIf="f['cedula'].hasError('taken')">
+          La cédula ya existe.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Correo -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Correo</mat-label>
+        <input matInput formControlName="correo" placeholder="ejemplo@dominio.com">
+        <mat-error *ngIf="f['correo'].hasError('required')">
+          El correo es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="f['correo'].hasError('email')">
+          Ingresa un correo válido.
+        </mat-error>
+        <mat-error *ngIf="f['correo'].hasError('taken')">
+          El correo ya está en uso.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Teléfono -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono</mat-label>
+        <span matPrefix style="padding-right:4px;">+593</span>
+        <input matInput formControlName="telefono" maxlength="9" placeholder="999999999">
+        <mat-error *ngIf="f['telefono'].hasError('required')">
+          El teléfono es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="f['telefono'].hasError('pattern')">
+          Debe tener 9 dígitos.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Dirección -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dirección</mat-label>
+        <textarea matInput formControlName="direccion_domicilio" rows="2"
+                  placeholder="Ingrese la dirección"></textarea>
+        <mat-error *ngIf="f['direccion_domicilio'].hasError('required')">
+          La dirección es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="f['direccion_domicilio'].hasError('minlength')">
+          Al menos 5 caracteres.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Fecha de nacimiento -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fecha de nacimiento</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="fecha_nacimiento" placeholder="YYYY-MM-DD">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="f['fecha_nacimiento'].hasError('required')">
+          La fecha es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="f['fecha_nacimiento'].hasError('underage')">
+          Debe ser mayor de 18 años.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Footer -->
+    <footer class="modal-footer">
+      <button class="btn-danger" mat-button (click)="cancelar()">Cancelar</button>
+      <button class="btn-success" mat-raised-button color="primary" type="submit" [disabled]="clienteForm.invalid">
+        Guardar Cambios
+      </button>
+    </footer>
+  </form>
+</div>

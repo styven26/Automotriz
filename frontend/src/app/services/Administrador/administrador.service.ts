@@ -2,6 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+interface Cliente {
+  cedula: string;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  telefono?: string;
+  direccion_domicilio?: string;
+  fecha_nacimiento?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,10 +33,19 @@ export class AdministradorService {
     return this.http.get<any>(`${this.baseUrl}/clientes`, { headers });
   }
 
-  eliminarCliente(clienteId: number): Observable<any> {
+  actualizarCliente(cedula: string, datos: Omit<Cliente,'cedula'>): Observable<{ message: string; cliente: Cliente }> {
     const headers = this.getAuthHeaders();
-    return this.http.delete<any>(`${this.baseUrl}/clientes/${clienteId}`, { headers });
-  }  
+    return this.http.put<{ message: string; cliente: Cliente }>(
+      `${this.baseUrl}/clientes/${cedula}`,
+      datos,
+      { headers }
+    );
+  }
+
+  eliminarCliente(cedula: string): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete<any>(`${this.baseUrl}/clientes/${cedula}`, { headers });
+  } 
 
   descargarReporteClientes(filtros: any): void {
     const headers = this.getAuthHeaders();

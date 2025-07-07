@@ -14,6 +14,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActualizarClientesComponent } from '../actualizar-clientes/actualizar-clientes.component';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
@@ -41,7 +42,7 @@ export class ListarClientesComponent {
 
   constructor( private fb: FormBuilder, private http: HttpClient, private snackBar: MatSnackBar, private router: Router, private authService: AuthService, private adminService: AdministradorService, public dialog: MatDialog) {}
 
-  displayedColumns: string[] = ['nombre', 'apellido', 'cedula', 'correo', 'telefono', 'direccion_domicilio', 'acciones'];
+  displayedColumns: string[] = ['nombre', 'apellido', 'cedula', 'fecha_nacimiento', 'correo', 'telefono', 'direccion_domicilio', 'acciones'];
   dataSource = new MatTableDataSource<any>(); // Inicializamos con un array vacío
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -251,10 +252,33 @@ export class ListarClientesComponent {
     }
   }
 
-  eliminarCliente(cliente: any): void {
+  editar(row: any): void {
+    const dialogRef = this.dialog.open(ActualizarClientesComponent, { data: row });
+    dialogRef.afterClosed().subscribe((updatedData: any) => {
+      if (!updatedData) return;
+      this.adminService.actualizarCliente(row.cedula, updatedData).subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Cliente actualizado',
+            text: 'Los datos del cliente se guardaron correctamente.',
+            confirmButtonText: 'OK',
+            customClass: { confirmButton: 'btn btn-success btn-rounded' },
+            buttonsStyling: false
+          });
+          this.obtenerClientes();
+        },
+        error: () => {
+          Swal.fire('Error','No se pudo actualizar','error');
+        }
+      });
+    });
+  }
+
+  eliminar(row: any): void {
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: `Estás a punto de eliminar al cliente: ${cliente.nombre}. ¡Esta acción no se puede deshacer!`,
+      title: '¿Estás seguro de eliminar este cliente?',
+      text: `Vas a eliminar al cliente:\n\nNombre: ${row.nombre} ${row.apellido}\nCédula: ${row.cedula}\n\n¡Esta acción no se puede deshacer!`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Eliminar',
@@ -265,34 +289,36 @@ export class ListarClientesComponent {
       },
       buttonsStyling: false,
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.adminService.eliminarCliente(cliente.id).subscribe(
-          (response) => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Eliminado',
-              text: 'Cliente eliminado correctamente.',
-              confirmButtonText: 'OK',
-              customClass: {
-                confirmButton: 'btn btn-success btn-rounded',
-              },
-            });
-            this.obtenerClientes(); // Refresca la lista de clientes
-          },
-          (error) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Ocurrió un error al eliminar el cliente.',
-              confirmButtonText: 'OK',
-              customClass: {
-                confirmButton: 'btn btn-danger btn-rounded',
-              },
-            });
-            console.error('Error al eliminar cliente:', error);
-          }
-        );
-      }
+      if (!result.isConfirmed) return;
+
+      this.adminService.eliminarCliente(row.cedula).subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Eliminado',
+            text: 'El cliente ha sido eliminado correctamente.',
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'btn btn-success btn-rounded',
+            },
+            buttonsStyling: false,
+          });
+          this.obtenerClientes();
+        },
+        error: (err) => {
+          console.error('Error al eliminar cliente:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar el cliente. Intenta nuevamente más tarde.',
+            confirmButtonText: 'OK',
+            customClass: {
+              confirmButton: 'btn btn-danger btn-rounded',
+            },
+            buttonsStyling: false,
+          });
+        },
+      });
     });
   }
 

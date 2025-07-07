@@ -266,6 +266,14 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header> Cédula </th>
               <td mat-cell *matCellDef="let mecanico"> {{mecanico.cedula}} </td>
             </ng-container>
+
+            <!-- Fecha de nacimiento Column -->
+            <ng-container matColumnDef="fecha_nacimiento">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Nacimiento </th>
+              <td mat-cell *matCellDef="let mecanico">
+                {{ mecanico.fecha_nacimiento | date:'dd/MM/yyyy' }}
+              </td>
+            </ng-container>
         
             <!-- Correo Column -->
             <ng-container matColumnDef="correo">

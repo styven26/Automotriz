@@ -46,6 +46,15 @@ export class ActualizarMecanicoComponent {
     if (rawPhone.startsWith('+593')) {
       rawPhone = rawPhone.slice(4); // Elimina los primeros 4 caracteres (+593)
     }
+
+    // 2) Convertir string "YYYY-MM-DD" a Date para el datepicker
+    let initialDate: Date | null = null;
+    if (typeof data.fecha_nacimiento === 'string') {
+      const [y, m, d] = data.fecha_nacimiento
+        .split('-')
+        .map((v: string) => parseInt(v, 10));   // ← aquí aclaramos (v: string)
+      initialDate = new Date(y, m - 1, d);
+    }
   
     this.mecanicoForm = this.fb.group({
       nombre: [
@@ -73,65 +82,70 @@ export class ActualizarMecanicoComponent {
         [Validators.required, Validators.minLength(5)]
       ],
       especialidad: [data.especialidad, [Validators.required]],
-      fecha_nacimiento: [
-        data.fecha_nacimiento,
-        [Validators.required, this.validateAge(18)]
-      ],
+      fecha_nacimiento: [ initialDate, [Validators.required, this.validateAge(18)] ],
       genero: [data.genero, [Validators.required]],
       id_admin: [data.id_admin || 1, Validators.required],
     });
   }  
 
+  get f(): Record<string, AbstractControl> {
+    return this.mecanicoForm.controls;
+  }
+
   guardarCambios(): void {
-    if (this.mecanicoForm.valid) {
-      // 1. Obtenemos los datos del formulario
-      const formValues = this.mecanicoForm.value;
-  
-      // 2. Concatenamos +593 al teléfono
-      const telefonoCompleto = '+593' + formValues.telefono;
-  
-      // 3. Creamos el objeto final a enviar
-      const datosActualizados = {
-        ...formValues,
-        telefono: telefonoCompleto
-      };
-  
-      // 4. Llamamos al servicio
-      this.mecanicoService.actualizarMecanico(this.data.cedula, datosActualizados).subscribe(
-        response => {
+    if (this.mecanicoForm.invalid) return;
+
+    const vals = this.mecanicoForm.value;
+
+    // Reconstruir teléfono
+    const telefonoCompleto = '+593' + vals.telefono;
+
+    // Formatear fecha a "YYYY-MM-DD"
+    const fechaControl = vals.fecha_nacimiento;
+    let fechaString = '';
+    if (fechaControl instanceof Date && !isNaN(fechaControl.getTime())) {
+      const y = fechaControl.getFullYear();
+      const m = String(fechaControl.getMonth() + 1).padStart(2, '0');
+      const d = String(fechaControl.getDate()).padStart(2, '0');
+      fechaString = `${y}-${m}-${d}`;
+    }
+
+    // Objeto final
+    const datosActualizados = {
+      ...vals,
+      telefono: telefonoCompleto,
+      fecha_nacimiento: fechaString
+    };
+
+    this.mecanicoService
+      .actualizarMecanico(this.data.cedula, datosActualizados)
+      .subscribe({
+        next: () => {
           Swal.fire({
             icon: 'success',
             title: '¡Mecánico actualizado!',
-            text: 'El mecánico se ha actualizado con éxito.',
+            text: 'Los datos se guardaron correctamente.',
             confirmButtonText: 'OK',
-            customClass: {
-              confirmButton: 'btn btn-success btn-rounded'
-            },
+            customClass: { confirmButton: 'btn btn-success btn-rounded' },
             buttonsStyling: false
           });
-          this.dialogRef.close(this.mecanicoForm.value);
+          this.dialogRef.close(datosActualizados);
         },
-        error => {
-          // Verificamos si el backend nos envía algo como: error.error.cedula
-          if (error.error && error.error.cedula) {
-            // Marcamos el control 'cedula' con el error 'taken'
-            this.mecanicoForm.get('cedula')?.setErrors({ taken: true });
+        error: err => {
+          if (err.error?.cedula) {
+            this.f['cedula'].setErrors({ taken: true });
           }
-  
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Hubo un problema al actualizar el mecánico.',
+            text: err.error?.message || 'No se pudo actualizar el mecánico.',
             confirmButtonText: 'Cerrar',
-            customClass: {
-              confirmButton: 'btn btn-danger'
-            },
+            customClass: { confirmButton: 'btn btn-danger btn-rounded' },
             buttonsStyling: false
           });
         }
-      );
-    }
-  }    
+      });
+  } 
 
   cancelar(): void {
     this.dialogRef.close();

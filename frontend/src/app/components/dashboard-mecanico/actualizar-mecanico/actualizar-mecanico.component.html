@@ -64,7 +64,27 @@
         <mat-error *ngIf="mecanicoForm.get('cedula')?.hasError('taken')">
           La cédula ya está registrada.
         </mat-error>
-      </mat-form-field>      
+      </mat-form-field>
+
+      <!-- Fecha de nacimiento -->
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de nacimiento</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="fecha_nacimiento"
+          placeholder="DD/MM/YYYY"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+
+        <mat-error *ngIf="mecanicoForm.get('fecha_nacimiento')?.hasError('required')">
+          La fecha es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="mecanicoForm.get('fecha_nacimiento')?.hasError('underage')">
+          Debe ser mayor de 18 años.
+        </mat-error>
+      </mat-form-field>
 
       <!-- Correo -->
       <mat-form-field appearance="outline">

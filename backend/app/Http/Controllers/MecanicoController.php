@@ -105,8 +105,10 @@ class MecanicoController extends Controller
             'correo' => 'required|string|email|max:100|unique:usuario,correo,' . $id . ',cedula',
             'telefono' => 'required|string|max:20',
             'direccion_domicilio' => 'required|string|max:100',
+            'fecha_nacimiento'  => 'required|date|before:18 years ago',
             'especialidad' => 'required|string|max:100|in:' . implode(',', $especialidadesDisponibles),
         ], [
+            'fecha_nacimiento.before' => 'El mecánico debe tener al menos 18 años.',
             'especialidad.in' => 'La especialidad seleccionada no es válida.',
         ]);
 

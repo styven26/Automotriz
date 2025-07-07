@@ -44,7 +44,7 @@ export interface Orden {
     hora: string;
     fecha_fin?: string;
     hora_fin?: string;
-    cliente: { cedula: string; nombre: string; apellido: string; correo?: string; };
+    cliente: { cedula: string; nombre: string; telefono: string; apellido: string; correo?: string; };
     cedula_mecanico: string;    // ← agregado
   };
   vehiculo: { id_vehiculo: number; marca: string; modelo: string; imagen?: string; kilometraje?:number; numero_placa?: string; fecha_ultimo_servicio?:string; };
@@ -82,6 +82,20 @@ export class OrdenService {
       `${this.base}/${idOrden}/enviar-foto-gmail`,
       payload,
       { headers }   // ¡sin Content-Type!
+    );
+  }
+
+  /** 8) Subir foto y obtener URL para WhatsApp */
+  enviarFotoWhatsAppPorOrden(
+    idOrden: number,
+    payload: FormData
+  ): Observable<{ url: string }> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<{ url: string }>(
+      `${this.base}/${idOrden}/enviar-foto-whatsapp`,
+      payload,
+      { headers }
     );
   }
 

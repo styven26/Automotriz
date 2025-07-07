@@ -267,6 +267,14 @@
                     <td mat-cell *matCellDef="let cliente"> {{cliente.cedula}} </td>
                 </ng-container>
 
+                <!-- Fecha Nacimiento Column -->
+                <ng-container matColumnDef="fecha_nacimiento">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha Nacimiento </th>
+                  <td mat-cell *matCellDef="let cliente">
+                    {{ cliente.fecha_nacimiento | date:'dd/MM/yyyy' }}
+                  </td>
+                </ng-container>
+
                 <!-- Correo Column -->
                 <ng-container matColumnDef="correo">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Correo </th>
@@ -288,8 +296,11 @@
                 <!-- Acciones Column -->
                 <ng-container matColumnDef="acciones">
                   <th mat-header-cell *matHeaderCellDef> Acciones </th>
-                  <td mat-cell *matCellDef="let cliente">
-                    <button mat-icon-button color="warn" (click)="eliminarCliente(cliente)">
+                  <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button color="primary" (click)="editar(row)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="eliminar(row)">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>

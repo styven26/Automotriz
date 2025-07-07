@@ -46,12 +46,15 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // Listar Clientes
     Route::get('/clientes',                 [AdminController::class, 'listarClientes']);
+    
+    // Editar Cliente
+    Route::put('/clientes/{cedula}',        [AdminController::class, 'actualizarCliente']);
+
+    // Eliminar Cliente
+    Route::delete('/clientes/{cedula}',     [AdminController::class, 'eliminarCliente']);
 
     // Reportes
     Route::get('/dashboard/citas-clientes', [AdminController::class, 'citasYClientesPorMes']);
-
-    // Eliminar Clientes
-    Route::delete('/clientes/{id}',         [AdminController::class, 'eliminarCliente']);
 
     // CRUD de mecanicos
     Route::apiResource('mecanicos', App\Http\Controllers\MecanicoController::class);
@@ -97,6 +100,7 @@ Route::prefix('mecanico')->middleware('auth:mecanico')->group(function () {
     Route::patch ('/ordenes/{id}/descripciones',            [OrdenServicioController::class,'actualizarDescripcion']);
     Route::post  ('/ordenes/{id}/finalizar-auto',           [OrdenServicioController::class,'finalizarOrdenAutomatico']);
     Route::post  ('/ordenes/{idOrden}/enviar-foto-gmail',   [OrdenServicioController::class, 'notificarFotoGmailPorOrden']);
+    Route::post  ('/ordenes/{idOrden}/enviar-foto-whatsapp',[OrdenServicioController::class, 'subirFotoWhatsAppPorOrden']);
 
     // Detalle de servicio
     Route::get    ('/detalle-servicio',           [DetalleServicioController::class, 'index']);

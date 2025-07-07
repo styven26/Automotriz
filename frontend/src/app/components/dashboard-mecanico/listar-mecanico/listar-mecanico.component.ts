@@ -44,7 +44,7 @@ export class ListarMecanicoComponent {
 
   constructor( private fb: FormBuilder, private http: HttpClient, private admin:AdministradorService, private snackBar: MatSnackBar, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService, public dialog: MatDialog) {}
 
-  displayedColumns: string[] = ['nombre', 'apellido', 'cedula', 'correo', 'telefono', 'direccion_domicilio', 'especialidad', 'acciones'];
+  displayedColumns: string[] = ['nombre', 'apellido', 'cedula', 'fecha_nacimiento', 'correo', 'telefono', 'direccion_domicilio', 'especialidad', 'acciones'];
   dataSource!: MatTableDataSource<any>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;

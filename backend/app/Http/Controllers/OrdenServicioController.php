@@ -353,4 +353,18 @@ class OrdenServicioController extends Controller
 
         return response()->json(['message' => 'Correo enviado.'], 200);
     }
+
+    public function subirFotoWhatsAppPorOrden(Request $request, $idOrden)
+    {
+        $request->validate([
+            'foto' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        // Guarda el archivo
+        $path = $request->file('foto')->store('public/repuestos');
+        $url  = Storage::url($path);               // '/storage/repuestos/archivo.jpg'
+        $full = asset($url);                       // 'https://tuservidor.com/storage/...'
+
+        return response()->json(['url' => $full], 200);
+    }
 }

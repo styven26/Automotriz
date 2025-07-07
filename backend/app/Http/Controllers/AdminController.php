@@ -74,6 +74,39 @@ class AdminController extends Controller
         ], 200);
     }
 
+    public function actualizarCliente(Request $request, string $cedula)
+    {
+        // 1. Validación (nota: tabla 'usuario', PK 'cedula')
+        $validated = $request->validate([
+            'nombre'               => 'required|string|max:100',
+            'apellido'             => 'required|string|max:100',
+            'correo'               => "required|email|unique:usuario,correo,{$cedula},cedula",
+            'telefono'             => 'nullable|string|max:20',
+            'direccion_domicilio'  => 'nullable|string|max:255',
+            'fecha_nacimiento'     => 'nullable|date',
+        ]);
+
+        // 2. Buscar cliente con rol 'cliente'
+        $cliente = Usuario::whereHas('roles', fn($q) =>
+            $q->where('nombre', 'cliente')
+        )->find($cedula);
+
+        if (! $cliente) {
+            return response()->json([
+                'error' => 'Cliente no encontrado'
+            ], 404);
+        }
+
+        // 3. Actualizar y guardar
+        $cliente->update($validated);
+
+        // 4. Devolver cliente actualizado
+        return response()->json([
+            'message' => 'Cliente actualizado correctamente',
+            'cliente' => $cliente
+        ], 200);
+    }
+
     public function eliminarCliente($cedula)
     {
         $cliente = Usuario::whereHas('roles', fn($q) => 
