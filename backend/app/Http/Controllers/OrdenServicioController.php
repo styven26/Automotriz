@@ -13,6 +13,7 @@ use App\Events\TrabajoActualizado;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class OrdenServicioController extends Controller
@@ -354,6 +355,7 @@ class OrdenServicioController extends Controller
         return response()->json(['message' => 'Correo enviado.'], 200);
     }
 
+    // Notificar por WhatsApp al cliente que un repuesto
     public function subirFotoWhatsAppPorOrden(Request $request, $idOrden)
     {
         $request->validate([

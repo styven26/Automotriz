@@ -85,37 +85,50 @@ export class TrabajosComponent {
     this.fileInput.nativeElement.click();
   }
 
-  // trabajos.component.ts (sólo la parte del método onFileSelected)
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     const file = input.files[0];
 
-    // 1) Prepara FormData
+    const cliente = this.selectedTrabajo.cita.cliente;
+    const nombreCompleto = `${cliente.nombre} ${cliente.apellido}`;
+
+    // 1) Si el navegador soporta compartir archivos…
+    if (navigator.canShare?.({ files: [file] })) {
+      const textoCompartir = 
+        `Hola ${nombreCompleto},\n` +
+        `Por favor adquiere el repuesto y revisa la foto aquí:`;
+
+      navigator.share({
+        files: [file],
+        text: textoCompartir
+      }).catch(err => {
+        console.error('Error al compartir:', err);
+        Swal.fire('Error', 'No se pudo compartir la foto', 'error');
+      });
+
+      return;
+    }
+
+    // 2) Fallback: sube la imagen y comparte el enlace
     const formData = new FormData();
     formData.append('foto', file);
 
-    // 2) Llama al nuevo endpoint
     this.ordenService
       .enviarFotoWhatsAppPorOrden(this.selectedTrabajo.id_orden, formData)
       .subscribe({
         next: ({ url }) => {
-          // 3) Construye el enlace de WhatsApp
-          const cliente = this.selectedTrabajo.cita.cliente;
-          const telefono = cliente.telefono.replace(/[^0-9]/g, ''); // "593987654321"
-          const mensaje = encodeURIComponent(
-            `Hola ${cliente.nombre},\n` +
-            `el repuesto "${this.selectedRepuestoId}" no está disponible en stock.\n` +
-            `Por favor adquiere el repuesto y revisa la foto aquí:\n${url}`
-          );
-          const waLink = `https://wa.me/${telefono}?text=${mensaje}`;
+          const mensaje = 
+            `Hola ${nombreCompleto},\n` +
+            `Por favor adquiere el repuesto y revisa la foto aquí:\n${url}`;
 
-          // 4) Abre WhatsApp Web o App
+          const telefono = cliente.telefono.replace(/[^0-9]/g, '');
+          const waLink   = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
           window.open(waLink, '_blank');
         },
         error: err => {
           console.error(err);
-          Swal.fire('Error', 'No se pudo subir la foto para WhatsApp', 'error');
+          Swal.fire('Error', 'No se pudo subir la foto', 'error');
         }
       });
   }
