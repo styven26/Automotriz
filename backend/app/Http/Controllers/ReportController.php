@@ -83,7 +83,12 @@ class ReportController extends Controller
             });
 
         if ($trabajos->isEmpty()) {
-            return response()->json(['error' => 'No hay órdenes atendidas para generar el reporte.'], 404);
+            $mensaje = 'No hay órdenes atendidas para generar el reporte.';
+            $pdf = Pdf::loadView('reportes.sin_trabajos', compact('mensaje','mecanico'))
+                    ->setPaper('A4', 'portrait')
+                    ->setOption('isRemoteEnabled', true);
+
+            return $pdf->download("reporte-trabajos-{$mecanico->cedula}.pdf");
         }
 
         // 4) Generar PDF

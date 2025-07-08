@@ -17,6 +17,7 @@ use App\Http\Controllers\DetalleServicioController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\OptionController;
 
 // Rutas de autenticación
 Route::prefix('auth')->group(function () {
@@ -67,6 +68,18 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     // CRUD de horarios
     Route::apiResource('horarios', HorarioController::class);
+
+    // CRUD de catálogos dinámicos
+    Route::prefix('options')->group(function() {
+        Route::get('/',                      [OptionController::class,'index']);
+        Route::post('transmissions',         [OptionController::class,'addTransmission']);
+        Route::delete('transmissions/{id}',  [OptionController::class,'deleteTransmission']);
+        Route::post('fuel-types',            [OptionController::class,'addFuelType']);
+        Route::delete('fuel-types/{id}',     [OptionController::class,'deleteFuelType']);
+        // NUEVAS RUTAS
+        Route::post('especialidades',        [OptionController::class,'addEspecialidad']);
+        Route::delete('especialidades/{id}', [OptionController::class,'deleteEspecialidad']);
+    });
 
     // Reportes
     Route::get('/reporte-clientes',    [ReportController::class, 'descargarReporteClientes']);

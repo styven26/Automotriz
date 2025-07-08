@@ -212,6 +212,26 @@
               </li>
             </ul>
           </li>
+
+          <!-- Opción "Configuración" -->
+          <li>
+            <a (click)="toggleMenu('configuracion')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-cog" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Configuración </span>
+              </div>
+            </a>
+            <ul *ngIf="showConfiguracionMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateConfiguracion()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-layer-group" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Configuración de Catálogos </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
   
           <!-- Opción "Cerrar Sesión" -->
           <li>
@@ -244,10 +264,16 @@
                   
                   <mat-form-field appearance="outline" class="half-width">
                     <mat-label>Nombre del Tipo de Servicio de Mantenimiento</mat-label>
-                    <input matInput formControlName="nombre" placeholder="Ej. Mantenimiento Preventivo" required>
-                    
+                    <input
+                      matInput
+                      formControlName="nombre"
+                      placeholder="Ej. Mantenimiento Preventivo"
+                    />
                     <mat-error *ngIf="tipoOrdenForm.get('nombre')?.hasError('required')">
                       El nombre del tipo de servicio es obligatorio.
+                    </mat-error>
+                    <mat-error *ngIf="tipoOrdenForm.get('nombre')?.hasError('pattern')">
+                      Sólo letras y espacios, sin números.
                     </mat-error>
                     <mat-error *ngIf="nombreExistente">
                       Ese tipo de servicio ya existe. Intente con otro nombre.

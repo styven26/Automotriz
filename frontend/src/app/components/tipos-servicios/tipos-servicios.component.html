@@ -213,6 +213,26 @@
           </ul>
         </li>
 
+        <!-- Opción "Configuración" -->
+        <li>
+          <a (click)="toggleMenu('configuracion')">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-cog" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Configuración </span>
+            </div>
+          </a>
+          <ul *ngIf="showConfiguracionMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateConfiguracion()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-layer-group" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Configuración de Catálogos </span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         <!-- Opción "Cerrar Sesión" -->
         <li>
           <a (click)="logout()">
@@ -260,6 +280,9 @@
               <mat-error *ngIf="tipoSubtipoForm.get('nombre')?.hasError('required')">
                 El nombre del servicio es obligatorio.
               </mat-error>
+              <mat-error *ngIf="tipoSubtipoForm.get('nombre')?.hasError('pattern')">
+                Sólo letras y espacios, sin números.
+              </mat-error>
             </mat-form-field>
     
             <!-- Descripción del Subtipo -->
@@ -281,15 +304,17 @@
                 type="number"
                 formControlName="precio_base"
                 min="0"
+                step="0.01"
                 placeholder="Precio Base"
               />
-              <!-- Error: campo requerido -->
               <mat-error *ngIf="tipoSubtipoForm.get('precio_base')?.hasError('required')">
                 El precio base es obligatorio.
               </mat-error>
-              <!-- Error: valor mínimo -->
               <mat-error *ngIf="tipoSubtipoForm.get('precio_base')?.hasError('min')">
                 El precio base no puede ser negativo.
+              </mat-error>
+              <mat-error *ngIf="tipoSubtipoForm.get('precio_base')?.hasError('pattern')">
+                Hasta 2 decimales (ej: 50,56).
               </mat-error>
             </mat-form-field>
           

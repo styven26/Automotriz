@@ -111,11 +111,12 @@ export class ListarMecanicoComponent {
   navigateListarOrden(): void {
     this.router.navigate(['/tipo-orden-servicio']);
   }
-
-   descargarCitasPDF(): void {
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
+  descargarCitasPDF(): void {
     this.admin.descargarReporteCitas(this.filtrosCitas);
   }
-  
   descargarFinancieroPDF(): void {
     this.admin.descargarReporteFinanciero(this.filtrosIngresos);
   }  

@@ -132,9 +132,10 @@
       <!-- Especialidad -->
       <mat-form-field appearance="outline">
         <mat-label>Especialidad</mat-label>
-        <mat-select formControlName="especialidad" placeholder="Seleccione una especialidad">
-          <mat-option *ngFor="let esp of especialidades" [value]="esp">
-            {{ esp }}
+        <mat-select formControlName="especialidad">
+          <!-- Usamos esp.id como valor y mostramos esp.name -->
+          <mat-option *ngFor="let esp of especialidades" [value]="esp.name">
+            {{ esp.name }}
           </mat-option>
         </mat-select>
         <mat-error *ngIf="mecanicoForm.get('especialidad')?.hasError('required')">

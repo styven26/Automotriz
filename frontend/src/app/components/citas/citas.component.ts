@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { VehiculoService } from '../../services/Vehiculo/vehiculo.service';
+import { OptionService } from '../../services/option.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { MatStepperModule, MatStepper  } from '@angular/material/stepper';
@@ -63,6 +64,8 @@ export class CitasComponent implements OnInit {
   tiempoRestante: string = '';
   nombreUsuario: string = '';
   apellidoUsuario: string = '';
+  transmissions: {id:string,name:string}[] = [];
+  fuelTypes:    {id:string,name:string}[] = [];
 
   // Datos del dashboard
   appointmentsCount: number = 0;
@@ -85,6 +88,7 @@ export class CitasComponent implements OnInit {
   constructor(
     private vehiculoService: VehiculoService,
     private authService: AuthService,
+    private optionSvc: OptionService,
     private router: Router,
     private http: HttpClient,
     private fb: FormBuilder
@@ -108,8 +112,8 @@ export class CitasComponent implements OnInit {
         Validators.required,
         Validators.pattern(/^[A-Z0-9\-]+$/)
       ]],
-      transmision: ['Manual', Validators.required],
-      tipo_combustible: ['Gasolina', Validators.required],
+      transmision: [Validators.required],
+      tipo_combustible: [Validators.required],
       kilometraje: [null, [
         Validators.required,
         Validators.min(0)
@@ -130,6 +134,11 @@ export class CitasComponent implements OnInit {
       console.error('El id_cliente no existe en localStorage.');
       return;
     }
+
+    this.optionSvc.list().subscribe(opts => {
+      this.transmissions = opts.transmissions;
+      this.fuelTypes    = opts.fuel_types;
+    });
   
     // Asigna el id_cliente al formulario
     this.vehicleFormGroup.patchValue({ id_cliente: user.id });

@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { OptionItem, OptionService } from '../../../services/option.service';
 import { MatIconModule } from '@angular/material/icon'; 
 import { AuthService } from '../../../services/auth.service';
 import { AdministradorService } from '../../../services/Administrador/administrador.service';
@@ -36,7 +37,7 @@ import Swal from 'sweetalert2';
 })
 export class CrearMecanicoComponent {
 
-  constructor( private fb: FormBuilder, private http: HttpClient, private admin: AdministradorService, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService ) {}
+  constructor( private fb: FormBuilder, private http: HttpClient, private optionSvc: OptionService, private admin: AdministradorService, private router: Router, private authService: AuthService, private mecanicoService: MecanicoService ) {}
 
   sidebarActive: boolean = false;
   tiempoRestante: string = '';
@@ -99,14 +100,13 @@ export class CrearMecanicoComponent {
   navigateListarOrden(): void {
     this.router.navigate(['/tipo-orden-servicio']);
   }
-
-  // Lista de especialidades disponibles
-  especialidades: string[] = [
-    'Mecánico General'
-  ];
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
 
   // Validaciones de cada campo
   registerForm!: FormGroup;
+  especialidades: OptionItem[] = [];
 
   ngOnInit(): void {
 
@@ -118,6 +118,10 @@ export class CrearMecanicoComponent {
   
     this.nombreUsuario = user.nombre || 'Sin Nombre';
     this.apellidoUsuario = user.apellido || 'Sin Apellido';
+
+    this.optionSvc.list().subscribe(opts => {
+      this.especialidades = opts.especialidades;
+    });
 
     this.registerForm = this.fb.group({
       nombre: ['', [

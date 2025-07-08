@@ -282,6 +282,9 @@ export class CitasAdminComponent {
   navigateListarOrden(): void {
     this.router.navigate(['/tipo-orden-servicio']);
   }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
 
   iniciarReloj(): void {
     const expirationTime = Number(localStorage.getItem('token_expiration')) || 0;

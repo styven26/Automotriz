@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -62,57 +63,120 @@ export class CrearRepuestosComponent implements OnInit {
       this.apellidoUsuario = user.apellido || 'Sin Apellido';
 
       this.repuestoForm = this.fb.group({
-        nombre:      ['', [Validators.required, Validators.maxLength(50)]],
-        precio_base: [0,  [Validators.required, Validators.min(0)]],
-        iva:         [0,  [Validators.required, Validators.min(0), Validators.max(100)]],
-        stock:       [0,  [Validators.required, Validators.min(0)]],
-        stock_minimo:[1,  [Validators.required, Validators.min(0)]],
+        nombre: [
+          '',
+          [
+            Validators.required,
+            Validators.maxLength(50),
+            Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/)
+          ]
+        ],
+        precio_base: [
+          0,
+          [
+            Validators.required,
+            Validators.min(0),
+            Validators.pattern(/^\d+(\.\d{1,2})?$/)
+          ]
+        ],
+        iva: [
+          0,
+          [
+            Validators.required,
+            Validators.min(0),
+            // sólo enteros
+            Validators.pattern(/^[0-9]+$/)
+          ]
+        ],
+        stock: [
+          0,
+          [
+            Validators.required,
+            Validators.min(0),
+            Validators.pattern(/^[0-9]+$/)
+          ]
+        ],
+        stock_minimo: [
+          0,
+          [
+            Validators.required,
+            Validators.min(0),
+            Validators.pattern(/^[0-9]+$/)
+          ]
+        ],
       });
+
+      // 1) Agrega el validador **después** de crear el FormGroup:
+      const stockMinCtrl = this.repuestoForm.get('stock_minimo')!;
+      stockMinCtrl.addValidators(this.stockMinimoValidator());
+
+      // 2) Cada vez que cambie el stock, re-valida stock_minimo
+      this.repuestoForm.get('stock')!
+        .valueChanges
+        .subscribe(() => stockMinCtrl.updateValueAndValidity());
 
       this.iniciarReloj();
     }
 
-   onSubmit(): void {
-    if (this.repuestoForm.invalid) {
-      console.warn('Formulario inválido:', this.repuestoForm.value);
-      Swal.fire({
-        icon: 'warning',
-        title: 'Formulario inválido',
-        text: 'Por favor completa todos los campos correctamente.'
-      });
-      return;
-    }
+    /** Validador cruzado: stock_minimo <= stock */
+    private stockMinimoValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const min   = control.value;
+      const stock = this.repuestoForm?.get('stock')?.value;
+      return (min != null && stock != null && min > stock)
+        ? { stockMinimoMayor: true }
+        : null;
+    };
+  }
 
-    console.log('Enviando repuesto...', this.repuestoForm.value);
-    this.repuestoService.create(this.repuestoForm.value)
-      .subscribe({
-        next: rep => {
-          console.log('Repuesto creado exitosamente:', rep);
-          Swal.fire({
-            icon: 'success',
-            title: '¡Repuesto Creado!',
-            text: `El repuesto "${rep.nombre}" ha sido agregado correctamente.`
-          }).then(() => {
-            // Reset y redirige tras cerrar el alerta
-            this.repuestoForm.reset({
-              nombre: '',
-              precio_base: 0,
-              iva: 0,
-              stock: 0,
-              stock_minimo: 1
+    // Getters
+    get nombre()      { return this.repuestoForm.get('nombre'); }
+    get precioBase()  { return this.repuestoForm.get('precio_base'); }
+    get iva()         { return this.repuestoForm.get('iva'); }
+    get stock()       { return this.repuestoForm.get('stock'); }
+    get stockMinimo() { return this.repuestoForm.get('stock_minimo'); }
+
+    onSubmit(): void {
+      if (this.repuestoForm.invalid) {
+        console.warn('Formulario inválido:', this.repuestoForm.value);
+        Swal.fire({
+          icon: 'warning',
+          title: 'Formulario inválido',
+          text: 'Por favor completa todos los campos correctamente.'
+        });
+        return;
+      }
+
+      console.log('Enviando repuesto...', this.repuestoForm.value);
+      this.repuestoService.create(this.repuestoForm.value)
+        .subscribe({
+          next: rep => {
+            console.log('Repuesto creado exitosamente:', rep);
+            Swal.fire({
+              icon: 'success',
+              title: '¡Repuesto Creado!',
+              text: `El repuesto "${rep.nombre}" ha sido agregado correctamente.`
+            }).then(() => {
+              // Reset y redirige tras cerrar el alerta
+              this.repuestoForm.reset({
+                nombre: '',
+                precio_base: 0,
+                iva: 0,
+                stock: 0,
+                stock_minimo: 1
+              });
+              this.router.navigate(['/listar-repuestos']);
             });
-            this.router.navigate(['/listar-repuestos']);
-          });
-        },
-        error: err => {
-          console.error('Error creando repuesto:', err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al crear',
-            text: err?.error?.message || 'No se pudo crear el repuesto. Intenta de nuevo.'
-          });
-        }
-      });
+          },
+          error: err => {
+            console.error('Error creando repuesto:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al crear',
+              text: err?.error?.message || 'No se pudo crear el repuesto. Intenta de nuevo.'
+            });
+          }
+        });
     }
   
     // dashboard-vendedor-repuestos.component.ts

@@ -329,4 +329,7 @@ export class SubtiposServiciosComponent {
   navigateListarOrden(): void {
     this.router.navigate(['/tipo-orden-servicio']);
   }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
 }

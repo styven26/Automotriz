@@ -7,25 +7,44 @@ use App\Models\Usuario;
 use App\Models\Rol;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MecanicoController extends Controller
 {
+    /** Ruta al JSON de opciones */
+    protected $optionsPath = 'vehiculo_options.json';
+
+    /**
+     * Lee y devuelve el contenido del JSON de opciones.
+     *
+     * @return array  ['transmissions'=>…, 'fuel_types'=>…, 'especialidades'=>…]
+     */
+    private function loadOptions(): array
+    {
+        if (! Storage::exists($this->optionsPath)) {
+            Storage::put($this->optionsPath, json_encode([
+                'transmissions'   => [],
+                'fuel_types'      => [],
+                'especialidades'  => [],
+            ], JSON_PRETTY_PRINT));
+        }
+
+        return json_decode(Storage::get($this->optionsPath), true);
+    }
+
     /**
      * Listar todos los mecánicos.
      */
     public function index(Request $request)
     {
-        // Verificar autenticación del administrador
         $admin = auth()->guard('admin')->user();
-
-        if (!$admin) {
+        if (! $admin) {
             return response()->json(['message' => 'No autenticado.'], 401);
         }
 
-        // Obtener los usuarios con el rol de "mecánico"
-        $mecanicos = Usuario::whereHas('roles', function ($query) {
-            $query->where('nombre', 'mecanico');
-        })->get();
+        $mecanicos = Usuario::whereHas('roles', fn($q) =>
+            $q->where('nombre', 'mecanico')
+        )->get();
 
         return response()->json($mecanicos, 200);
     }
@@ -35,51 +54,45 @@ class MecanicoController extends Controller
      */
     public function store(Request $request)
     {
-        // Definir especialidades permitidas
-        $especialidadesDisponibles = ['Mecánico General'];
+        // 1) Obtiene las especialidades válidas del JSON
+        $opts = $this->loadOptions();
+        $validEspecialidades = array_column($opts['especialidades'], 'name');
 
-        // Validar los datos del mecánico
+        // 2) Validación
         $validated = $request->validate([
-            'nombre' => 'required|string|max:50',
-            'apellido' => 'required|string|max:50',
-            'cedula' => 'required|string|unique:usuario,cedula|max:10',
-            'correo' => 'required|string|email|max:100|unique:usuario,correo',
-            'password' => 'required|string|min:8|confirmed',
-            'telefono' => 'required|string|max:20',
+            'nombre'              => 'required|string|max:50',
+            'apellido'            => 'required|string|max:50',
+            'cedula'              => 'required|string|max:10|unique:usuario,cedula',
+            'correo'              => 'required|email|max:100|unique:usuario,correo',
+            'password'            => 'required|string|min:8|confirmed',
+            'telefono'            => 'required|string|max:20',
             'direccion_domicilio' => 'required|string|max:100',
-            'especialidad' => 'required|string|max:100|in:' . implode(',', $especialidadesDisponibles),
-            'fecha_nacimiento' => 'required|date|before:18 years ago',
-            'genero' => 'required|in:masculino,femenino,otro',
+            'especialidad'        => 'required|string|in:' . implode(',', $validEspecialidades),
+            'fecha_nacimiento'    => 'required|date|before:18 years ago',
+            'genero'              => 'required|in:masculino,femenino,otro',
         ], [
             'fecha_nacimiento.before' => 'El mecánico debe tener al menos 18 años.',
-            'especialidad.in' => 'La especialidad seleccionada no es válida.',
-            'genero.in' => 'El género seleccionado no es válido.',
+            'especialidad.in'         => 'La especialidad seleccionada no es válida.',
+            'genero.in'               => 'El género seleccionado no es válido.',
         ]);
 
-        // Formatear el teléfono con el prefijo +593
-        $telefono = $this->formatTelefonoEcuador($request->telefono);
+        // 3) Formatea el teléfono
+        $telefono = $this->formatTelefonoEcuador($validated['telefono']);
 
-        // Iniciar una transacción
-        DB::transaction(function () use ($validated, $request, $telefono) {
-            // Crear el usuario como mecánico
+        // 4) Transacción para crear el usuario y asignar roles
+        DB::transaction(function() use ($validated, $telefono, $request) {
             $usuario = new Usuario($validated);
             $usuario->password = Hash::make($request->password);
             $usuario->telefono = $telefono;
             $usuario->save();
 
-            // Obtener los roles de "mecanico" y "cliente"
-            $rolMecanico = Rol::where('nombre', 'mecanico')->first();
-            $rolCliente = Rol::where('nombre', 'cliente')->first();
+            $rolM = Rol::where('nombre', 'mecanico')->firstOrFail();
+            $rolC = Rol::where('nombre', 'cliente')->firstOrFail();
 
-            if (!$rolMecanico || !$rolCliente) {
-                throw new \Exception("Roles 'mecanico' o 'cliente' no encontrados.");
-            }
-
-            // Asignar los roles al usuario
-            $usuario->roles()->attach([$rolMecanico->id_rol, $rolCliente->id_rol]);
+            $usuario->roles()->attach([$rolM->id_rol, $rolC->id_rol]);
         });
 
-        return response()->json(['message' => 'Mecánico creado con éxito y rol cliente asignado.'], 201);
+        return response()->json(['message' => 'Mecánico creado con éxito.'], 201);
     }
 
     /**
@@ -87,39 +100,33 @@ class MecanicoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Buscar el usuario con rol de mecánico por su cédula
         $mecanico = Usuario::where('cedula', $id)
-            ->whereHas('roles', function ($query) {
-                $query->where('nombre', 'mecanico');
-            })->firstOrFail();
+            ->whereHas('roles', fn($q) => $q->where('nombre', 'mecanico'))
+            ->firstOrFail();
 
-        // Definir especialidades permitidas
-        $especialidadesDisponibles = ['Mecánico General'];
+        $opts = $this->loadOptions();
+        $validEspecialidades = array_column($opts['especialidades'], 'name');
 
-        // Validar los datos del mecánico
         $validated = $request->validate([
-            'nombre' => 'required|string|max:50',
-            'apellido' => 'required|string|max:50',
-            // Para la validación única se debe especificar la columna PK ('cedula')
-            'cedula' => 'required|string|max:10|unique:usuario,cedula,' . $id . ',cedula',
-            'correo' => 'required|string|email|max:100|unique:usuario,correo,' . $id . ',cedula',
-            'telefono' => 'required|string|max:20',
+            'nombre'              => 'required|string|max:50',
+            'apellido'            => 'required|string|max:50',
+            'cedula'              => "required|string|max:10|unique:usuario,cedula,{$id},cedula",
+            'correo'              => "required|email|max:100|unique:usuario,correo,{$id},cedula",
+            'telefono'            => 'required|string|max:20',
             'direccion_domicilio' => 'required|string|max:100',
-            'fecha_nacimiento'  => 'required|date|before:18 years ago',
-            'especialidad' => 'required|string|max:100|in:' . implode(',', $especialidadesDisponibles),
+            'fecha_nacimiento'    => 'required|date|before:18 years ago',
+            'especialidad'        => 'required|string|in:' . implode(',', $validEspecialidades),
         ], [
             'fecha_nacimiento.before' => 'El mecánico debe tener al menos 18 años.',
-            'especialidad.in' => 'La especialidad seleccionada no es válida.',
+            'especialidad.in'         => 'La especialidad seleccionada no es válida.',
         ]);
 
-        // Formatear el teléfono con el prefijo +593
-        $telefono = $this->formatTelefonoEcuador($request->telefono);
+        $telefono = $this->formatTelefonoEcuador($validated['telefono']);
 
-        // Actualizar los datos del mecánico
         $mecanico->fill($validated);
         $mecanico->telefono = $telefono;
 
-        if ($request->has('password')) {
+        if ($request->filled('password')) {
             $mecanico->password = Hash::make($request->password);
         }
 
@@ -129,27 +136,26 @@ class MecanicoController extends Controller
     }
 
     /**
-     * Eliminar (borrado lógico) un mecánico.
+     * Borrado lógico de un mecánico.
      */
     public function destroy($id)
     {
-        // Buscar el usuario con rol de mecánico por su cédula
         $mecanico = Usuario::where('cedula', $id)
-            ->whereHas('roles', function ($query) {
-                $query->where('nombre', 'mecanico');
-            })->firstOrFail();
+            ->whereHas('roles', fn($q) => $q->where('nombre', 'mecanico'))
+            ->firstOrFail();
 
-        // Eliminar el mecánico (borrado lógico)
         $mecanico->delete();
 
         return response()->json(['message' => 'Mecánico eliminado con éxito'], 200);
     }
 
     /**
-     * Formatear número de teléfono con el prefijo +593.
+     * Formatea un número de teléfono a +593XXXXXXXXX.
      */
-    private function formatTelefonoEcuador($telefono)
+    private function formatTelefonoEcuador(string $telefono): string
     {
-        return str_starts_with($telefono, '+593') ? $telefono : '+593' . ltrim($telefono, '0');
+        return str_starts_with($telefono, '+593')
+            ? $telefono
+            : '+593' . ltrim($telefono, '0');
     }
 }

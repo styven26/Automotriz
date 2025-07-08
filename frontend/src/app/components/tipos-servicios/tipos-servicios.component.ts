@@ -66,10 +66,23 @@ export class TiposServiciosComponent implements OnInit {
     // Combinar los controles en un solo formulario reactivo
     this.tipoSubtipoForm = this.fb.group({
       id_servicio: [null], // Si es null, se creará un nuevo servicio
-      id_tipo:     [null, Validators.required],  // <— nuevo control
-      nombre: ['', Validators.required],         // Campo para el nombre del servicio
-      descripcion: ['', Validators.required],      // Campo para la descripción del servicio
-      precio_base: ['', [Validators.required, Validators.min(0)]],
+      id_tipo:     [null, Validators.required],
+      nombre: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/)
+        ]
+      ],
+      descripcion: ['', Validators.required],
+      precio_base: [
+        '',
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.pattern(/^\d+(\.\d{1,2})?$/)
+        ]
+      ],
       iva: [
         '',
         [
@@ -351,5 +364,8 @@ export class TiposServiciosComponent implements OnInit {
   }
   navigateListarOrden(): void {
     this.router.navigate(['/tipo-orden-servicio']);
+  }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
   }
 }

@@ -33,9 +33,23 @@ export class ActualizarSubtiposComponent {
     this.subtipoForm = this.fb.group({
       id_servicio: [data.id_servicio, [Validators.required]],
       id_tipo: [ data.id_tipo, [Validators.required ]],
-      nombre: [data.nombre, [Validators.required, Validators.maxLength(100)]],
+      nombre: [
+        data.nombre,
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/)
+        ]
+      ],
       descripcion: [data.descripcion, [Validators.required, Validators.maxLength(255)]],
-      precio_base: [precioBase, [Validators.required, Validators.min(0)]],
+      precio_base: [
+        precioBase,
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.pattern(/^\d+(\.\d{1,2})?$/)
+        ]
+      ],
       iva: [data.iva || 12, [
         Validators.required,
         Validators.min(0),

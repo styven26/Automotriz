@@ -1,5 +1,5 @@
 <div class="modal-container">
-  <!-- Header del modal -->
+  <!-- Header -->
   <div class="modal-header">
     <h2 id="dialog-title">Editar Repuesto</h2>
     <button mat-icon-button (click)="cancelar()">
@@ -7,74 +7,136 @@
     </button>
   </div>
 
-  <!-- Formulario del modal -->
+  <!-- Formulario -->
   <form [formGroup]="repuestoForm" (ngSubmit)="guardarCambios()">
     <div class="modal-body">
       <!-- Nombre -->
       <mat-form-field appearance="outline">
         <mat-label>Nombre</mat-label>
-        <input matInput formControlName="nombre" placeholder="Nombre del repuesto">
-        <mat-error *ngIf="repuestoForm.get('nombre')?.hasError('required')">
+        <input
+          matInput
+          formControlName="nombre"
+          placeholder="Solo letras"
+        />
+        <mat-error *ngIf="nombre?.hasError('required')">
           El nombre es obligatorio.
         </mat-error>
-        <mat-error *ngIf="repuestoForm.get('nombre')?.hasError('maxlength')">
+        <mat-error *ngIf="nombre?.hasError('maxlength')">
           Máximo 50 caracteres.
+        </mat-error>
+        <mat-error *ngIf="nombre?.hasError('pattern')">
+          Sólo letras y espacios.
         </mat-error>
       </mat-form-field>
 
       <!-- Precio Base -->
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>Precio Base</mat-label>
-        <input matInput type="number" formControlName="precio_base" placeholder="0.00">
-        <mat-error *ngIf="repuestoForm.get('precio_base')?.hasError('required')">
+        <input
+          matInput
+          type="number"
+          formControlName="precio_base"
+          placeholder="0.00"
+          min="0"
+          max="1000"
+          step="0.01"
+        />
+        <mat-error *ngIf="precioBase?.hasError('required')">
           El precio base es obligatorio.
         </mat-error>
-        <mat-error *ngIf="repuestoForm.get('precio_base')?.hasError('min')">
+        <mat-error *ngIf="precioBase?.hasError('min')">
           Debe ser ≥ 0.
+        </mat-error>
+        <mat-error *ngIf="precioBase?.hasError('max')">
+          Debe ser ≤ 1000.
+        </mat-error>
+        <mat-error *ngIf="precioBase?.hasError('pattern')">
+          Formato inválido (máx. 2 decimales).
         </mat-error>
       </mat-form-field>
 
-      <!-- IVA -->
+      <!-- IVA (%) -->
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>IVA (%)</mat-label>
-        <input matInput type="number" formControlName="iva" placeholder="0–100">
-        <mat-error *ngIf="repuestoForm.get('iva')?.hasError('required')">
+        <input
+          matInput
+          type="number"
+          formControlName="iva"
+          placeholder="Entero ≥ 0"
+          min="0"
+          max="20"
+          step="1"
+        />
+        <mat-error *ngIf="iva?.hasError('required')">
           El IVA es obligatorio.
         </mat-error>
-        <mat-error *ngIf="repuestoForm.get('iva')?.hasError('min') || repuestoForm.get('iva')?.hasError('max')">
-          Debe estar entre 0 y 100.
+        <mat-error *ngIf="iva?.hasError('min')">
+          Debe ser ≥ 0.
+        </mat-error>
+        <mat-error *ngIf="iva?.hasError('max')">
+          Debe ser ≤ 20.
+        </mat-error>
+        <mat-error *ngIf="iva?.hasError('pattern')">
+          Sólo números enteros.
         </mat-error>
       </mat-form-field>
 
       <!-- Stock -->
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>Stock</mat-label>
-        <input matInput type="number" formControlName="stock" placeholder="Cantidad disponible">
-        <mat-error *ngIf="repuestoForm.get('stock')?.hasError('required')">
+        <input
+          matInput
+          type="number"
+          formControlName="stock"
+          placeholder="Entero ≥ 0"
+          min="0"
+          step="1"
+        />
+        <mat-error *ngIf="stock?.hasError('required')">
           El stock es obligatorio.
         </mat-error>
-        <mat-error *ngIf="repuestoForm.get('stock')?.hasError('min')">
+        <mat-error *ngIf="stock?.hasError('min')">
           Debe ser ≥ 0.
+        </mat-error>
+        <mat-error *ngIf="stock?.hasError('pattern')">
+          Sólo números enteros.
         </mat-error>
       </mat-form-field>
 
       <!-- Stock Mínimo -->
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>Stock Mínimo</mat-label>
-        <input matInput type="number" formControlName="stock_minimo" placeholder="Punto de pedido">
-        <mat-error *ngIf="repuestoForm.get('stock_minimo')?.hasError('required')">
+        <input
+          matInput
+          type="number"
+          formControlName="stock_minimo"
+          placeholder="Entero ≥ 0"
+          min="0"
+          step="1"
+        />
+        <mat-error *ngIf="stockMinimo?.hasError('required')">
           El stock mínimo es obligatorio.
         </mat-error>
-        <mat-error *ngIf="repuestoForm.get('stock_minimo')?.hasError('min')">
+        <mat-error *ngIf="stockMinimo?.hasError('min')">
           Debe ser ≥ 0.
+        </mat-error>
+        <mat-error *ngIf="stockMinimo?.hasError('stockMinimoMayor')">
+          El stock mínimo debe ser menor o igual al stock.
+        </mat-error>
+        <mat-error *ngIf="stockMinimo?.hasError('pattern')">
+          Sólo números enteros.
         </mat-error>
       </mat-form-field>
     </div>
 
-    <!-- Footer con botones -->
+    <!-- Footer -->
     <footer class="modal-footer">
-      <button mat-button class="btn-danger" type="button" (click)="cancelar()">Cancelar</button>
-      <button mat-raised-button color="primary" class="btn-success" type="submit">Guardar Cambios</button>
+      <button mat-button class="btn-danger" type="button" (click)="cancelar()">
+        Cancelar
+      </button>
+      <button mat-raised-button color="primary" class="btn-success" type="submit">
+        Guardar Cambios
+      </button>
     </footer>
   </form>
 </div>

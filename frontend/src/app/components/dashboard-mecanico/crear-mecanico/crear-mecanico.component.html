@@ -214,6 +214,26 @@
           </ul>
         </li>
 
+        <!-- Opción "Configuración" -->
+         <li>
+          <a (click)="toggleMenu('configuracion')">
+            <div style="display: flex; align-items: center;">
+              <i class="fa-solid fa-cog" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+              <span style="font-size: 18px; font-weight: bold; color: #050505;">Configuración </span>
+            </div>
+          </a>
+          <ul *ngIf="showConfiguracionMenu" class="submenu">
+            <li class="submenu-item">
+              <a (click)="navigateConfiguracion()">
+                <div style="display: flex; align-items: center;">
+                  <i class="fa-solid fa-layer-group" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                  <span style="font-size: 14px; color: #050505;">Configuración de Catálogos </span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         <!-- Opción "Cerrar Sesión" -->
         <li>
           <a (click)="logout()">
@@ -346,12 +366,14 @@
           <!-- Especialidad -->
           <mat-form-field appearance="outline" class="half-width">
             <mat-label>Especialidad</mat-label>
-            <mat-select formControlName="especialidad" placeholder="Seleccione una especialidad">
-              <mat-option *ngFor="let especialidad of especialidades" [value]="especialidad">
-                {{ especialidad }}
+            <mat-select formControlName="especialidad">
+              <mat-option *ngFor="let e of especialidades" [value]="e.name">
+                {{ e.name }}
               </mat-option>
             </mat-select>
-            <mat-error *ngIf="especialidadErrors">{{ especialidadErrors }}</mat-error>
+            <mat-error *ngIf="registerForm.get('especialidad')?.invalid">
+              Seleccione una especialidad válida.
+            </mat-error>
           </mat-form-field>
 
           <!-- Contraseña -->

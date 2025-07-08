@@ -78,6 +78,9 @@ export class ListarClientesComponent {
   navigateDashboardAdmin() {
     this.router.navigate(['/dashboard-admin']);
   }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
   // Rutas del Panel - Listar Mecanico
   navigateListarMecanico() {
     this.router.navigate(['/listar-mecanico']);

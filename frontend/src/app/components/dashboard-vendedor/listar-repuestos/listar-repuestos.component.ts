@@ -130,19 +130,19 @@ export class ListarRepuestosComponent {
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      const wb    = XLSX.read(e.target.result, { type: 'array' });
-      const ws    = wb.Sheets[wb.SheetNames[0]];
-      const rows  = XLSX.utils.sheet_to_json<any>(ws, { defval: '' });
+      const wb   = XLSX.read(e.target.result, { type: 'array' });
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<any>(ws, { defval: '' });
 
-      // internos
+      // 1) Detección de duplicados internos (por Nombre)
       const counts = rows.reduce((acc, r) => {
-        const n = (r['Nombre']||'').toString().trim();
-        if (n) acc[n] = (acc[n]||0) + 1;
+        const n = (r['Nombre'] || '').toString().trim();
+        if (n) acc[n] = (acc[n] || 0) + 1;
         return acc;
-      }, {} as Record<string,number>);
+      }, {} as Record<string, number>);
       const internalDupes = Object.keys(counts).filter(n => counts[n] > 1);
 
-      // existentes en BD
+      // 2) Detección de duplicados en BD
       this.repService.getAll().pipe(
         take(1),
         map((list: Repuesto[]) =>
@@ -152,15 +152,18 @@ export class ListarRepuestosComponent {
         const dbDupes = Array.from(
           new Set(
             rows
-              .map(r=>r['Nombre']?.toString().trim().toLowerCase())
+              .map(r => r['Nombre']?.toString().trim().toLowerCase())
               .filter(n => existingSet.has(n))
           )
         ).map(n => n.charAt(0).toUpperCase() + n.slice(1));
 
-        // filtramos los únicos
+        // Todas las filas duplicadas
+        this.duplicateNames = [...internalDupes, ...dbDupes];
+
+        // 3) Filtramos filas únicas (sin duplicados)
         const seen = new Set<string>();
         const uniques = rows.filter(r => {
-          const n  = r['Nombre'].toString().trim();
+          const n = r['Nombre'].toString().trim();
           const ln = n.toLowerCase();
           if (!n || counts[n] > 1 || existingSet.has(ln) || seen.has(ln)) {
             return false;
@@ -169,20 +172,49 @@ export class ListarRepuestosComponent {
           return true;
         });
 
-        this.duplicateNames = [...internalDupes, ...dbDupes];
-
         if (!uniques.length) {
           Swal.fire('Nada que importar', 'No quedan filas únicas.', 'info');
           input.value = '';
           return;
         }
 
+        // 4) Validación stock_minimo ≤ stock
+        const invalidStockRows = uniques.filter(r => {
+          const stock = parseInt(r['Stock'], 10) || 0;
+          const min   = parseInt(r['Stock Mínimo'], 10) || 0;
+          return min > stock;
+        });
+        const invalidStockNames = invalidStockRows
+          .map(r => r['Nombre'].toString().trim());
+
+        if (invalidStockNames.length) {
+          Swal.fire(
+            'Valores inválidos',
+            `Se omitieron porque stock_mínimo > stock en: ${invalidStockNames.join(', ')}`,
+            'warning'
+          );
+        }
+
+        // 5) Solo filas válidas
+        const validRows = uniques.filter(r => {
+          const stock = parseInt(r['Stock'], 10) || 0;
+          const min   = parseInt(r['Stock Mínimo'], 10) || 0;
+          return min <= stock;
+        });
+
+        if (!validRows.length) {
+          Swal.fire('Nada que importar', 'No quedan filas válidas.', 'info');
+          input.value = '';
+          return;
+        }
+
+        // 6) Confirmación final
         Swal.fire({
           icon: 'question',
           title: 'Confirmar Importación',
           html: `
-            Se importarán <b>${uniques.length}</b> repuestos.<br>
-            <b>${this.duplicateNames.length}</b> duplicados omitidos.
+            Se importarán <b>${validRows.length}</b> repuestos válidos.<br>
+            <b>${this.duplicateNames.length + invalidStockNames.length}</b> omitidos.
           `,
           showCancelButton: true,
           confirmButtonText: 'Importar',
@@ -193,7 +225,8 @@ export class ListarRepuestosComponent {
             return;
           }
 
-          const calls = uniques.map(r => {
+          // 7) Mapeo a llamadas HTTP
+          const calls = validRows.map(r => {
             const f = r['Fecha de Creación']?.toString().trim();
             const h = r['Hora de Creación']?.toString().trim();
             const created = (f && h)
@@ -201,14 +234,14 @@ export class ListarRepuestosComponent {
               : undefined;
 
             const rep: Repuesto = {
-              cedula:        this.user.cedula,
-              nombre:        r['Nombre'].toString().trim(),
-              precio_base:   parseFloat(r['Precio Base'])    || 0,
-              iva:            parseInt(r['IVA (%)'], 10)     || 0,
-              precio_final:  parseFloat(r['Precio Final'])   || 0,
-              stock:         parseInt(r['Stock'], 10)        || 0,
-              stock_minimo:  parseInt(r['Stock Mínimo'], 10) || 0,
-              created_at:    created
+              cedula:       this.user.cedula,
+              nombre:       r['Nombre'].toString().trim(),
+              precio_base:  parseFloat(r['Precio Base'])    || 0,
+              iva:          parseInt(r['IVA (%)'], 10)       || 0,
+              precio_final: parseFloat(r['Precio Final'])   || 0,
+              stock:        parseInt(r['Stock'], 10)        || 0,
+              stock_minimo: parseInt(r['Stock Mínimo'], 10) || 0,
+              created_at:   created
             };
             return this.repService.create(rep).pipe(
               catchError(err => {
@@ -218,16 +251,17 @@ export class ListarRepuestosComponent {
             );
           });
 
+          // 8) Ejecución en paralelo y feedback
           forkJoin(calls).subscribe(results => {
             const ok = results.filter(r => r !== null).length;
             this.loadAll();
             Swal.fire(
               '¡Listo!',
-              `✔ ${ok} creados.<br>❌ ${this.duplicateNames.length} omitidos.`,
+              `✔ ${ok} creados.<br>❌ ${this.duplicateNames.length + invalidStockNames.length} omitidos.`,
               'success'
             );
+            input.value = '';
           });
-          input.value = '';
         });
       });
     };

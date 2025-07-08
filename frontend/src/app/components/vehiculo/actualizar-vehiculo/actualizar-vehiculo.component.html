@@ -36,20 +36,21 @@
 
       <div class="row">
         <mat-form-field appearance="outline">
-          <mat-label>Transmisión</mat-label>
-          <mat-select formControlName="transmision">
-            <mat-option value="Manual">Manual</mat-option>
-            <mat-option value="Automática">Automática</mat-option>
-            <mat-option value="Semi-automática">Semi-automática</mat-option>
+          <mat-label>Transmisión *</mat-label>
+            <mat-select formControlName="transmision">
+              <mat-option *ngFor="let t of transmissions" [value]="t.name">
+                {{ t.name }}
+            </mat-option>
           </mat-select>
         </mat-form-field>
         
         <mat-form-field appearance="outline">
-          <mat-label>Tipo de Combustible</mat-label>
-          <mat-select formControlName="tipo_combustible">
-            <mat-option value="Gasolina">Gasolina</mat-option>
-            <mat-option value="Diesel">Diesel</mat-option>
-          </mat-select>
+          <mat-label>Combustible *</mat-label>
+            <mat-select formControlName="tipo_combustible">
+              <mat-option *ngFor="let f of fuelTypes" [value]="f.name">
+                {{ f.name }}
+              </mat-option>
+            </mat-select>
         </mat-form-field>
       </div>
       

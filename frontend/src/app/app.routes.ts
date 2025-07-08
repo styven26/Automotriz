@@ -29,6 +29,7 @@ import { PasswordResetConfirmComponent } from './components/password-reset-confi
 import { CitasAdminComponent } from './components/dashboard-admin/citas-admin/citas-admin.component';
 import { ListarClientesComponent } from './components/dashboard-clientes/listar-clientes/listar-clientes.component';
 import { DiagnosticoComponent } from './components/diagnostico/diagnostico.component';
+import { ConfiguracionesComponent } from './components/configuraciones/configuraciones.component';
 
 import { AuthGuard } from './auth.guard';
 
@@ -55,6 +56,7 @@ export const routes: Routes = [
   { path: 'crear-horario', component: HorariosComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'listar-horario', component: ListarHorariosComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'registrar-vehiculo', component: CitasComponent, canActivate: [AuthGuard], data: { role: 'cliente' } },
+  { path: 'configuracion', component: ConfiguracionesComponent, canActivate: [AuthGuard], data: { role: 'admin' } },
   { path: 'calendario', component: CalendarioComponent, canActivate: [AuthGuard], data: { role: 'cliente' } },
   { path: 'actualizar-cita', component: ActualizarCitaComponent, canActivate: [AuthGuard], data: { role: 'cliente' } },
   { path: 'cita-mecanico', component: MecanicoCitaComponent, canActivate: [AuthGuard], data: { role: 'mecanico' } },

@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { OptionService, OptionItem, OptionsResponse } from '../../../services/option.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MecanicoService } from '../../../services/Mecanico/mecanico.service';
@@ -31,13 +32,14 @@ import Swal from 'sweetalert2';
 })
 export class ActualizarMecanicoComponent {
   mecanicoForm: FormGroup;
-  especialidades: string[] = ['Mecánico General'];
+  especialidades: OptionItem[] = [];
   hidePassword: boolean = true;
   hideConfirmPassword: boolean = true;
 
   constructor(
     private fb: FormBuilder,
     private mecanicoService: MecanicoService,
+    private optionSvc: OptionService,
     public dialogRef: MatDialogRef<ActualizarMecanicoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -81,12 +83,19 @@ export class ActualizarMecanicoComponent {
         data.direccion_domicilio,
         [Validators.required, Validators.minLength(5)]
       ],
-      especialidad: [data.especialidad, [Validators.required]],
+      especialidad: [ data.especialidad, [ Validators.required ] ],
       fecha_nacimiento: [ initialDate, [Validators.required, this.validateAge(18)] ],
       genero: [data.genero, [Validators.required]],
       id_admin: [data.id_admin || 1, Validators.required],
     });
   }  
+
+  ngOnInit() {
+    this.optionSvc.list().subscribe(resp => {
+      this.especialidades = resp.especialidades;
+      // ¡el formControl ya trae data.especialidad (el nombre) y coincide con [value]="esp.name"!
+    });
+  }
 
   get f(): Record<string, AbstractControl> {
     return this.mecanicoForm.controls;

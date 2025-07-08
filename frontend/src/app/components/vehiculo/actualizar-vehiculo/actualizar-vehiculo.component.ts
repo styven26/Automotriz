@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { OptionService } from '../../../services/option.service';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,10 +26,13 @@ export class ActualizarVehiculoComponent {
 
   nuevaImagen: File | null = null; // Variable para la nueva imagen
   previewImage: string | null = null;
+  transmissions: {id:string,name:string}[] = [];
+  fuelTypes:    {id:string,name:string}[] = [];
 
   constructor(
     private fb: FormBuilder,
     private vehiculoService: VehiculoService,
+    private optionSvc: OptionService,
     public dialogRef: MatDialogRef<ActualizarVehiculoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -56,6 +60,14 @@ export class ActualizarVehiculoComponent {
     this.vehiculoForm.patchValue({ id_cliente: clienteId });
   }
 
+  ngOnInit(): void {
+    // 1) Cargamos transmisiones y combustibles
+    this.optionSvc.list().subscribe(opts => {
+      this.transmissions = opts.transmissions;
+      this.fuelTypes     = opts.fuel_types;
+    });
+  }
+
   onFileChange(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -70,7 +82,7 @@ export class ActualizarVehiculoComponent {
     }
   }
 
- guardarCambios(): void {
+  guardarCambios(): void {
     // 1) Si el formulario no es válido, mostrar error y salir
     if (this.vehiculoForm.invalid) {
       Swal.fire({

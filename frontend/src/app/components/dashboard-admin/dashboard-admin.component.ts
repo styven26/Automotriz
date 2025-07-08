@@ -127,6 +127,9 @@ export class DashboardAdminComponent implements OnInit {
   navigateListarOrden(): void {
     this.router.navigate(['/tipo-orden-servicio']);
   }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
 
   ngOnInit(): void {
     this.roles = JSON.parse(localStorage.getItem('roles') ?? '[]');

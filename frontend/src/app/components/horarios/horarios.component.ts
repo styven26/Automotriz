@@ -55,6 +55,9 @@ export class HorariosComponent {
   navigateDashboardAdmin() {
     this.router.navigate(['/dashboard-admin']);
   }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
   // Rutas del Panel - Crear Mecanico
   navigateToCrearMecanico() {
     this.router.navigate(['/crear-mecanico']);

@@ -212,6 +212,26 @@
               </li>
             </ul>
           </li>
+
+          <!-- Opción "Configuración" -->
+          <li>
+            <a (click)="toggleMenu('configuracion')">
+              <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-cog" style="color: #050505; font-size: 18px; margin-right: 10px;"></i>
+                <span style="font-size: 18px; font-weight: bold; color: #050505;">Configuración </span>
+              </div>
+            </a>
+            <ul *ngIf="showConfiguracionMenu" class="submenu">
+              <li class="submenu-item">
+                <a (click)="navigateConfiguracion()">
+                  <div style="display: flex; align-items: center;">
+                    <i class="fa-solid fa-layer-group" style="color: #050505; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 14px; color: #050505;">Configuración de Catálogos </span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
   
           <!-- Opción "Cerrar Sesión" -->
           <li>

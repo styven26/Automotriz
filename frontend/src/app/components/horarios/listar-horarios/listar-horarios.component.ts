@@ -91,6 +91,9 @@ export class ListarHorariosComponent {
   navigateToCrearMecanico() {
     this.router.navigate(['/crear-mecanico']);
   }
+  navigateConfiguracion() {
+    this.router.navigate(['/configuracion']);
+  }
   // Rutas del Panel - Listar Mecanico
   navigateToListarHorario() {
     this.router.navigate(['/listar-horario']);
