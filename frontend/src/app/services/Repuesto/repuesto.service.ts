@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 
 export interface Repuesto {
   id_repuesto?: number;
-  cedula: string;
   nombre: string;
   precio_base: number;
   iva: number;

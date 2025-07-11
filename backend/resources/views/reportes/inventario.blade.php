@@ -42,7 +42,6 @@
                 <th>Precio Final</th>
                 <th>Stock</th>
                 <th>Stock Mínimo</th>
-                <th>Registrado por</th>
             </tr>
         </thead>
         <tbody>
@@ -56,7 +55,6 @@
                     <td>${{ number_format($r->precio_final, 2) }}</td>
                     <td>{{ $r->stock }}</td>
                     <td>{{ $r->stock_minimo }}</td>
-                    <td>{{ $r->usuario->nombre ?? '-' }} {{ $r->usuario->apellido ?? '' }}</td>
                 </tr>
             @endforeach
         </tbody>

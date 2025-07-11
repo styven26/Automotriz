@@ -17,7 +17,6 @@ class Repuesto extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'cedula',
         'nombre',
         'precio_base',
         'iva',
@@ -50,14 +49,6 @@ class Repuesto extends Model
                 $orden->saveQuietly();
             });
         });
-    }
-
-    /**
-     * Un repuesto pertenece a un usuario (quien lo registra), si aplica.
-     */
-    public function usuario()
-    {
-        return $this->belongsTo(Usuario::class, 'cedula', 'cedula');
     }
 
     /**

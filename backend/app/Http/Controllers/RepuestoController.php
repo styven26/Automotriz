@@ -45,7 +45,6 @@ class RepuestoController extends Controller
             'created_at'   => ['nullable','date'],
         ]);
 
-        $data['cedula'] = $user->cedula;
         $rep = new Repuesto($data);
         $rep->save();        // aquí graba tanto created_at manual (si viene) como timestamp
         return response()->json($rep, 201);
@@ -59,7 +58,6 @@ class RepuestoController extends Controller
         $rep = Repuesto::findOrFail($id);
 
         $data = $request->validate([
-            'cedula'        => ['sometimes','exists:usuario,cedula'],
             'nombre'        => ['sometimes','string','max:50', Rule::unique('repuestos','nombre')->ignore($rep->id_repuesto,'id_repuesto')],
             'precio_base'   => ['sometimes','numeric','min:0'],
             'iva'           => ['sometimes','integer','between:0,100'],
@@ -105,8 +103,6 @@ class RepuestoController extends Controller
 
             // Generar PDF con vista personalizada
             $pdf = Pdf::loadView('reportes.inventario', compact('repuestos'));
-
-            \Log::info("Reporte de inventario generado correctamente por vendedor {$vendedor->cedula}.");
 
             return $pdf->download('reportes-inventario-actual.pdf');
 

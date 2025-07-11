@@ -14,13 +14,6 @@ return new class extends Migration
         Schema::create('repuestos', function (Blueprint $table) {
             $table->id('id_repuesto');
 
-            // FK al usuario (quien da de alta)
-            $table->string('cedula', 10);
-            $table->foreign('cedula')
-                ->references('cedula')
-                ->on('usuario')
-                ->onDelete('restrict');
-
             // Datos del repuesto
             $table->string('nombre', 50)->unique();
             $table->decimal('precio_base', 10, 2)->default(0);

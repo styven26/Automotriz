@@ -234,7 +234,6 @@ export class ListarRepuestosComponent {
               : undefined;
 
             const rep: Repuesto = {
-              cedula:       this.user.cedula,
               nombre:       r['Nombre'].toString().trim(),
               precio_base:  parseFloat(r['Precio Base'])    || 0,
               iva:          parseInt(r['IVA (%)'], 10)       || 0,
