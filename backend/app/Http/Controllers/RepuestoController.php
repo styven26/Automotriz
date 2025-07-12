@@ -93,16 +93,19 @@ class RepuestoController extends Controller
                 return response()->json(['error' => 'No autorizado.'], 403);
             }
 
-            // Obtener todos los repuestos activos
+            // Obtener todos los repuestos activos (puede estar vacío)
             $repuestos = Repuesto::orderBy('nombre')->get();
 
+            // Log informativo si está vacío
             if ($repuestos->isEmpty()) {
-                \Log::info("No hay repuestos registrados en inventario.");
-                return response()->json(['error' => 'No hay repuestos en inventario.'], 404);
+                \Log::info("Generando PDF sin repuestos: inventario vacío.");
             }
 
-            // Generar PDF con vista personalizada
-            $pdf = Pdf::loadView('reportes.inventario', compact('repuestos'));
+            // Generar PDF con la vista, pasando también el vendedor
+            $pdf = Pdf::loadView('reportes.inventario', [
+                'repuestos' => $repuestos,
+                'vendedor' => $vendedor
+            ]);
 
             return $pdf->download('reportes-inventario-actual.pdf');
 

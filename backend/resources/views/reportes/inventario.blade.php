@@ -27,7 +27,7 @@
     <div class="header">
         <img src="https://st.depositphotos.com/1006018/3132/v/450/depositphotos_31322065-stock-illustration-automotive-mechanic-car-repair-retro.jpg" alt="Logo Mecánica Automotriz Don Chavo">
         <h1>Mecánica Automotriz Don Chavo</h1><br>
-        <h2>Reporte del Inventario Actual de Repuestos</h2>
+        <h2>Reporte del Inventario de Repuestos</h2>
         <div class="line"></div>
     </div>
 
@@ -45,7 +45,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($repuestos as $i => $r)
+            @forelse ($repuestos as $i => $r)
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y') }}</td>
@@ -56,11 +56,18 @@
                     <td>{{ $r->stock }}</td>
                     <td>{{ $r->stock_minimo }}</td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="8" style="text-align: center; font-style: italic;">
+                        No hay repuestos registrados en el inventario.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 
     <div class="footer">
+        <p><em>Vendedor: {{ $vendedor->nombre }} {{ $vendedor->apellido }} - {{ $vendedor->cedula }}</em></p>
         <p><em>Reporte generado automáticamente el {{ now()->format('d/m/Y H:i') }}</em></p>
         <p><em>Total de repuestos: {{ $repuestos->count() }}</em></p>
     </div>
