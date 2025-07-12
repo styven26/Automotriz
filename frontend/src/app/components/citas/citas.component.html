@@ -167,7 +167,7 @@
                   <mat-error *ngIf="modelo.hasError('required')">El modelo es obligatorio</mat-error>
                   <mat-error *ngIf="modelo.hasError('pattern')">Letras, números y espacios</mat-error>
                 </mat-form-field>
-              </div><br><br>
+              </div><br>
 
               <!-- SEGUNDA FILA: Año + Placa -->
               <div class="form-row">
@@ -191,7 +191,7 @@
                     Sólo mayúsculas, dígitos y guiones
                   </mat-error>
                 </mat-form-field>
-              </div><br><br>
+              </div><br>
 
               <!-- TERCERA FILA: Kilometraje + Transmisión -->
               <div class="form-row">
@@ -216,7 +216,7 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-              </div><br><br>
+              </div><br>
 
               <!-- CUARTA FILA: Combustible + Fecha último servicio -->
               <div class="form-row">
@@ -233,14 +233,44 @@
                 <!-- Fecha último servicio -->
                 <mat-form-field appearance="fill" class="half-width">
                   <mat-label>Último Servicio *</mat-label>
-                  <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio" />
+                  <input
+                    matInput
+                    [matDatepicker]="picker"
+                    [max]="today"
+                    formControlName="fecha_ultimo_servicio"
+                  />
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                   <mat-error *ngIf="fecha_ultimo_servicio.hasError('required')">
                     La fecha es obligatoria
                   </mat-error>
                 </mat-form-field>       
-              </div><br><br>
+              </div><br>
+
+              <!-- QUINTA FILA: Detalle último servicio -->
+              <div class="form-row">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>¿Qué se realizó en el último servicio? *</mat-label>
+                  <textarea
+                    matInput
+                    formControlName="detalle_ultimo_servicio"
+                    rows="3"
+                    maxlength="1000"
+                  ></textarea>
+                  <mat-hint align="end">
+                    {{ detalle_ultimo_servicio.value?.length || 0 }}/1000
+                  </mat-hint>
+                  <mat-error *ngIf="detalle_ultimo_servicio.hasError('required')">
+                    Este campo es obligatorio.
+                  </mat-error>
+                  <mat-error *ngIf="detalle_ultimo_servicio.hasError('minlength')">
+                    Debe tener al menos 10 caracteres.
+                  </mat-error>
+                  <mat-error *ngIf="detalle_ultimo_servicio.hasError('maxlength')">
+                    No puede exceder 1000 caracteres.
+                  </mat-error>
+                </mat-form-field>
+              </div>
             </div>
 
             <!-- Derecha: Seleccionar Imagen y vista previa -->

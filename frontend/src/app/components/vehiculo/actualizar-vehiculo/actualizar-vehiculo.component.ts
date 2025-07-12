@@ -28,6 +28,7 @@ export class ActualizarVehiculoComponent {
   previewImage: string | null = null;
   transmissions: {id:string,name:string}[] = [];
   fuelTypes:    {id:string,name:string}[] = [];
+  today: Date = new Date();
 
   constructor(
     private fb: FormBuilder,
@@ -37,13 +38,55 @@ export class ActualizarVehiculoComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.vehiculoForm = this.fb.group({
-      marca: [data.marca, [Validators.required, Validators.maxLength(100)]],
-      modelo: [data.modelo, [Validators.required, Validators.maxLength(100)]],
-      anio: [data.anio, [Validators.required, Validators.min(1886), Validators.max(new Date().getFullYear())]],
-      numero_placa: [data.numero_placa, [Validators.required, Validators.maxLength(100)]],
+      marca: [
+        data.marca,
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/) // Solo letras y espacios
+        ]
+      ],
+      modelo: [
+        data.modelo,
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          Validators.pattern(/^[A-Za-z0-9\s]+$/) // Letras, números y espacios
+        ]
+      ],
+      anio: [
+        data.anio,
+        [
+          Validators.required,
+          Validators.min(1886),
+          Validators.max(new Date().getFullYear())
+        ]
+      ],
+      numero_placa: [
+        data.numero_placa,
+        [
+          Validators.required,
+          Validators.maxLength(10),
+          Validators.pattern(/^[A-Z0-9\-]+$/) // Mayúsculas, números y guiones
+        ]
+      ],
       transmision: [data.transmision, Validators.required],
       tipo_combustible: [data.tipo_combustible, Validators.required],
-      kilometraje: [data.kilometraje, [Validators.min(0)]],
+      kilometraje: [
+        data.kilometraje,
+        [
+          Validators.required,
+          Validators.min(0)
+        ]
+      ],
+      detalle_ultimo_servicio: [
+        data.detalle_ultimo_servicio || '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(1000)
+        ]
+      ],
       // Forzamos que se interprete la fecha como local añadiéndole 'T00:00:00'
       fecha_ultimo_servicio: [
         data.fecha_ultimo_servicio
@@ -68,6 +111,32 @@ export class ActualizarVehiculoComponent {
     });
   }
 
+  verificarPlaca(): void {
+    const numeroPlaca = this.vehiculoForm.get('numero_placa')?.value;
+
+    if (!numeroPlaca || numeroPlaca === this.data.numero_placa) {
+      return; // No verifica si la placa no ha cambiado
+    }
+
+    this.vehiculoService.verificarPlaca(numeroPlaca).subscribe(
+      (response) => {
+        if (response.existe) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Placa duplicada',
+            text: 'El número de placa ingresado ya está registrado. Usa otro.',
+            confirmButtonText: 'Aceptar',
+          });
+
+          this.vehiculoForm.get('numero_placa')?.setValue(this.data.numero_placa);
+        }
+      },
+      (error) => {
+        console.error('Error al verificar la placa:', error);
+      }
+    );
+  }
+
   onFileChange(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -83,13 +152,25 @@ export class ActualizarVehiculoComponent {
   }
 
   guardarCambios(): void {
-    // 1) Si el formulario no es válido, mostrar error y salir
+    // 1) Validación del formulario
     if (this.vehiculoForm.invalid) {
       Swal.fire({
         icon: 'error',
         title: 'Formulario Inválido',
         text: 'Por favor, revisa los campos e inténtalo nuevamente.',
         confirmButtonText: 'Aceptar',
+      });
+      return;
+    }
+
+    // 1.1 Validación adicional de fecha futura
+    const fecha: Date | null = this.vehiculoForm.value.fecha_ultimo_servicio;
+    if (fecha && fecha > this.today) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Fecha inválida',
+        text: 'La fecha del último servicio no puede ser posterior a hoy.',
+        confirmButtonText: 'Aceptar'
       });
       return;
     }
@@ -107,7 +188,6 @@ export class ActualizarVehiculoComponent {
     });
 
     // 2b) Convertir y agregar la fecha en formato YYYY-MM-DD
-    const fecha: Date | null = this.vehiculoForm.value.fecha_ultimo_servicio;
     if (fecha) {
       const yyyy = fecha.getFullYear();
       const mm = String(fecha.getMonth() + 1).padStart(2, '0');

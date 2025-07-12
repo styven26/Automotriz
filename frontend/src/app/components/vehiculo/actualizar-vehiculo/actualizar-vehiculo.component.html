@@ -14,11 +14,15 @@
         <mat-form-field appearance="outline">
           <mat-label>Marca</mat-label>
           <input matInput formControlName="marca" placeholder="Ingrese la marca">
+          <mat-error *ngIf="vehiculoForm.get('marca')?.hasError('required')">La marca es obligatoria</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('marca')?.hasError('pattern')">Solo letras y espacios</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Modelo</mat-label>
           <input matInput formControlName="modelo" placeholder="Ingrese el modelo">
+          <mat-error *ngIf="vehiculoForm.get('modelo')?.hasError('required')">El modelo es obligatorio</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('modelo')?.hasError('pattern')">Solo letras, números y espacios</mat-error>
         </mat-form-field>
       </div>
 
@@ -26,31 +30,34 @@
         <mat-form-field appearance="outline">
           <mat-label>Año</mat-label>
           <input matInput type="number" formControlName="anio" placeholder="Ingrese el año">
+          <mat-error *ngIf="vehiculoForm.get('anio')?.hasError('required')">El año es obligatorio</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('anio')?.hasError('min')">Año mínimo permitido: 1886</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('anio')?.hasError('max')">Año no puede superar el actual</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Número de Placa</mat-label>
-          <input matInput formControlName="numero_placa" placeholder="Ingrese el número de placa">
+          <input matInput formControlName="numero_placa" (blur)="verificarPlaca()" placeholder="Ingrese el número de placa">
+          <mat-error *ngIf="vehiculoForm.get('numero_placa')?.hasError('required')">La placa es obligatoria</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('numero_placa')?.hasError('pattern')">Solo mayúsculas, números y guiones</mat-error>
         </mat-form-field>
       </div>
 
       <div class="row">
         <mat-form-field appearance="outline">
           <mat-label>Transmisión *</mat-label>
-            <mat-select formControlName="transmision">
-              <mat-option *ngFor="let t of transmissions" [value]="t.name">
-                {{ t.name }}
-            </mat-option>
+          <mat-select formControlName="transmision">
+            <mat-option *ngFor="let t of transmissions" [value]="t.name">{{ t.name }}</mat-option>
           </mat-select>
+          <mat-error *ngIf="vehiculoForm.get('transmision')?.hasError('required')">Seleccione la transmisión</mat-error>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline">
           <mat-label>Combustible *</mat-label>
-            <mat-select formControlName="tipo_combustible">
-              <mat-option *ngFor="let f of fuelTypes" [value]="f.name">
-                {{ f.name }}
-              </mat-option>
-            </mat-select>
+          <mat-select formControlName="tipo_combustible">
+            <mat-option *ngFor="let f of fuelTypes" [value]="f.name">{{ f.name }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="vehiculoForm.get('tipo_combustible')?.hasError('required')">Seleccione el tipo de combustible</mat-error>
         </mat-form-field>
       </div>
       
@@ -59,14 +66,33 @@
         <mat-form-field appearance="outline">
           <mat-label>Kilometraje</mat-label>
           <input matInput type="number" formControlName="kilometraje" placeholder="Ingrese el kilometraje">
+          <mat-error *ngIf="vehiculoForm.get('kilometraje')?.hasError('required')">El kilometraje es obligatorio</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('kilometraje')?.hasError('min')">No puede ser negativo</mat-error>
         </mat-form-field>
 
         <!-- Fecha Último Servicio -->
         <mat-form-field appearance="outline">
           <mat-label>Fecha Último Servicio</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="fecha_ultimo_servicio" placeholder="Elige la fecha">
+          <input matInput [matDatepicker]="picker"
+                [max]="today"
+                formControlName="fecha_ultimo_servicio"
+                placeholder="Elige la fecha" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="vehiculoForm.get('fecha_ultimo_servicio')?.hasError('required')">La fecha es obligatoria</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <!-- Detalle del Último Servicio -->
+        <mat-form-field appearance="outline">
+          <mat-label>Detalle del Último Servicio</mat-label>
+          <textarea matInput formControlName="detalle_ultimo_servicio"
+                    placeholder="Ej: Cambio de aceite, revisión de frenos"
+                    rows="3"></textarea>
+          <mat-error *ngIf="vehiculoForm.get('detalle_ultimo_servicio')?.hasError('required')">Este campo es obligatorio</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('detalle_ultimo_servicio')?.hasError('minlength')">Debe tener al menos 10 caracteres</mat-error>
+          <mat-error *ngIf="vehiculoForm.get('detalle_ultimo_servicio')?.hasError('maxlength')">Máximo 1000 caracteres</mat-error>
         </mat-form-field>
       </div>
       

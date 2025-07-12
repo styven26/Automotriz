@@ -49,6 +49,7 @@ class VehiculoController extends Controller
             'tipo_combustible' => 'required|string|max:50',
             'kilometraje' => 'nullable|integer|min:0',
             'fecha_ultimo_servicio' => 'nullable|date',
+            'detalle_ultimo_servicio' => 'nullable|string|max:1000',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -93,6 +94,7 @@ class VehiculoController extends Controller
             'tipo_combustible' => 'required|string|max:50',
             'kilometraje' => 'nullable|integer|min:0',
             'fecha_ultimo_servicio' => 'nullable|date',
+            'detalle_ultimo_servicio' => 'nullable|string|max:1000',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 

@@ -33,6 +33,7 @@ return new class extends Migration
 
             $table->integer('kilometraje')->default(0);
             $table->date('fecha_ultimo_servicio')->nullable();
+            $table->text('detalle_ultimo_servicio')->nullable()->comment('Descripción de lo realizado en la última fecha de servicio');
 
             // Imagen (ruta o nombre de archivo)
             $table->string('imagen', 255)->nullable();

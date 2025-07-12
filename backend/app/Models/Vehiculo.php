@@ -24,6 +24,7 @@ class Vehiculo extends Model
         'tipo_combustible',
         'kilometraje',
         'fecha_ultimo_servicio',
+        'detalle_ultimo_servicio',
         'imagen',
     ];
 

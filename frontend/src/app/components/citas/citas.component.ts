@@ -84,6 +84,7 @@ export class CitasComponent implements OnInit {
   // Control de formularios
   vehicleFormGroup: FormGroup;
   registered = false;      // ← Nueva bandera
+  today: Date = new Date(); // ← Aquí
 
   constructor(
     private vehiculoService: VehiculoService,
@@ -119,8 +120,20 @@ export class CitasComponent implements OnInit {
         Validators.min(0)
       ]],
       fecha_ultimo_servicio: [null, Validators.required],
+      detalle_ultimo_servicio: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(1000)
+        ]
+      ],
       imagen: [null, Validators.required]
     });       
+  }
+
+  get detalle_ultimo_servicio(): AbstractControl {
+    return this.vehicleFormGroup.get('detalle_ultimo_servicio')!;
   }
 
   ngOnInit(): void {

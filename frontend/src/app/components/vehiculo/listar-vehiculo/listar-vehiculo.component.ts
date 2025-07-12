@@ -57,7 +57,7 @@ export class ListarVehiculoComponent {
   tiempoRestante: string = '';
 
   // DataSource para la tabla de vehículos
-  displayedColumns: string[] = ['marca', 'modelo', 'anio', 'numero_placa', 'transmision', 'tipo_combustible', 'kilometraje', 'fecha_ultimo_servicio', 'imagen', 'acciones'];
+  displayedColumns: string[] = ['marca', 'modelo', 'anio', 'numero_placa', 'transmision', 'tipo_combustible', 'kilometraje', 'fecha_ultimo_servicio', 'detalle_ultimo_servicio' ,'imagen', 'acciones'];
   dataSource = new MatTableDataSource<any>();
 
   // Variable para mensajes de error

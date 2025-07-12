@@ -204,7 +204,15 @@
                     <td mat-cell *matCellDef="let vehiculo">
                       {{ vehiculo.fecha_ultimo_servicio | date:'dd/MM/yyyy' }}
                     </td>
-                  </ng-container>                  
+                  </ng-container>  
+                  
+                  <!-- Detalle Último Servicio Column -->
+                  <ng-container matColumnDef="detalle_ultimo_servicio">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Detalle Último Servicio </th>
+                    <td mat-cell *matCellDef="let vehiculo">
+                      {{ vehiculo.detalle_ultimo_servicio }}
+                    </td>
+                  </ng-container>
 
                   <!-- Imagen Column -->
                   <ng-container matColumnDef="imagen">

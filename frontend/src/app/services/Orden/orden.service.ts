@@ -47,7 +47,7 @@ export interface Orden {
     cliente: { cedula: string; nombre: string; telefono: string; apellido: string; correo?: string; };
     cedula_mecanico: string;    // ← agregado
   };
-  vehiculo: { id_vehiculo: number; marca: string; modelo: string; imagen?: string; kilometraje?:number; numero_placa?: string; fecha_ultimo_servicio?:string; };
+  vehiculo: { id_vehiculo: number; marca: string; modelo: string; imagen?: string; kilometraje?:number; numero_placa?: string; fecha_ultimo_servicio?:string; detalle_ultimo_servicio?: string;};
   detalles_servicios: DetalleServicio[];
   detalles_repuestos: DetalleRepuesto[];
 }
