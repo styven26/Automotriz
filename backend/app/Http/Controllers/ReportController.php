@@ -83,7 +83,7 @@ class ReportController extends Controller
             });
 
         if ($trabajos->isEmpty()) {
-            $mensaje = 'No hay órdenes atendidas para generar el reporte.';
+            $mensaje = 'No hay trabajos completados para generar el reporte.';
             $pdf = Pdf::loadView('reportes.sin_trabajos', compact('mensaje','mecanico'))
                     ->setPaper('A4', 'portrait')
                     ->setOption('isRemoteEnabled', true);
