@@ -33,7 +33,7 @@ import {MatSort} from '@angular/material/sort';
 })
 export class ListarTiposComponent {
 
-  displayedColumns: string[] = ['nombre', 'acciones'];
+  displayedColumns: string[] = ['nombre', 'activo', 'acciones'];
   dataSource!: MatTableDataSource<any>;
   filterValue: string = '';
 
@@ -208,10 +208,10 @@ export class ListarTiposComponent {
   eliminarTipoServicio(tipo: any): void {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `Estás a punto de eliminar el tipo de servicio: ${tipo.nombre}. ¡Esta acción no se puede deshacer!`,
+      text: `Estás a punto de desactivar el tipo de servicio: ${tipo.nombre}.`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Eliminar',
+      confirmButtonText: 'Desactivar',
       cancelButtonText: 'Cancelar',
       customClass: {
         confirmButton: 'btn btn-danger btn-rounded',
@@ -225,17 +225,47 @@ export class ListarTiposComponent {
   
         this.tiposService.eliminarTipoServicio(id).subscribe(
           () => {
-            Swal.fire('Eliminado', 'El tipo de servicio se ha eliminado con éxito.', 'success');
+            Swal.fire('Desactivado', 'El tipo de servicio se ha desactivado con éxito.', 'success');
             this.obtenerTiposServicios(); // refresca lista
           },
           (error) => {
-            console.error('Error al eliminar el tipo de servicio:', error);
-            Swal.fire('Error', 'Hubo un problema al eliminar el tipo de servicio.', 'error');
+            console.error('Error al desactivar el tipo de servicio:', error);
+            Swal.fire('Error', 'Hubo un problema al desactivar el tipo de servicio.', 'error');
           }
         );
       }
     });
   }  
+
+  reactivarTipoServicio(tipo: any): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Estás a punto de reactivar el tipo de servicio: ${tipo.nombre}.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Reactivar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-success btn-rounded',
+        cancelButton: 'btn btn-secondary btn-rounded'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const id = tipo.id_tipo;
+        this.tiposService.reactivarTipoServicio(id).subscribe(
+          () => {
+            Swal.fire('Reactivado', 'El tipo de servicio se ha reactivado con éxito.', 'success');
+            this.obtenerTiposServicios(); // refresca la lista
+          },
+          (error) => {
+            console.error('Error al reactivar el tipo de servicio:', error);
+            Swal.fire('Error', 'Hubo un problema al reactivar el tipo de servicio.', 'error');
+          }
+        );
+      }
+    });
+  }
 
   // Función de cierre de sesión
   logout(): void { 

@@ -158,7 +158,7 @@ class CitasController extends Controller
             'fecha'                 => 'required|date|after_or_equal:' . Carbon::today()->toDateString(),
             'hora'                  => 'required|date_format:H:i',
             'servicios'             => 'required|array|min:1',
-            'servicios.*'             => 'required|exists:servicios,id_servicio',
+            'servicios.*'           => 'required|exists:servicios,id_servicio',
         ]);
     
         // Configurar Carbon en español
@@ -914,13 +914,14 @@ class CitasController extends Controller
         $atendidaId = EstadoCita::where('nombre_estado', 'Atendida')
             ->value('id_estado');
 
-        // 2) Para cada servicio, cuento sus detalles (detalle_servicio)
+        // 2) Para cada servicio activo, cuento sus detalles (detalle_servicio)
         //    cuyos órdenes pertenecen a citas de este cliente y que estén "atendidas"
         $data = Servicio::select('id_servicio', 'nombre')
+            ->where('activo', true)  // <-- filtro para servicios activos
             ->withCount(['detalles as total_solicitudes' => function ($q) use ($cliente, $atendidaId) {
                 $q->whereHas('orden.cita', function ($q2) use ($cliente, $atendidaId) {
                     $q2->where('cedula_cliente', $cliente->cedula)
-                       ->where('id_estado', $atendidaId);
+                    ->where('id_estado', $atendidaId);
                 });
             }])
             ->get();

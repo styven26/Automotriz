@@ -191,19 +191,22 @@ Route::prefix('vendedor')->middleware('auth:vendedor')->group(function () {
 Route::prefix('public')->group(function () {
     
     // CRUD completo con Route Model Binding
-    Route::get   ('tipos-servicios',                [TipoServicioController::class, 'index']);
-    Route::post  ('tipos-servicios',                [TipoServicioController::class, 'store']);
-    Route::get   ('tipos-servicios/{tipoServicio}', [TipoServicioController::class, 'show']);
-    Route::put   ('tipos-servicios/{tipoServicio}', [TipoServicioController::class, 'update']);
-    Route::delete('tipos-servicios/{tipoServicio}', [TipoServicioController::class, 'destroy']);
-    Route::get('tipos-servicios/existe/{nombre}',   [TipoServicioController::class, 'verificarNombreExiste']);
+    Route::get   ('tipos-servicios',                  [TipoServicioController::class, 'index']);
+    Route::post  ('tipos-servicios',                  [TipoServicioController::class, 'store']);
+    Route::get   ('tipos-servicios/{tipoServicio}',   [TipoServicioController::class, 'show']);
+    Route::put   ('tipos-servicios/{tipoServicio}',   [TipoServicioController::class, 'update']);
+    Route::delete('tipos-servicios/{tipoServicio}',   [TipoServicioController::class, 'destroy']);
+    Route::patch ('tipos-servicios/{tipoServicio}/reactivar', [TipoServicioController::class, 'reactivar']);
+    Route::get   ('tipos-servicios/existe/{nombre}',  [TipoServicioController::class, 'verificarNombreExiste']);
 
     // Obtener servicios
-    Route::post('/servicios',                  [ServicioController::class, 'store']);
-    Route::get('/servicios',                   [ServicioController::class, 'index']);
-    Route::put('/servicios/{id}',              [ServicioController::class, 'update']);
-    Route::delete('/servicios/{id}',           [ServicioController::class, 'destroy']);
-    Route::get   ('servicios/existe/{nombre}', [ServicioController::class,'verificarNombreExiste']);
+    Route::post('/servicios',                   [ServicioController::class, 'store']);
+    Route::get('/servicios',                    [ServicioController::class, 'index']);
+    Route::put('/servicios/{id}',               [ServicioController::class, 'update']);
+    Route::delete('/servicios/{id}',            [ServicioController::class, 'destroy']);
+    Route::get   ('/servicios/existe/{nombre}', [ServicioController::class,'verificarNombreExiste']);
+    Route::patch('/servicios/{id}/reactivar',   [ServicioController::class, 'reactivar']);
+    Route::get   ('/servicios/activos',         [ServicioController::class, 'indexActivos']);
 
     // Obtener horarios
     Route::get('/horarios',            [HorarioController::class, 'index']); 

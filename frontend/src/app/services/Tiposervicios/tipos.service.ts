@@ -27,6 +27,10 @@ export class TiposService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  reactivarTipoServicio(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/reactivar`, {});
+  }
+
   verificarNombreExiste(nombre: string): Observable<boolean> {
     return this.http.get<boolean>(`${this.apiUrl}/existe/${nombre}`);
   }

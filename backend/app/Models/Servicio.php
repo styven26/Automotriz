@@ -21,6 +21,7 @@ class Servicio extends Model
         'precio_base',
         'iva',
         'precio',
+        'activo',
     ];
 
     protected static function booted()
@@ -50,5 +51,13 @@ class Servicio extends Model
     public function detalles()
     {
         return $this->hasMany(DetalleServicio::class, 'id_servicio', 'id_servicio');
+    }
+
+    /**
+     * Scope para filtrar servicios activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 }

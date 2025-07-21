@@ -26,5 +26,17 @@ export class SubtipoService {
   eliminarSubtipoServicio(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  reactivarSubtipoServicio(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/reactivar`, {});
+  }
+
+  obtenerSubtiposServiciosActivos(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/activos`);
+  }
+
+  verificarNombreExiste(nombre: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/existe/${nombre}`);
+  }
   
 }

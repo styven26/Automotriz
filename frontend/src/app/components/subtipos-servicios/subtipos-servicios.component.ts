@@ -33,7 +33,7 @@ import Swal from 'sweetalert2';
 })
 export class SubtiposServiciosComponent {
 
-  displayedColumns: string[] = ['tipo', 'nombre', 'descripcion', 'precio_base', 'iva', 'precio', 'acciones'];
+  displayedColumns: string[] = ['tipo', 'nombre', 'descripcion', 'precio_base', 'iva', 'precio', 'activo', 'acciones'];
   dataSource!: MatTableDataSource<any>;
   filterValue: string = '';
 
@@ -211,13 +211,43 @@ export class SubtiposServiciosComponent {
     });
   }  
 
+  reactivarSubtipoServicio(servicio: any): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Estás a punto de reactivar el subtipo de servicio: ${servicio.nombre}.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Reactivar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-success btn-rounded',
+        cancelButton: 'btn btn-secondary btn-rounded'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const id = servicio.id_servicio; // Asegúrate de usar la propiedad correcta
+        this.subtipoService.reactivarSubtipoServicio(id).subscribe(
+          () => {
+            Swal.fire('Reactivado', 'El servicio se ha reactivado con éxito.', 'success');
+            this.obtenerSubtiposServicios(); // refresca la lista
+          },
+          (error) => {
+            console.error('Error al reactivar el servicio:', error);
+            Swal.fire('Error', 'Hubo un problema al reactivar el servicio.', 'error');
+          }
+        );
+      }
+    });
+  }
+
   eliminarSubtipoServicio(servicio: any): void {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `Estás a punto de eliminar el servicio: ${servicio.nombre}. ¡Esta acción no se puede deshacer!`,
+      text: `Estás a punto de desactivar el servicio: ${servicio.nombre}. ¡Esta acción no se puede deshacer!`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Eliminar',
+      confirmButtonText: 'Desactivar',
       cancelButtonText: 'Cancelar',
       customClass: {
         confirmButton: 'btn btn-danger btn-rounded',
@@ -229,12 +259,12 @@ export class SubtiposServiciosComponent {
         // Usamos la propiedad correcta "id_servicio"
         this.subtipoService.eliminarSubtipoServicio(servicio.id_servicio).subscribe(
           (response) => {
-            Swal.fire('Eliminado', 'El servicio se ha eliminado con éxito.', 'success');
+            Swal.fire('Desactivado', 'El servicio se ha desactivado con éxito.', 'success');
             this.obtenerSubtiposServicios();
           },
           (error) => {
-            console.error('Error al eliminar el servicio:', error);
-            Swal.fire('Error', 'Hubo un problema al eliminar el servicio.', 'error');
+            console.error('Error al desactivar el servicio:', error);
+            Swal.fire('Error', 'Hubo un problema al desactivar el servicio.', 'error');
           }
         );
       }

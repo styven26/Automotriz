@@ -17,6 +17,8 @@ return new class extends Migration
 
             // Único para no repetir nombres
             $table->unique('nombre');
+
+            $table->boolean('activo')->default(true);
         });
     }
 

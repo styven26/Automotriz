@@ -11,7 +11,14 @@ class ServicioController extends Controller
     public function index()
     {
         // Incluimos el tipo para no hacer N+1
-        $servicios = Servicio::with('tipoServicio')->get();
+        $servicios = Servicio::with('tipoServicio')->get(); // sin filtro 'activo'
+        return response()->json($servicios);
+    }
+
+    public function indexActivos()
+    {
+        // Solo servicios activos
+        $servicios = Servicio::with('tipoServicio')->where('activo', true)->get();
         return response()->json($servicios);
     }
 
@@ -25,6 +32,9 @@ class ServicioController extends Controller
             'iva'           => 'required|integer|min:0',
             'precio'        => 'required|numeric|min:0',
         ]);
+
+        // Campo añadido por defecto
+        $validated['activo'] = true;
 
         $servicio = Servicio::create($validated);
 
@@ -51,6 +61,7 @@ class ServicioController extends Controller
             'precio_base'   => 'required|numeric|min:0',
             'iva'           => 'required|integer|min:0',
             'precio'        => 'required|numeric|min:0',
+            'activo'        => 'sometimes|boolean',
         ]);
 
         $servicio->update($validated);
@@ -64,10 +75,23 @@ class ServicioController extends Controller
     public function destroy($id)
     {
         $servicio = Servicio::findOrFail($id);
-        $servicio->delete();  // hard delete
+        $servicio->activo = false;
+        $servicio->save();
 
         return response()->json([
-            'message' => 'Servicio eliminado exitosamente'
+            'message' => 'Servicio desactivado exitosamente'
+        ]);
+    }
+
+    public function reactivar($id)
+    {
+        $servicio = Servicio::findOrFail($id);
+        $servicio->activo = true;
+        $servicio->save();
+
+        return response()->json([
+            'message' => 'Servicio reactivado exitosamente',
+            'servicio' => $servicio
         ]);
     }
 

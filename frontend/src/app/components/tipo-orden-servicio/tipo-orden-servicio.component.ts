@@ -58,14 +58,15 @@ export class TipoOrdenServicioComponent {
     private fb: FormBuilder,
     private tiposService: TiposService
   ) {
-    this.tipoOrdenForm = this.fb.group({
+   this.tipoOrdenForm = this.fb.group({
       nombre: [
         '',
         [
           Validators.required,
           Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/)
         ]
-      ]
+      ],
+      activo: [true]
     });
   }
 

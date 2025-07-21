@@ -89,6 +89,12 @@ export class TrabajosComponent {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     const file = input.files[0];
+    input.value = ''; // ← Reinicia input file para evitar problemas al volver a seleccionar
+
+    if (!this.selectedTrabajo || !this.selectedTrabajo.cita || !this.selectedTrabajo.cita.cliente) {
+      Swal.fire('Error', 'No hay trabajo seleccionado para enviar la foto', 'error');
+      return;
+    }
 
     const cliente = this.selectedTrabajo.cita.cliente;
     const nombreCompleto = `${cliente.nombre} ${cliente.apellido}`;
@@ -110,7 +116,7 @@ export class TrabajosComponent {
       return;
     }
 
-    // 2) Fallback: sube la imagen y comparte el enlace
+    // 2) Fallback: subir imagen al servidor y compartir por WhatsApp
     const formData = new FormData();
     formData.append('foto', file);
 
@@ -123,7 +129,7 @@ export class TrabajosComponent {
             `Por favor adquiere el repuesto y revisa la foto aquí:\n${url}`;
 
           const telefono = cliente.telefono.replace(/[^0-9]/g, '');
-          const waLink   = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
+          const waLink = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
           window.open(waLink, '_blank');
         },
         error: err => {

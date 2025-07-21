@@ -10,28 +10,28 @@
   <!-- Formulario del modal -->
   <form [formGroup]="tipoForm" (ngSubmit)="guardarCambios()">
     <div class="modal-body">
-        <!-- Nombre -->
-        <mat-form-field class="full-span" appearance="outline">
-          <mat-label>Nombre del Mantenimiento Automotriz</mat-label>
-          <textarea matInput formControlName="nombre" placeholder="Ingrese el nombre" ></textarea>
-  
-          <!-- Muestra errores de 'nombre' sin condición de touched/dirty -->
-          <mat-error *ngIf="tipoForm.get('nombre')?.hasError('required')">
-            El nombre es obligatorio.
-          </mat-error>
-          <mat-error *ngIf="tipoForm.get('nombre')?.hasError('maxlength')">
-            El nombre no puede exceder 50 caracteres.
-          </mat-error>
-          <mat-error *ngIf="tipoForm.get('nombre')?.hasError('pattern')">
-            Solo se permiten letras y espacios.
-          </mat-error>
-        </mat-form-field>
-      </div>
+      <!-- Nombre -->
+      <mat-form-field class="full-span" appearance="outline">
+        <mat-label>Nombre del Mantenimiento Automotriz</mat-label>
+        <textarea matInput formControlName="nombre" placeholder="Ingrese el nombre" ></textarea>
 
-        <!-- Footer con los botones de Cancelar y Guardar -->
-        <footer class="modal-footer">
-            <button class="btn-danger" mat-button type="button" (click)="cancelar()">Cancelar</button>
-            <button class="btn-success" mat-raised-button color="primary" type="submit">Guardar Cambios</button>
-        </footer>
+        <!-- Muestra errores de 'nombre' sin condición de touched/dirty -->
+        <mat-error *ngIf="tipoForm.get('nombre')?.hasError('required')">
+          El nombre es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="tipoForm.get('nombre')?.hasError('maxlength')">
+          El nombre no puede exceder 50 caracteres.
+        </mat-error>
+        <mat-error *ngIf="tipoForm.get('nombre')?.hasError('pattern')">
+          Solo se permiten letras y espacios.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Footer con los botones de Cancelar y Guardar -->
+    <footer class="modal-footer">
+        <button class="btn-danger" mat-button type="button" (click)="cancelar()">Cancelar</button>
+        <button class="btn-success" mat-raised-button color="primary" type="submit">Guardar Cambios</button>
+    </footer>
   </form>
 </div>

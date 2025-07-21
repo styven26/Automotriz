@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('citas', function (Blueprint $table) {
-            $table->id('id_cita'); // PK
+      Schema::create('citas', function (Blueprint $table) {
+         $table->id('id_cita'); // PK
 
             // FK a estados_citas (ej. "Pendiente", "Confirmada", "Cancelada", etc.)
             $table->unsignedBigInteger('id_estado');
@@ -66,7 +66,7 @@ return new class extends Migration
             // Timestamps y borrado lógico
             $table->timestamps();
             $table->softDeletes();
-        });
+      });
     }
 
     /**

@@ -251,41 +251,41 @@
       </div>
     </div>
       
-      <!-- Contenido Principal del Dashboard -->
-        <div class="main-content">
-          <div class="auth-container">
-            <div class="header">
-              <h2>Tipos de Servicios de Mantenimiento Automotriz</h2>
-              <p>Tipos de Servicios de Mantenimiento Automotriz</p>
-            </div><br>
+    <!-- Contenido Principal del Dashboard -->
+      <div class="main-content">
+        <div class="auth-container">
+          <div class="header">
+            <h2>Tipos de Servicios de Mantenimiento Automotriz</h2>
+            <p>Tipos de Servicios de Mantenimiento Automotriz</p>
+          </div><br>
 
-            <div class="form-container">
-                <form [formGroup]="tipoOrdenForm" (ngSubmit)="guardarTipoOrden()">
-                  
-                  <mat-form-field appearance="outline" class="half-width">
-                    <mat-label>Nombre del Tipo de Servicio de Mantenimiento</mat-label>
-                    <input
-                      matInput
-                      formControlName="nombre"
-                      placeholder="Ej. Mantenimiento Preventivo"
-                    />
-                    <mat-error *ngIf="tipoOrdenForm.get('nombre')?.hasError('required')">
-                      El nombre del tipo de servicio es obligatorio.
-                    </mat-error>
-                    <mat-error *ngIf="tipoOrdenForm.get('nombre')?.hasError('pattern')">
-                      Sólo letras y espacios, sin números.
-                    </mat-error>
-                    <mat-error *ngIf="nombreExistente">
-                      Ese tipo de servicio ya existe. Intente con otro nombre.
-                    </mat-error>
-                  </mat-form-field>
-              
-                  <button class="large-button" mat-flat-button color="primary" type="submit" [disabled]="tipoOrdenForm.invalid">
-                    Guardar Cambios
-                  </button>
-              
-                </form>
-            </div>            
-        </div>
+          <div class="form-container">
+              <form [formGroup]="tipoOrdenForm" (ngSubmit)="guardarTipoOrden()">
+                
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>Nombre del Tipo de Servicio de Mantenimiento</mat-label>
+                  <input
+                    matInput
+                    formControlName="nombre"
+                    placeholder="Ej. Mantenimiento Preventivo"
+                  />
+                  <mat-error *ngIf="tipoOrdenForm.get('nombre')?.hasError('required')">
+                    El nombre del tipo de servicio es obligatorio.
+                  </mat-error>
+                  <mat-error *ngIf="tipoOrdenForm.get('nombre')?.hasError('pattern')">
+                    Sólo letras y espacios, sin números.
+                  </mat-error>
+                  <mat-error *ngIf="nombreExistente">
+                    Ese tipo de servicio ya existe. Intente con otro nombre.
+                  </mat-error>
+                </mat-form-field>
+                
+                <button class="large-button" mat-flat-button color="primary" type="submit" [disabled]="tipoOrdenForm.invalid">
+                  Guardar Cambios
+                </button>
+            
+              </form>
+          </div>            
+      </div>
     </div>      
 </div>   

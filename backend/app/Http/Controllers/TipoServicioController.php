@@ -23,6 +23,7 @@ class TipoServicioController extends Controller
             'nombre.unique'   => 'Ese tipo de servicio ya existe.',
         ]);
 
+        $validated['activo'] = true;
         return response()->json(TipoServicio::create($validated), 201);
     }
 
@@ -38,6 +39,7 @@ class TipoServicioController extends Controller
         $validated = $request->validate([
             // Asegúrate de usar el nombre real de la PK en la regla unique
             'nombre' => "required|string|max:100|unique:tipo_servicio,nombre,{$tipoServicio->id_tipo},id_tipo",
+            'activo' => 'sometimes|boolean',
         ], [
             'nombre.required' => 'Debes enviar un nombre.',
             'nombre.unique'   => 'Ese tipo de servicio ya existe.',
@@ -50,8 +52,10 @@ class TipoServicioController extends Controller
     /** Eliminar un tipo (binding) */
     public function destroy(TipoServicio $tipoServicio)
     {
-        $tipoServicio->delete();
-        return response()->json(['message' => 'Tipo de servicio eliminado'], 200);
+        $tipoServicio->activo = false;
+        $tipoServicio->save();
+
+        return response()->json(['message' => 'Tipo de servicio desactivado'], 200);
     }
 
     /** Verificar si un nombre ya existe */
@@ -59,5 +63,14 @@ class TipoServicioController extends Controller
     {
         $existe = TipoServicio::where('nombre', $nombre)->exists();
         return response()->json($existe);
+    }
+
+    /** Reactivar un tipo */
+    public function reactivar(TipoServicio $tipoServicio)
+    {
+        $tipoServicio->activo = true;
+        $tipoServicio->save();
+
+        return response()->json(['message' => 'Tipo de servicio reactivado'], 200);
     }
 }

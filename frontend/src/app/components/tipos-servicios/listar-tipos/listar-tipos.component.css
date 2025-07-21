@@ -10,6 +10,13 @@
   background-color: #f9fafc; 
 }
 
+.icon-activo {
+  color: #2e7d32; /* verde */
+}
+.icon-inactivo {
+  color: #c62828; /* rojo */
+}
+
 .sidebar {
   flex-direction: column; /* Organiza los elementos en columna */
   display: flex;

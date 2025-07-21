@@ -301,6 +301,15 @@
                             <th mat-header-cell *matHeaderCellDef mat-sort-header> Precio Total </th>
                             <td mat-cell *matCellDef="let servicio"> {{servicio.precio | currency}} </td>
                         </ng-container>
+
+                        <ng-container matColumnDef="activo">
+                          <th mat-header-cell *matHeaderCellDef mat-sort-header>Activo</th>
+                          <td mat-cell *matCellDef="let tipo" class="activo-cell">
+                            <mat-icon [ngClass]="tipo.activo ? 'icon-activo' : 'icon-inactivo'">
+                              {{ tipo.activo ? 'check_circle' : 'cancel' }}
+                            </mat-icon>
+                          </td>
+                        </ng-container>
                         
                         <ng-container matColumnDef="acciones">
                             <th mat-header-cell *matHeaderCellDef class="acciones-header">Acciones</th>
@@ -311,6 +320,9 @@
                                     </button>
                                     <button mat-icon-button color="warn" (click)="eliminarSubtipoServicio(servicio)">
                                         <mat-icon>delete</mat-icon>
+                                    </button>
+                                    <button *ngIf="!servicio.activo" mat-icon-button color="primary" aria-label="Reactivar" (click)="reactivarSubtipoServicio(servicio)" title="Reactivar">
+                                      <mat-icon>refresh</mat-icon>
                                     </button>
                                 </div>
                             </td>

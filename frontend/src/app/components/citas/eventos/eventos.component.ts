@@ -170,7 +170,7 @@ export class EventosComponent {
   }
 
   cargarServicios(): void {
-    this.subtipoService.obtenerSubtiposServicios().subscribe(
+    this.subtipoService.obtenerSubtiposServiciosActivos().subscribe(
       (response: any[]) => {
         this.servicios = response;
 

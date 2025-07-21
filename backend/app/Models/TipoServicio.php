@@ -20,6 +20,7 @@ class TipoServicio extends Model
     // Campos asignables
     protected $fillable = [
         'nombre',
+        'activo',
     ];
 
     /**
@@ -28,5 +29,13 @@ class TipoServicio extends Model
     public function servicios()
     {
         return $this->hasMany(Servicio::class, 'id_tipo', 'id_tipo');
+    }
+
+    /**
+     * Scope para obtener solo los tipos activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 }

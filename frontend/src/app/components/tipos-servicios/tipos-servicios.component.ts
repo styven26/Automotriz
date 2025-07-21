@@ -93,6 +93,7 @@ export class TiposServiciosComponent implements OnInit {
         ]
       ],
       precio: [{ value: 0, disabled: true }],
+      activo: [true, Validators.required],
     });             
   }
 
@@ -202,12 +203,13 @@ export class TiposServiciosComponent implements OnInit {
   guardarDatos(): void {
     if (this.tipoSubtipoForm.valid) {  
       const datos = {
-        id_tipo:     this.tipoSubtipoForm.value.id_tipo,      // <— nuevo
+        id_tipo:     this.tipoSubtipoForm.value.id_tipo,
         nombre:      this.tipoSubtipoForm.value.nombre,
         descripcion: this.tipoSubtipoForm.value.descripcion,
         precio_base: this.tipoSubtipoForm.value.precio_base,
         iva:         this.tipoSubtipoForm.value.iva,
         precio:      parseFloat(this.tipoSubtipoForm.get('precio')?.value),
+        activo:     this.tipoSubtipoForm.value.activo
       };
       
       if (this.tipoSubtipoForm.value.id_servicio !== null) {
@@ -246,7 +248,8 @@ export class TiposServiciosComponent implements OnInit {
       descripcion: datos.descripcion,
       precio_base: datos.precio_base,
       iva: datos.iva,
-      precio: datos.precio
+      precio: datos.precio,
+      activo: datos.activo
     };
   
     this.subtipoService.crearSubtipoServicio(subtipoData).subscribe(
